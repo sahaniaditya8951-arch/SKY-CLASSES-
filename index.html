@@ -42,7 +42,7 @@
         .hero-section p { font-size: 1.2rem; color: #E0E0E0; font-weight: 300; }
 
         /* Subject Cards */
-        .subject-card { background: white; border-radius: 16px; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.08); transition: all 0.4s ease; border: 1px solid #eee; height: 100%; }
+        .subject-card { background: white; border-radius: 16px; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.08); transition: all 0.4s ease; border: 1px solid #eee; height: 100%; cursor: pointer; }
         .subject-card:hover { transform: translateY(-15px); box-shadow: 0 20px 40px rgba(0,0,0,0.15); border-color: var(--accent-gold); }
         .subject-img { height: 220px; width: 100%; object-fit: cover; }
         .subject-body { padding: 30px; text-align: center; }
@@ -51,6 +51,7 @@
         .subject-features { list-style: none; padding: 0; text-align: left; margin-bottom: 0; color: #555; }
         .subject-features li { margin-bottom: 10px; font-size: 15px; }
         .subject-features i { color: var(--accent-gold); margin-right: 8px; }
+        .click-hint { font-size: 13px; color: var(--accent-red); margin-top: 15px; font-weight: 600; }
 
         /* Board Prep Banner */
         .board-banner { background: var(--primary-blue); color: white; padding: 80px 0; margin-top: 80px; position: relative; }
@@ -73,6 +74,12 @@
         .footer-logo span { color: var(--accent-red); }
         .footer-contact p { margin-bottom: 10px; font-size: 15px;}
         .footer-contact i { color: var(--accent-gold); width: 25px; }
+
+        /* Modal Customization */
+        .modal-header { background-color: var(--primary-blue); color: white; border-bottom: 3px solid var(--accent-gold); }
+        .modal-title { font-weight: 700; }
+        .modal-body ul { list-style-type: square; color: #444; }
+        .modal-body ul li { margin-bottom: 8px; }
     </style>
 </head>
 <body>
@@ -102,7 +109,7 @@
     <section class="container" style="margin-top: -60px; position: relative; z-index: 10;">
         <div class="row g-4 justify-content-center">
             <div class="col-lg-4 col-md-6">
-                <div class="subject-card">
+                <div class="subject-card" data-bs-toggle="modal" data-bs-target="#physicsModal">
                     <img src="https://images.unsplash.com/photo-1636466497217-26a8cbeaf0aa?auto=format&fit=crop&w=800&q=80" alt="Physics Class" class="subject-img">
                     <div class="subject-body">
                         <h3 class="subject-title">Physics</h3>
@@ -112,11 +119,12 @@
                             <li><i class="fa-solid fa-check"></i> Complex concepts simplified</li>
                             <li><i class="fa-solid fa-check"></i> Single subject enrollment available</li>
                         </ul>
+                        <div class="click-hint">Click for Syllabus & Details <i class="fa-solid fa-arrow-pointer ms-1"></i></div>
                     </div>
                 </div>
             </div>
             <div class="col-lg-4 col-md-6">
-                <div class="subject-card">
+                <div class="subject-card" data-bs-toggle="modal" data-bs-target="#chemistryModal">
                     <img src="https://images.unsplash.com/photo-1532094349884-543bc11b234d?auto=format&fit=crop&w=800&q=80" alt="Chemistry Class" class="subject-img">
                     <div class="subject-body">
                         <h3 class="subject-title">Chemistry</h3>
@@ -126,11 +134,12 @@
                             <li><i class="fa-solid fa-check"></i> In-depth periodic table analysis</li>
                             <li><i class="fa-solid fa-check"></i> Focus on chemical equations</li>
                         </ul>
+                        <div class="click-hint">Click for Syllabus & Details <i class="fa-solid fa-arrow-pointer ms-1"></i></div>
                     </div>
                 </div>
             </div>
             <div class="col-lg-4 col-md-6">
-                <div class="subject-card">
+                <div class="subject-card" data-bs-toggle="modal" data-bs-target="#biologyModal">
                     <img src="https://images.unsplash.com/photo-1576086213369-97a306d36557?auto=format&fit=crop&w=800&q=80" alt="Biology Class" class="subject-img">
                     <div class="subject-body">
                         <h3 class="subject-title">Biology</h3>
@@ -140,6 +149,7 @@
                             <li><i class="fa-solid fa-check"></i> Botany & Zoology special focus</li>
                             <li><i class="fa-solid fa-check"></i> Excellent for Medical aspirants</li>
                         </ul>
+                        <div class="click-hint">Click for Syllabus & Details <i class="fa-solid fa-arrow-pointer ms-1"></i></div>
                     </div>
                 </div>
             </div>
@@ -241,6 +251,87 @@
         </div>
     </footer>
 
+    <div class="modal fade" id="physicsModal" tabindex="-1" aria-labelledby="physicsModalLabel" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="physicsModalLabel"><i class="fa-solid fa-atom me-2 text-warning"></i> Physics Details</h5>
+            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            <h6 class="fw-bold text-primary mb-3">Course Highlights:</h6>
+            <ul>
+                <li>Complete NCERT coverage for Board Exams.</li>
+                <li>Special numerical practice sessions.</li>
+                <li>Foundation building for NEET/JEE.</li>
+                <li>Weekly test and performance tracking.</li>
+            </ul>
+            <hr>
+            <p class="mb-1"><strong><i class="fa-regular fa-clock text-danger me-2"></i> Duration:</strong> 1 Year / Crash Course available.</p>
+            <p class="mb-1"><strong><i class="fa-solid fa-wallet text-success me-2"></i> Fees:</strong> ₹2,000 per month.</p>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            <a href="#enroll" class="btn btn-danger" data-bs-dismiss="modal" onclick="document.getElementById('courseSelect').value='Only Physics (Single)';">Enroll Now</a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="modal fade" id="chemistryModal" tabindex="-1" aria-labelledby="chemistryModalLabel" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="chemistryModalLabel"><i class="fa-solid fa-flask me-2 text-warning"></i> Chemistry Details</h5>
+            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            <h6 class="fw-bold text-primary mb-3">Course Highlights:</h6>
+            <ul>
+                <li>Master Organic, Inorganic & Physical Chemistry.</li>
+                <li>Tricks to remember the Periodic Table and Equations.</li>
+                <li>Thorough preparation for 12th Boards.</li>
+                <li>Doubt solving sessions after every chapter.</li>
+            </ul>
+            <hr>
+            <p class="mb-1"><strong><i class="fa-regular fa-clock text-danger me-2"></i> Duration:</strong> 1 Year / Crash Course available.</p>
+            <p class="mb-1"><strong><i class="fa-solid fa-wallet text-success me-2"></i> Fees:</strong> ₹2,000 per month.</p>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            <a href="#enroll" class="btn btn-danger" data-bs-dismiss="modal" onclick="document.getElementById('courseSelect').value='Only Chemistry (Single)';">Enroll Now</a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="modal fade" id="biologyModal" tabindex="-1" aria-labelledby="biologyModalLabel" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="biologyModalLabel"><i class="fa-solid fa-microscope me-2 text-warning"></i> Biology Details</h5>
+            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            <h6 class="fw-bold text-primary mb-3">Course Highlights:</h6>
+            <ul>
+                <li>Detailed study of Botany and Zoology.</li>
+                <li>Focus on diagrams and labeling for Boards.</li>
+                <li>NEET-oriented objective questions practice.</li>
+                <li>Interactive learning with visual aids.</li>
+            </ul>
+            <hr>
+            <p class="mb-1"><strong><i class="fa-regular fa-clock text-danger me-2"></i> Duration:</strong> 1 Year / Crash Course available.</p>
+            <p class="mb-1"><strong><i class="fa-solid fa-wallet text-success me-2"></i> Fees:</strong> ₹2,000 per month.</p>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            <a href="#enroll" class="btn btn-danger" data-bs-dismiss="modal" onclick="document.getElementById('courseSelect').value='Only Biology (Single)';">Enroll Now</a>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <script>
         (function(){
             // Aapki Public Key
@@ -283,5 +374,7 @@
                 });
         }
     </script>
+    
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
