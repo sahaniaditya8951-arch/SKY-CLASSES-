@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sky Classes | AI Face Registration</title>
+    <title>Sky Classes | Fast AI Face Registration</title>
     
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -30,11 +30,11 @@
         .sky { color: #0A2540; } .classes { color: #D90429; }
         
         .camera-container {
-            position: relative; width: 100%; max-width: 320px; height: 320px; /* Square for better focus */
+            position: relative; width: 100%; max-width: 320px; height: 320px;
             margin: 0 auto 20px; border-radius: 15px; overflow: hidden;
             border: 4px solid #E6B31E; background: #000;
         }
-        /* YAHAN FIX KIYA HAI: scaleX(-1) se camera seedha ho jayega */
+        /* Mirror Fix */
         video, canvas { 
             position: absolute; top: 0; left: 0; 
             width: 100%; height: 100%; 
@@ -59,14 +59,14 @@
 <body>
 
     <div class="loading-overlay" id="loadingScreen">
-        <i class="fa-solid fa-microchip fa-spin" style="font-size: 50px; color: #E6B31E; margin-bottom: 20px;"></i>
-        <h3 class="fw-bold">Initializing Sky AI...</h3>
-        <p class="text-white text-center px-4">Please wait 10-15 seconds. Downloading AI Face Recognition Models.</p>
+        <i class="fa-solid fa-bolt fa-bounce" style="font-size: 50px; color: #E6B31E; margin-bottom: 20px;"></i>
+        <h3 class="fw-bold">Starting Lightning AI...</h3>
+        <p class="text-white text-center px-4">Loading Fast Face Detector. Just a second!</p>
     </div>
 
     <div class="scanner-box">
         <div class="logo"><span class="sky">SKY</span> <span class="classes">CLASSES</span></div>
-        <h5 class="text-muted fw-bold mb-4">New Student AI Registration</h5>
+        <h5 class="text-muted fw-bold mb-4">Fast Student Registration</h5>
         
         <div class="camera-container">
             <video id="video" autoplay muted playsinline></video>
@@ -103,11 +103,11 @@
         const statusText = document.getElementById('statusText');
         const registerBtn = document.getElementById('registerBtn');
 
-        // Load AI Models
+        // Yahan 'tinyFaceDetector' lagaya hai jo bohot fast hai
         const MODEL_URL = 'https://cdn.jsdelivr.net/npm/@vladmandic/face-api/model/';
         
         Promise.all([
-            faceapi.nets.ssdMobilenetv1.loadFromUri(MODEL_URL),
+            faceapi.nets.tinyFaceDetector.loadFromUri(MODEL_URL),
             faceapi.nets.faceLandmark68Net.loadFromUri(MODEL_URL),
             faceapi.nets.faceRecognitionNet.loadFromUri(MODEL_URL)
         ]).then(startVideo).catch(err => {
@@ -115,7 +115,6 @@
             statusText.innerHTML = "Error loading AI. Please refresh the page.";
         });
 
-        // Start Webcam
         function startVideo() {
             navigator.mediaDevices.getUserMedia({ video: { facingMode: "user" } })
                 .then(stream => {
@@ -127,44 +126,39 @@
                 });
         }
 
-        // Live Face Tracking (Draws Blue Box)
         video.addEventListener('play', () => {
             document.getElementById('loadingScreen').style.display = 'none';
             
-            // Sync canvas size with video
             const displaySize = { width: video.clientWidth, height: video.clientHeight };
             faceapi.matchDimensions(canvas, displaySize);
 
-            // Continuously scan for face
+            // Har 0.2 second me scan karega (Fast detection)
             setInterval(async () => {
-                const detection = await faceapi.detectSingleFace(video).withFaceLandmarks();
+                // TinyFaceDetector options use kar rahe hain
+                const detection = await faceapi.detectSingleFace(video, new faceapi.TinyFaceDetectorOptions()).withFaceLandmarks();
                 
                 const ctx = canvas.getContext('2d');
                 ctx.clearRect(0, 0, canvas.width, canvas.height);
 
                 if (detection) {
-                    // Face Found - Enable Button
                     statusText.innerHTML = "<i class='fa-solid fa-lock text-success me-2'></i> Face Locked! You can Register now.";
                     statusText.style.color = "#28a745";
                     registerBtn.disabled = false;
                     registerBtn.innerHTML = "<i class='fa-solid fa-camera me-2'></i> Capture & Save Data";
-                    registerBtn.style.background = "#28a745"; // Green button
+                    registerBtn.style.background = "#28a745"; 
                     
-                    // Draw Box
                     const resizedDetection = faceapi.resizeResults(detection, displaySize);
                     faceapi.draw.drawDetections(canvas, resizedDetection);
                 } else {
-                    // Face Lost - Disable Button
                     statusText.innerHTML = "<i class='fa-solid fa-spinner fa-spin text-warning me-2'></i> Align your face in the center...";
                     statusText.style.color = "#E6B31E";
                     registerBtn.disabled = true;
                     registerBtn.innerHTML = "<i class='fa-solid fa-face-viewfinder me-2'></i> Waiting for Face Lock...";
                     registerBtn.style.background = "#0A2540";
                 }
-            }, 500); // Check every 0.5 seconds
+            }, 200); 
         });
 
-        // Capture and Register
         async function registerFace() {
             const name = document.getElementById('studentName').value;
             const phone = document.getElementById('studentPhone').value;
@@ -178,17 +172,18 @@
             registerBtn.innerHTML = "<i class='fa-solid fa-spinner fa-spin me-2'></i> Generating AI Face ID...";
             registerBtn.disabled = true;
 
-            // Final Deep Scan
-            const detection = await faceapi.detectSingleFace(video).withFaceLandmarks().withFaceDescriptor();
+            // Final Fast Scan
+            const detection = await faceapi.detectSingleFace(video, new faceapi.TinyFaceDetectorOptions()).withFaceLandmarks().withFaceDescriptor();
 
             if (!detection) {
                 alert("Face lock lost! Please look at the camera again.");
+                registerBtn.disabled = false;
+                registerBtn.innerHTML = "<i class='fa-solid fa-camera me-2'></i> Capture & Save Data";
                 return;
             }
 
             const faceDataArray = Array.from(detection.descriptor);
 
-            // Save to Firebase
             db.ref('Face_Data/' + phone).set({
                 Name: name,
                 Phone: phone,
