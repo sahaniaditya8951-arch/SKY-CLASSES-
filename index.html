@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sky Classes | Premium Education in Gorakhpur</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
+    
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
+    
+    <style>
+        :root { 
+            --primary-dark: #001A33; 
+            --primary-blue: #003366; 
+            --accent-gold: #D4AF37; 
+            --accent-red: #C8102E; 
+            --bg-light: #F8F9FA;
+        }
+        
+        body { font-family: 'Poppins', sans-serif; background-color: var(--bg-light); color: #333; overflow-x: hidden;}
+        
+        /* Navbar */
+        .navbar { background: white; padding: 15px 0; box-shadow: 0 4px 20px rgba(0,0,0,0.05); }
+        .logo-text { font-family: 'Playfair Display', serif; font-size: 32px; font-weight: 700; letter-spacing: 1px;}
+        .logo-text .sky { color: var(--primary-blue); }
+        .logo-text .classes { color: var(--accent-red); }
+        .nav-contact i { color: var(--accent-gold); font-size: 20px; vertical-align: middle;}
+
+        /* Hero Banner */
+        .hero-section {
+            background: linear-gradient(to right, rgba(0, 26, 51, 0.9), rgba(0, 26, 51, 0.7)), 
+                        url('https://images.unsplash.com/photo-1523240795612-9a054b0db644?auto=format&fit=crop&w=1920&q=80') center/cover no-repeat;
+            color: white; padding: 140px 0 100px; position: relative; border-bottom: 5px solid var(--accent-gold);
+        }
+        .hero-badge { background: var(--accent-gold); color: var(--primary-dark); padding: 8px 20px; border-radius: 30px; font-weight: 600; font-size: 14px; letter-spacing: 1px; display: inline-block; margin-bottom: 25px; box-shadow: 0 4px 15px rgba(212, 175, 55, 0.4);}
+        .hero-section h1 { font-size: 4rem; font-weight: 700; line-height: 1.2; margin-bottom: 20px; }
+        .hero-section p { font-size: 1.2rem; color: #E0E0E0; font-weight: 300; }
+
+        /* Subject Cards */
+        .subject-card { background: white; border-radius: 16px; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.08); transition: all 0.4s ease; border: 1px solid #eee; height: 100%; }
+        .subject-card:hover { transform: translateY(-15px); box-shadow: 0 20px 40px rgba(0,0,0,0.15); border-color: var(--accent-gold); }
+        .subject-img { height: 220px; width: 100%; object-fit: cover; }
+        .subject-body { padding: 30px; text-align: center; }
+        .subject-title { font-weight: 700; color: var(--primary-dark); font-size: 24px; margin-bottom: 10px; }
+        .fee-badge { background: #f0f4f8; color: var(--primary-blue); padding: 10px 20px; border-radius: 8px; font-weight: 700; font-size: 20px; display: inline-block; margin-bottom: 20px; border: 1px dashed var(--primary-blue);}
+        .subject-features { list-style: none; padding: 0; text-align: left; margin-bottom: 0; color: #555; }
+        .subject-features li { margin-bottom: 10px; font-size: 15px; }
+        .subject-features i { color: var(--accent-gold); margin-right: 8px; }
+
+        /* Board Prep Banner */
+        .board-banner { background: var(--primary-blue); color: white; padding: 80px 0; margin-top: 80px; position: relative; }
+        .board-banner h2 { font-weight: 700; color: var(--accent-gold); }
+        .board-icon-box { text-align: center; margin-top: 30px; }
+        .board-icon-box i { font-size: 45px; color: var(--accent-gold); margin-bottom: 15px; }
+        
+        /* Admission Section */
+        .admission-section { padding: 100px 0; background: white; }
+        .admission-img { width: 100%; height: 100%; object-fit: cover; border-radius: 20px; box-shadow: 0 15px 40px rgba(0,0,0,0.1); }
+        .form-container { background: var(--bg-light); padding: 45px; border-radius: 20px; border-top: 6px solid var(--primary-blue); box-shadow: 0 10px 30px rgba(0,0,0,0.05); }
+        .form-control, .form-select { border-radius: 8px; padding: 12px 15px; border: 1px solid #ccc; font-size: 15px; }
+        .form-control:focus, .form-select:focus { border-color: var(--accent-gold); box-shadow: 0 0 0 0.2rem rgba(212, 175, 55, 0.25); }
+        .btn-submit { background: var(--primary-blue); color: white; font-weight: 600; padding: 15px; border-radius: 8px; border: none; width: 100%; transition: 0.3s; letter-spacing: 1px;}
+        .btn-submit:hover { background: var(--accent-gold); color: var(--primary-dark); transform: translateY(-2px); }
+
+        /* Footer */
+        .footer { background: var(--primary-dark); color: #ccc; padding: 60px 0 20px; border-top: 5px solid var(--accent-red); }
+        .footer-logo { font-family: 'Playfair Display', serif; font-size: 28px; font-weight: 700; color: white; margin-bottom: 20px;}
+        .footer-logo span { color: var(--accent-red); }
+        .footer-contact p { margin-bottom: 10px; font-size: 15px;}
+        .footer-contact i { color: var(--accent-gold); width: 25px; }
+    </style>
+</head>
+<body>
+
+    <nav class="navbar sticky-top">
+        <div class="container d-flex justify-content-between align-items-center">
+            <div class="logo-text"><span class="sky">SKY</span> <span class="classes">CLASSES</span></div>
+            <div class="nav-contact d-none d-md-block">
+                <span class="fw-bold text-dark"><i class="fa-solid fa-phone me-1"></i> 9453080133</span>
+            </div>
+        </div>
+    </nav>
+
+    <header class="hero-section">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-8">
+                    <div class="hero-badge"><i class="fa-solid fa-crown me-2"></i> 30+ Years of Unmatched Legacy</div>
+                    <h1>Igniting Minds.<br><span style="color: var(--accent-gold);">Elevating Results.</span></h1>
+                    <p class="mt-3 mb-4">Gorakhpur's premier institute for Board Exams, Science & Competitive English. Learn under the expert mentorship of <strong>Director Sandesh Samant</strong>.</p>
+                    <a href="#enroll" class="btn btn-light btn-lg fw-bold px-4 py-3" style="border-radius: 50px; color: var(--primary-dark);">Start Your Journey <i class="fa-solid fa-arrow-right ms-2"></i></a>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <section class="container" style="margin-top: -60px; position: relative; z-index: 10;">
+        <div class="row g-4 justify-content-center">
+            <div class="col-lg-4 col-md-6">
+                <div class="subject-card">
+                    <img src="https://images.unsplash.com/photo-1636466497217-26a8cbeaf0aa?auto=format&fit=crop&w=800&q=80" alt="Physics Class" class="subject-img">
+                    <div class="subject-body">
+                        <h3 class="subject-title">Physics</h3>
+                        <div class="fee-badge">₹2,000 / Month</div>
+                        <ul class="subject-features">
+                            <li><i class="fa-solid fa-check"></i> Boards to NEET/JEE Foundation</li>
+                            <li><i class="fa-solid fa-check"></i> Complex concepts simplified</li>
+                            <li><i class="fa-solid fa-check"></i> Single subject enrollment available</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-4 col-md-6">
+                <div class="subject-card">
+                    <img src="https://images.unsplash.com/photo-1532094349884-543bc11b234d?auto=format&fit=crop&w=800&q=80" alt="Chemistry Class" class="subject-img">
+                    <div class="subject-body">
+                        <h3 class="subject-title">Chemistry</h3>
+                        <div class="fee-badge">₹2,000 / Month</div>
+                        <ul class="subject-features">
+                            <li><i class="fa-solid fa-check"></i> Theory + Practical understanding</li>
+                            <li><i class="fa-solid fa-check"></i> In-depth periodic table analysis</li>
+                            <li><i class="fa-solid fa-check"></i> Focus on chemical equations</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-4 col-md-6">
+                <div class="subject-card">
+                    <img src="https://images.unsplash.com/photo-1576086213369-97a306d36557?auto=format&fit=crop&w=800&q=80" alt="Biology Class" class="subject-img">
+                    <div class="subject-body">
+                        <h3 class="subject-title">Biology</h3>
+                        <div class="fee-badge">₹2,000 / Month</div>
+                        <ul class="subject-features">
+                            <li><i class="fa-solid fa-check"></i> Interactive diagrams & charts</li>
+                            <li><i class="fa-solid fa-check"></i> Botany & Zoology special focus</li>
+                            <li><i class="fa-solid fa-check"></i> Excellent for Medical aspirants</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="board-banner">
+        <div class="container text-center">
+            <h2 class="display-5 mb-3">Target: 10th & 12th Board Excellence</h2>
+            <p class="lead text-light mb-5">We provide integrated classes for students wanting to study all subjects (PCM/PCB). Our structured approach guarantees top-tier performance.</p>
+            <div class="row g-4">
+                <div class="col-md-4 board-icon-box">
+                    <i class="fa-solid fa-pen-nib"></i>
+                    <h4 class="text-white fw-bold">Sample Papers</h4>
+                    <p class="small text-light">Rigorous practice with latest board patterns.</p>
+                </div>
+                <div class="col-md-4 board-icon-box">
+                    <i class="fa-solid fa-book-open"></i>
+                    <h4 class="text-white fw-bold">Dedicated Notes</h4>
+                    <p class="small text-light">Premium study material for quick revision.</p>
+                </div>
+                <div class="col-md-4 board-icon-box">
+                    <i class="fa-solid fa-users-rays"></i>
+                    <h4 class="text-white fw-bold">Doubt Sessions</h4>
+                    <p class="small text-light">1-on-1 interaction to clear every concept.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="admission-section" id="enroll">
+        <div class="container">
+            <div class="row align-items-center g-5">
+                <div class="col-lg-6">
+                    <img src="https://images.unsplash.com/photo-1577896851231-70ef18881754?auto=format&fit=crop&w=800&q=80" alt="Counseling" class="admission-img">
+                    <div class="mt-4 ms-2">
+                        <h3 class="fw-bold" style="color: var(--primary-dark);">Visit Our Campus</h3>
+                        <p class="text-muted"><i class="fa-solid fa-location-dot text-danger me-2"></i> RS Tower, Khajanchi Chowk, Gorakhpur</p>
+                    </div>
+                </div>
+                
+                <div class="col-lg-6">
+                    <div class="form-container">
+                        <div class="text-center mb-4">
+                            <h3 class="fw-bold" style="color: var(--primary-dark);">Student Admission Enquiry</h3>
+                            <p class="text-muted small">Fill out the form to request a callback regarding fees, batch timings, and registration.</p>
+                        </div>
+                        
+                        <form id="admissionForm">
+                            <div class="mb-3">
+                                <label class="form-label fw-bold text-secondary small">Student Full Name *</label>
+                                <input type="text" class="form-control" id="studentName" placeholder="Enter name" required>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label fw-bold text-secondary small">Mobile Number *</label>
+                                <input type="tel" class="form-control" id="studentPhone" placeholder="10-digit number" required>
+                            </div>
+                            <div class="mb-4">
+                                <label class="form-label fw-bold text-secondary small">Select Course/Subject Preference *</label>
+                                <select class="form-select" id="courseSelect">
+                                    <option value="Only Physics (Single)">Only Physics (Single Subject)</option>
+                                    <option value="Only Chemistry (Single)">Only Chemistry (Single Subject)</option>
+                                    <option value="Only Biology (Single)">Only Biology (Single Subject)</option>
+                                    <option value="All Subjects (PCM/PCB) Boards">All Subjects (PCM/PCB) Boards</option>
+                                    <option value="English (Competitive - NDA/SSC)">English (Competitive - NDA/SSC/UPSC)</option>
+                                    <option value="English (Spoken & Grammar)">English (Spoken & Grammar)</option>
+                                </select>
+                            </div>
+                            <button type="button" id="submitBtn" class="btn-submit" onclick="submitAdmission()">
+                                SUBMIT APPLICATION <i class="fa-solid fa-paper-plane ms-2"></i>
+                            </button>
+                        </form>
+                        
+                        <div id="statusMessage" class="mt-3 text-center fw-bold fs-5"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <footer class="footer">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-6 mb-4">
+                    <div class="footer-logo">SKY <span>CLASSES</span></div>
+                    <p class="pe-md-5">Setting the benchmark for quality education in Gorakhpur. Empowering students with the knowledge and confidence to achieve their academic dreams.</p>
+                </div>
+                <div class="col-md-6 footer-contact">
+                    <h5 class="text-white fw-bold mb-3">Contact Us</h5>
+                    <p><i class="fa-solid fa-location-dot"></i> RS Tower, Khajanchi Chowk, Gorakhpur</p>
+                    <p><i class="fa-solid fa-phone"></i> +91 9453080133, +91 8840068514</p>
+                    <p><i class="fa-solid fa-envelope"></i> Director: Sandesh Samant</p>
+                </div>
+            </div>
+            <hr style="border-color: #444;">
+            <div class="text-center small mt-3">
+                &copy; 2026 Sky Classes, Gorakhpur. All Rights Reserved.
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        (function(){
+            // Aapki Public Key
+            emailjs.init("RNJWSUbvZx9K-RKFm"); 
+        })();
+
+        function submitAdmission() {
+            const name = document.getElementById('studentName').value;
+            const phone = document.getElementById('studentPhone').value;
+            const course = document.getElementById('courseSelect').value;
+            const btn = document.getElementById('submitBtn');
+            const msg = document.getElementById('statusMessage');
+
+            if(!name || !phone) {
+                msg.innerHTML = "<i class='fa-solid fa-triangle-exclamation'></i> Please fill both Name and Phone Number!";
+                msg.className = "mt-3 text-center fw-bold text-danger";
+                return;
+            }
+
+            btn.innerHTML = "<i class='fa-solid fa-spinner fa-spin me-2'></i> Processing...";
+            btn.disabled = true;
+            msg.innerHTML = "";
+
+            const templateParams = { name: name, phone: phone, course: course };
+
+            // Aapki Service ID aur Template ID
+            emailjs.send('service_29mekw9', 'template_yrhieyg', templateParams)
+                .then(function() {
+                   msg.innerHTML = "<i class='fa-solid fa-circle-check'></i> Thank you! Form submitted. We will call you soon.";
+                   msg.className = "mt-3 text-center fw-bold text-success";
+                   document.getElementById('admissionForm').reset();
+                   btn.innerHTML = "SUBMIT APPLICATION <i class='fa-solid fa-paper-plane ms-2'></i>";
+                   btn.disabled = false;
+                }, function(error) {
+                   msg.innerHTML = "<i class='fa-solid fa-circle-xmark'></i> Something went wrong. Please call us directly.";
+                   msg.className = "mt-3 text-center fw-bold text-danger";
+                   btn.innerHTML = "SUBMIT APPLICATION <i class='fa-solid fa-paper-plane ms-2'></i>";
+                   btn.disabled = false;
+                   console.log(error);
+                });
+        }
+    </script>
+</body>
+</html>
