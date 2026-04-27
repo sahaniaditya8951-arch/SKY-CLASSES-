@@ -33,8 +33,10 @@
         .table-container { background: white; padding: 25px; border-radius: 15px; margin-top: 30px; box-shadow: 0 4px 15px rgba(0,0,0,0.04); display: none; }
         .active-section { display: block; }
         
-        .btn-excel { background: #28a745; color: white; border: none; padding: 8px 18px; border-radius: 8px; font-weight: 600; }
+        .btn-excel { background: #28a745; color: white; border: none; padding: 8px 18px; border-radius: 8px; font-weight: 600; white-space: nowrap; }
         .badge-time { background: #fff3cd; color: #856404; padding: 4px 10px; border-radius: 5px; font-size: 12px; font-weight: 600; }
+        .date-picker { border: 2px solid #e2e8f0; border-radius: 8px; padding: 6px 12px; outline: none; font-weight: 500; color: #0A2540;}
+        .date-picker:focus { border-color: var(--accent-gold); }
     </style>
 </head>
 <body>
@@ -66,7 +68,7 @@
                 <div class="col-md-6">
                     <div class="stat-card" style="border-color: #28a745;">
                         <h2 id="countAttendance">0</h2>
-                        <p class="text-muted fw-bold mb-0">Today's Attendance</p>
+                        <p class="text-muted fw-bold mb-0" id="attendanceCardLabel">Selected Date Attendance</p>
                     </div>
                 </div>
             </div>
@@ -87,14 +89,20 @@
             </div>
 
             <div id="section-attendance" class="table-container">
-                <div class="d-flex justify-content-between align-items-center mb-4">
+                <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-3">
                     <h5 class="fw-bold m-0 text-success">Daily Attendance Log</h5>
-                    <button class="btn-excel" style="background: #17a2b8;" onclick="downloadCSV('attendance')"><i class="fa-solid fa-file-csv me-2"></i> Attendance Excel</button>
+                    <div class="d-flex gap-2 align-items-center">
+                        <span class="text-muted fw-bold small">Filter Date:</span>
+                        <input type="date" id="dateFilter" class="date-picker" onchange="filterAttendanceData()">
+                        <button class="btn-excel" style="background: #17a2b8;" onclick="downloadCSV('attendance')">
+                            <i class="fa-solid fa-file-csv me-2"></i> Download Excel
+                        </button>
+                    </div>
                 </div>
                 <div class="table-responsive">
                     <table class="table table-hover">
                         <thead class="table-light">
-                            <tr><th>Date</th><th>Time</th><th>Student Name</th><th>Phone</th></tr>
+                            <tr><th>Date</th><th>Time</th><th>Method</th><th>Student Name</th><th>Phone</th></tr>
                         </thead>
                         <tbody id="attendanceBody"></tbody>
                     </table>
@@ -109,6 +117,7 @@
             if(document.getElementById('adminPassword').value === "SkyAdmin123") {
                 document.getElementById('loginScreen').style.display = 'none';
                 document.getElementById('dashboardScreen').style.display = 'block';
+                setDefaultDate();
                 startRealtimeData();
             } else { alert("Wrong Password!"); }
         }
@@ -121,6 +130,22 @@
             document.querySelectorAll('.sidebar a').forEach(el => el.classList.remove('active'));
             document.getElementById('section-' + id).classList.add('active-section');
             document.getElementById('link-' + id).classList.add('active');
+        }
+
+        // Set Today's date automatically in the filter
+        function setDefaultDate() {
+            const today = new Date();
+            const yyyy = today.getFullYear();
+            const mm = String(today.getMonth() + 1).padStart(2, '0');
+            const dd = String(today.getDate()).padStart(2, '0');
+            document.getElementById('dateFilter').value = `${yyyy}-${mm}-${dd}`;
+        }
+
+        // Convert YYYY-MM-DD to DD/MM/YYYY (Indian format used in Firebase)
+        function formatInputDate(dateStr) {
+            if(!dateStr) return "";
+            const parts = dateStr.split('-');
+            return `${parts[2]}/${parts[1]}/${parts[0]}`; // DD/MM/YYYY
         }
 
         // Firebase Config
@@ -137,10 +162,11 @@
         const db = firebase.database();
 
         let admissionsList = [];
-        let attendanceList = [];
+        let allAttendanceList = []; // Firebase se aaya saara data
+        let filteredAttendanceList = []; // Sirf select ki hui date ka data
 
         function startRealtimeData() {
-            // Admissions
+            // Fetch Admissions
             db.ref('Student_Admissions').on('value', snap => {
                 const data = snap.val();
                 const body = document.getElementById('admissionsBody');
@@ -154,38 +180,90 @@
                 document.getElementById('countAdmissions').innerText = admissionsList.length;
             });
 
-            // Attendance
+            // Fetch Daily Attendance
             db.ref('Daily_Attendance').on('value', snap => {
                 const data = snap.val();
-                const body = document.getElementById('attendanceBody');
-                body.innerHTML = ''; attendanceList = [];
-                let todayCount = 0;
-                const today = new Date().toLocaleDateString('en-IN');
-                
+                allAttendanceList = [];
                 if(data) {
                     Object.values(data).reverse().forEach(at => {
-                        attendanceList.push(at);
-                        if(at.Date === today) todayCount++;
-                        body.innerHTML += `<tr><td>${at.Date}</td><td><span class="badge-time">${at.Time}</span></td><td class="fw-bold">${at.Name}</td><td>${at.Phone}</td></tr>`;
+                        allAttendanceList.push(at);
                     });
                 }
-                document.getElementById('countAttendance').innerText = todayCount;
+                filterAttendanceData(); // Data aane par turant filter apply karo
             });
         }
 
-        function downloadCSV(type) {
-            let data = type === 'admissions' ? admissionsList : attendanceList;
-            if(data.length === 0) { alert("No data to download!"); return; }
+        // Smart Filter Function
+        function filterAttendanceData() {
+            const selectedDateVal = document.getElementById('dateFilter').value;
+            const targetFormat1 = formatInputDate(selectedDateVal); // "DD/MM/YYYY"
             
-            let csv = type === 'admissions' ? "Date,Name,Phone,Course\n" : "Date,Time,Name,Phone\n";
+            // Single digit dates ko handle karne ke liye (e.g. 05/04 vs 5/4)
+            const parts = selectedDateVal.split('-');
+            const targetFormat2 = `${parseInt(parts[2])}/${parseInt(parts[1])}/${parts[0]}`; 
+
+            const body = document.getElementById('attendanceBody');
+            body.innerHTML = '';
+            filteredAttendanceList = [];
+
+            allAttendanceList.forEach(at => {
+                // Check if attendance date matches selected date
+                if(at.Date === targetFormat1 || at.Date === targetFormat2) {
+                    filteredAttendanceList.push(at);
+                    const method = at.Method ? at.Method : 'Manual'; // Face ID or Manual
+                    const methodBadge = method === 'Face ID' ? `<span class="badge bg-success"><i class="fa-solid fa-face-smile me-1"></i> Face ID</span>` : `<span class="badge bg-secondary"><i class="fa-solid fa-keyboard me-1"></i> Form</span>`;
+                    
+                    body.innerHTML += `
+                        <tr>
+                            <td>${at.Date}</td>
+                            <td><span class="badge-time">${at.Time}</span></td>
+                            <td>${methodBadge}</td>
+                            <td class="fw-bold text-dark">${at.Name}</td>
+                            <td>${at.Phone}</td>
+                        </tr>
+                    `;
+                }
+            });
+
+            // Update Header Count
+            document.getElementById('countAttendance').innerText = filteredAttendanceList.length;
+            
+            // Update Label Text (Today vs Selected)
+            const todayStr = formatInputDate(document.getElementById('dateFilter').defaultValue);
+            if(targetFormat1 === todayStr) {
+                document.getElementById('attendanceCardLabel').innerText = "Today's Attendance";
+            } else {
+                document.getElementById('attendanceCardLabel').innerText = `Attendance for ${targetFormat1}`;
+            }
+
+            if(filteredAttendanceList.length === 0) {
+                body.innerHTML = `<tr><td colspan="5" class="text-center text-danger fw-bold py-4">No attendance found for selected date.</td></tr>`;
+            }
+        }
+
+        function downloadCSV(type) {
+            // Agar attendance select hai, toh sirf filtered wali list download hogi
+            let data = type === 'admissions' ? admissionsList : filteredAttendanceList;
+            if(data.length === 0) { alert("No data to download for this selection!"); return; }
+            
+            let csv = type === 'admissions' ? "Date,Name,Phone,Course\n" : "Date,Time,Method,Name,Phone\n";
             data.forEach(row => {
-                csv += type === 'admissions' ? `"${row.Date}","${row.Name}","${row.Phone}","${row.Course}"\n` : `"${row.Date}","${row.Time}","${row.Name}","${row.Phone}"\n`;
+                if(type === 'admissions') {
+                    csv += `"${row.Date}","${row.Name}","${row.Phone}","${row.Course}"\n`;
+                } else {
+                    const method = row.Method ? row.Method : 'Manual';
+                    csv += `"${row.Date}","${row.Time}","${method}","${row.Name}","${row.Phone}"\n`;
+                }
             });
 
             const blob = new Blob([csv], { type: 'text/csv' });
             const link = document.createElement("a");
             link.href = URL.createObjectURL(blob);
-            link.download = `Sky_${type}_${new Date().toLocaleDateString()}.csv`;
+            
+            // Excel file ke naam mein Date jodna
+            const dateSuf = type === 'attendance' ? document.getElementById('dateFilter').value : new Date().toLocaleDateString();
+            link.download = `Sky_${type}_${dateSuf}.csv`;
+            
             link.click();
         }
     </script>
