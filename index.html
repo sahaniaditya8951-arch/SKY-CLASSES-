@@ -1,0 +1,576 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sky Classes | Elite Education in Gorakhpur</title>
+    
+    <meta name="description" content="Sky Classes is Gorakhpur's premier coaching institute for 10th, 12th Board Exams, Physics, Chemistry, Biology, and Competitive English under Director Sandesh Samant.">
+    <meta name="keywords" content="Sky Classes, Sky Classes Gorakhpur, best coaching in Gorakhpur, Physics coaching Gorakhpur, Board exam coaching, Sandesh Samant">
+
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&family=Playfair+Display:wght@700;800&display=swap" rel="stylesheet">
+    
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+    
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
+
+    <script src="https://www.gstatic.com/firebasejs/10.11.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.11.0/firebase-database-compat.js"></script>
+    
+    <style>
+        :root { 
+            --primary-dark: #07192F; 
+            --primary-blue: #0A2540; 
+            --accent-gold: #E6B31E; 
+            --accent-red: #D90429; 
+            --bg-light: #F8F9FA;
+        }
+        
+        body { font-family: 'Poppins', sans-serif; background-color: var(--bg-light); color: #333; overflow-x: hidden;}
+        
+        /* Glassmorphism Navbar */
+        .navbar { 
+            padding: 18px 0; 
+            transition: all 0.4s ease; 
+            background: rgba(255, 255, 255, 1);
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.05);
+        }
+        .navbar.scrolled {
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            padding: 10px 0;
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+        }
+        .logo-text { font-family: 'Playfair Display', serif; font-size: 34px; font-weight: 800; letter-spacing: 1px;}
+        .logo-text .sky { color: var(--primary-blue); }
+        .logo-text .classes { color: var(--accent-red); }
+        .nav-contact span { font-weight: 600; font-size: 17px; background: #f4f4f4; padding: 8px 18px; border-radius: 50px; border: 1px solid #e1e1e1;}
+        .nav-contact i { color: var(--accent-red); margin-right: 5px; }
+
+        /* Parallax Hero Banner */
+        .hero-section {
+            background: linear-gradient(to right, rgba(7, 25, 47, 0.92), rgba(7, 25, 47, 0.7)), 
+                        url('https://images.unsplash.com/photo-1523240795612-9a054b0db644?auto=format&fit=crop&w=1920&q=80') center/cover no-repeat;
+            background-attachment: fixed;
+            color: white; padding: 180px 0 120px; position: relative;
+        }
+        .hero-badge { 
+            background: linear-gradient(45deg, var(--accent-gold), #FFD700); 
+            color: var(--primary-dark); padding: 8px 25px; border-radius: 30px; font-weight: 700; font-size: 14px; letter-spacing: 1px; display: inline-block; margin-bottom: 25px; box-shadow: 0 4px 20px rgba(230, 179, 30, 0.4);
+        }
+        .hero-section h1 { font-size: 4.5rem; font-weight: 800; line-height: 1.1; margin-bottom: 20px; text-shadow: 2px 2px 20px rgba(0,0,0,0.5); }
+        .hero-section p { font-size: 1.25rem; color: #E2E8F0; font-weight: 300; max-width: 600px;}
+        .btn-glow { 
+            background: var(--accent-red); color: white; padding: 15px 35px; border-radius: 50px; font-weight: 600; font-size: 18px; border: none; transition: 0.4s; box-shadow: 0 10px 30px rgba(217, 4, 41, 0.3);
+            text-decoration: none; display: inline-block; cursor: pointer;
+        }
+        .btn-glow:hover { background: #b00320; color: white; transform: translateY(-3px); box-shadow: 0 15px 40px rgba(217, 4, 41, 0.5); }
+
+        /* Stats Section */
+        .stats-section { background: white; padding: 40px 0; border-radius: 20px; box-shadow: 0 20px 50px rgba(0,0,0,0.05); margin-top: -50px; position: relative; z-index: 10; }
+        .stat-item h2 { font-weight: 800; color: var(--primary-blue); font-size: 2.5rem; margin-bottom: 0;}
+        .stat-item p { color: #666; font-weight: 500; font-size: 14px; text-transform: uppercase; letter-spacing: 1px;}
+
+        /* Subject Cards */
+        .section-title { text-align: center; margin-bottom: 50px; }
+        .section-title h2 { font-weight: 800; color: var(--primary-dark); font-size: 2.5rem; }
+        .section-title .line { height: 4px; width: 80px; background: var(--accent-gold); margin: 15px auto; border-radius: 2px; }
+        
+        .subject-card { background: white; border-radius: 20px; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.06); transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); border: 1px solid #f0f0f0; height: 100%; cursor: pointer; position: relative; }
+        .subject-card:hover { transform: translateY(-15px); box-shadow: 0 30px 60px rgba(0,0,0,0.12); border-color: transparent; }
+        .subject-img { height: 240px; width: 100%; object-fit: cover; transition: 0.5s; }
+        .subject-card:hover .subject-img { transform: scale(1.05); }
+        .subject-img-wrap { overflow: hidden; position: relative; }
+        
+        .subject-body { padding: 35px 30px; position: relative; z-index: 2; background: white; }
+        .subject-title { font-weight: 800; color: var(--primary-dark); font-size: 26px; margin-bottom: 5px; }
+        .fee-badge { background: rgba(10, 37, 64, 0.05); color: var(--primary-blue); padding: 8px 15px; border-radius: 8px; font-weight: 700; font-size: 18px; display: inline-block; margin-bottom: 20px; border: 1px dashed rgba(10, 37, 64, 0.2);}
+        .subject-features { list-style: none; padding: 0; text-align: left; margin-bottom: 0; color: #555; }
+        .subject-features li { margin-bottom: 12px; font-size: 15px; display: flex; align-items: flex-start; }
+        .subject-features i { color: var(--accent-gold); margin-top: 4px; margin-right: 10px; font-size: 14px;}
+        
+        .card-action { margin-top: 25px; border-top: 1px solid #eee; padding-top: 15px; text-align: center; color: var(--accent-red); font-weight: 600; font-size: 14px; transition: 0.3s;}
+        .subject-card:hover .card-action { color: var(--primary-blue); letter-spacing: 1px;}
+
+        /* Board Prep Banner */
+        .board-banner { background: var(--primary-blue); color: white; padding: 100px 0; margin-top: 100px; position: relative; overflow: hidden; }
+        .board-banner::before { content: ''; position: absolute; top: -50%; left: -10%; width: 50%; height: 200%; background: rgba(255,255,255,0.03); transform: rotate(30deg); }
+        .board-banner h2 { font-weight: 800; color: white; font-size: 3rem; }
+        .board-banner .highlight { color: var(--accent-gold); }
+        .board-icon-box { text-align: center; margin-top: 40px; padding: 30px; background: rgba(255,255,255,0.05); border-radius: 20px; transition: 0.3s; border: 1px solid rgba(255,255,255,0.05); }
+        .board-icon-box:hover { background: rgba(255,255,255,0.1); transform: translateY(-10px); }
+        .board-icon-box i { font-size: 50px; color: var(--accent-gold); margin-bottom: 20px; }
+        
+        /* Admission Section */
+        .admission-section { padding: 120px 0; background: white; }
+        .admission-img { width: 100%; height: 100%; object-fit: cover; border-radius: 24px; box-shadow: 0 20px 50px rgba(0,0,0,0.1); }
+        .form-container { background: #ffffff; padding: 50px; border-radius: 24px; box-shadow: 0 30px 60px rgba(0,0,0,0.08); border: 1px solid #f5f5f5; position: relative;}
+        .form-container::before { content:''; position: absolute; top: 0; left: 0; width: 100%; height: 6px; background: linear-gradient(90deg, var(--primary-blue), var(--accent-red)); border-radius: 24px 24px 0 0; }
+        
+        .form-control, .form-select { border-radius: 12px; padding: 15px; border: 1px solid #e2e8f0; font-size: 15px; background: #f8fafc; transition: 0.3s;}
+        .form-control:focus, .form-select:focus { border-color: var(--primary-blue); background: white; box-shadow: 0 0 0 4px rgba(10, 37, 64, 0.1); outline: none; }
+        .btn-submit { background: var(--primary-dark); color: white; font-weight: 600; padding: 16px; border-radius: 12px; border: none; width: 100%; transition: 0.4s; letter-spacing: 1px; font-size: 16px; margin-top: 10px;}
+        .btn-submit:hover { background: var(--accent-red); color: white; box-shadow: 0 10px 25px rgba(217, 4, 41, 0.3); }
+
+        /* Floating WhatsApp Button */
+        .whatsapp-float {
+            position: fixed; width: 60px; height: 60px; bottom: 30px; right: 30px;
+            background-color: #25d366; color: #FFF; border-radius: 50px;
+            text-align: center; font-size: 35px; box-shadow: 0 10px 30px rgba(37, 211, 102, 0.4);
+            z-index: 100; transition: 0.3s; display: flex; align-items: center; justify-content: center;
+            text-decoration: none;
+        }
+        .whatsapp-float:hover { background-color: #1ebe57; transform: scale(1.1); color: white; }
+
+        /* Footer */
+        .footer { background: var(--primary-dark); color: #a0aec0; padding: 80px 0 30px; }
+        .footer-logo { font-family: 'Playfair Display', serif; font-size: 32px; font-weight: 800; color: white; margin-bottom: 20px;}
+        .footer-logo span { color: var(--accent-red); }
+        .footer-contact p { margin-bottom: 15px; font-size: 15px;}
+        .footer-contact i { color: var(--accent-gold); width: 30px; font-size: 18px;}
+
+        /* Modal Customization */
+        .modal-content { border-radius: 20px; border: none; overflow: hidden; box-shadow: 0 30px 60px rgba(0,0,0,0.2); }
+        .modal-header { background-color: var(--primary-blue); color: white; border-bottom: none; padding: 25px; }
+        .modal-title { font-weight: 700; font-size: 24px;}
+        .modal-body { padding: 30px; }
+        .modal-body ul { list-style: none; padding-left: 0;}
+        .modal-body ul li { position: relative; padding-left: 25px; margin-bottom: 12px; color: #4a5568;}
+        .modal-body ul li::before { content: '\f00c'; font-family: 'Font Awesome 6 Free'; font-weight: 900; position: absolute; left: 0; color: var(--accent-gold); }
+        .modal-footer { border-top: 1px solid #f0f0f0; padding: 20px 30px; }
+    </style>
+</head>
+<body>
+
+    <a href="https://wa.me/919453080133?text=Hello%20Sky%20Classes,%20I%20want%20to%20know%20more%20about%20admissions." class="whatsapp-float" target="_blank">
+        <i class="fa-brands fa-whatsapp"></i>
+    </a>
+
+    <nav class="navbar fixed-top" id="navbar">
+        <div class="container d-flex justify-content-between align-items-center">
+            <div class="logo-text"><span class="sky">SKY</span> <span class="classes">CLASSES</span></div>
+            <div class="nav-contact d-none d-md-block">
+                <span><i class="fa-solid fa-phone-volume"></i> 9453080133</span>
+            </div>
+        </div>
+    </nav>
+
+    <header class="hero-section">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-8" data-aos="fade-up" data-aos-duration="1000">
+                    <div class="hero-badge"><i class="fa-solid fa-crown me-2"></i> 30+ Years of Unmatched Legacy</div>
+                    <h1>Igniting Minds.<br><span style="color: var(--accent-gold);">Elevating Results.</span></h1>
+                    <p class="mt-4 mb-5">Gorakhpur's premier institute for Board Exams, Science & Competitive English. Learn under the expert mentorship of <strong>Director Sandesh Samant</strong>.</p>
+                    <button onclick="scrollToEnroll('All Subjects (PCM/PCB) Boards')" class="btn-glow text-decoration-none">Start Your Journey <i class="fa-solid fa-arrow-right ms-2"></i></button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <div class="container">
+        <div class="stats-section" data-aos="fade-up" data-aos-delay="200">
+            <div class="row text-center g-4">
+                <div class="col-md-4 stat-item">
+                    <h2>30+</h2>
+                    <p>Years of Experience</p>
+                </div>
+                <div class="col-md-4 stat-item" style="border-left: 2px solid #eee; border-right: 2px solid #eee;">
+                    <h2>5000+</h2>
+                    <p>Students Mentored</p>
+                </div>
+                <div class="col-md-4 stat-item">
+                    <h2>#1</h2>
+                    <p>In Board Results</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <section class="container" style="margin-top: 100px;">
+        <div class="section-title" data-aos="fade-up">
+            <h2>Our Premium Courses</h2>
+            <div class="line"></div>
+            <p class="text-muted">Master your subjects with specialized focus and expert faculty.</p>
+        </div>
+
+        <div class="row g-5 justify-content-center">
+            <div class="col-lg-4 col-md-6" data-aos="zoom-in" data-aos-delay="100">
+                <div class="subject-card" data-bs-toggle="modal" data-bs-target="#physicsModal">
+                    <div class="subject-img-wrap">
+                        <img src="https://images.unsplash.com/photo-1636466497217-26a8cbeaf0aa?auto=format&fit=crop&w=800&q=80" alt="Physics Class" class="subject-img">
+                    </div>
+                    <div class="subject-body">
+                        <h3 class="subject-title">Physics</h3>
+                        <div class="fee-badge">₹2,000 / Month</div>
+                        <ul class="subject-features">
+                            <li><i class="fa-solid fa-circle-check"></i> Boards to NEET/JEE Base</li>
+                            <li><i class="fa-solid fa-circle-check"></i> Complex numericals simplified</li>
+                            <li><i class="fa-solid fa-circle-check"></i> Single subject enrollment</li>
+                        </ul>
+                        <div class="card-action">View Full Syllabus <i class="fa-solid fa-arrow-right ms-1"></i></div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-lg-4 col-md-6" data-aos="zoom-in" data-aos-delay="200">
+                <div class="subject-card" data-bs-toggle="modal" data-bs-target="#chemistryModal">
+                    <div class="subject-img-wrap">
+                        <img src="https://images.unsplash.com/photo-1532094349884-543bc11b234d?auto=format&fit=crop&w=800&q=80" alt="Chemistry Class" class="subject-img">
+                    </div>
+                    <div class="subject-body">
+                        <h3 class="subject-title">Chemistry</h3>
+                        <div class="fee-badge">₹2,000 / Month</div>
+                        <ul class="subject-features">
+                            <li><i class="fa-solid fa-circle-check"></i> Organic & Inorganic Mastery</li>
+                            <li><i class="fa-solid fa-circle-check"></i> Periodic table deep-dive</li>
+                            <li><i class="fa-solid fa-circle-check"></i> Focus on chemical equations</li>
+                        </ul>
+                        <div class="card-action">View Full Syllabus <i class="fa-solid fa-arrow-right ms-1"></i></div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-lg-4 col-md-6" data-aos="zoom-in" data-aos-delay="300">
+                <div class="subject-card" data-bs-toggle="modal" data-bs-target="#biologyModal">
+                    <div class="subject-img-wrap">
+                        <img src="https://images.unsplash.com/photo-1576086213369-97a306d36557?auto=format&fit=crop&w=800&q=80" alt="Biology Class" class="subject-img">
+                    </div>
+                    <div class="subject-body">
+                        <h3 class="subject-title">Biology</h3>
+                        <div class="fee-badge">₹2,000 / Month</div>
+                        <ul class="subject-features">
+                            <li><i class="fa-solid fa-circle-check"></i> Botany & Zoology Special focus</li>
+                            <li><i class="fa-solid fa-circle-check"></i> Interactive diagrams & charts</li>
+                            <li><i class="fa-solid fa-circle-check"></i> Perfect for Medical aspirants</li>
+                        </ul>
+                        <div class="card-action">View Full Syllabus <i class="fa-solid fa-arrow-right ms-1"></i></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="board-banner">
+        <div class="container text-center">
+            <h2 class="mb-4" data-aos="fade-down">Target: <span class="highlight">10th & 12th Board</span> Excellence</h2>
+            <p class="lead text-light mb-5 mx-auto" style="max-width: 800px;" data-aos="fade-up" data-aos-delay="100">We provide integrated classes for students wanting to study all subjects (PCM/PCB). Our structured approach guarantees top-tier performance.</p>
+            
+            <div class="row g-4">
+                <div class="col-md-4" data-aos="fade-up" data-aos-delay="200">
+                    <div class="board-icon-box">
+                        <i class="fa-solid fa-pen-nib"></i>
+                        <h4 class="text-white fw-bold">Sample Papers</h4>
+                        <p class="small text-light">Rigorous practice with latest board patterns.</p>
+                    </div>
+                </div>
+                <div class="col-md-4" data-aos="fade-up" data-aos-delay="300">
+                    <div class="board-icon-box">
+                        <i class="fa-solid fa-book-open"></i>
+                        <h4 class="text-white fw-bold">Dedicated Notes</h4>
+                        <p class="small text-light">Premium study material for quick revision.</p>
+                    </div>
+                </div>
+                <div class="col-md-4" data-aos="fade-up" data-aos-delay="400">
+                    <div class="board-icon-box">
+                        <i class="fa-solid fa-users-rays"></i>
+                        <h4 class="text-white fw-bold">Doubt Sessions</h4>
+                        <p class="small text-light">1-on-1 interaction to clear every concept.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="admission-section" id="enroll">
+        <div class="container">
+            <div class="row align-items-center g-5">
+                <div class="col-lg-6" data-aos="fade-right">
+                    <img src="https://images.unsplash.com/photo-1577896851231-70ef18881754?auto=format&fit=crop&w=800&q=80" alt="Counseling" class="admission-img">
+                    <div class="mt-5 ms-3 border-start border-4 border-danger ps-4">
+                        <h3 class="fw-bold" style="color: var(--primary-dark);">Visit Our Campus</h3>
+                        <p class="text-muted fs-5"><i class="fa-solid fa-location-dot text-danger me-2"></i> RS Tower, Khajanchi Chowk, Gorakhpur</p>
+                    </div>
+                </div>
+                
+                <div class="col-lg-6" data-aos="fade-left">
+                    <div class="form-container">
+                        <div class="mb-4">
+                            <h3 class="fw-bold" style="color: var(--primary-dark); font-size: 2rem;">Secure Your Seat</h3>
+                            <p class="text-muted">Fill out the form to request a callback regarding fees, batch timings, and registration.</p>
+                        </div>
+                        
+                        <form id="admissionForm">
+                            <div class="mb-4">
+                                <label class="form-label fw-bold text-secondary small">Student Full Name <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" id="studentName" placeholder="e.g. Aditya Sahani" required>
+                            </div>
+                            <div class="mb-4">
+                                <label class="form-label fw-bold text-secondary small">Mobile Number <span class="text-danger">*</span></label>
+                                <input type="tel" class="form-control" id="studentPhone" placeholder="10-digit number" required>
+                            </div>
+                            <div class="mb-5">
+                                <label class="form-label fw-bold text-secondary small">Select Course/Subject Preference <span class="text-danger">*</span></label>
+                                <select class="form-select" id="courseSelect">
+                                    <option value="Only Physics (Single)">Only Physics (Single Subject)</option>
+                                    <option value="Only Chemistry (Single)">Only Chemistry (Single Subject)</option>
+                                    <option value="Only Biology (Single)">Only Biology (Single Subject)</option>
+                                    <option value="All Subjects (PCM/PCB) Boards">All Subjects (PCM/PCB) Boards</option>
+                                    <option value="English (Competitive - NDA/SSC)">English (Competitive - NDA/SSC/UPSC)</option>
+                                    <option value="English (Spoken & Grammar)">English (Spoken & Grammar)</option>
+                                </select>
+                            </div>
+                            <button type="button" id="submitBtn" class="btn-submit" onclick="submitAdmission()">
+                                SUBMIT APPLICATION <i class="fa-solid fa-arrow-right ms-2"></i>
+                            </button>
+                        </form>
+                        
+                        <div id="statusMessage" class="mt-4 text-center fw-bold fs-5"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <footer class="footer">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-5 col-md-6 mb-5">
+                    <div class="footer-logo">SKY <span>CLASSES</span></div>
+                    <p class="pe-md-5 mt-4">Setting the benchmark for quality education in Gorakhpur. Empowering students with the knowledge and confidence to achieve their academic dreams.</p>
+                </div>
+                <div class="col-lg-4 col-md-6 mb-5 footer-contact">
+                    <h5 class="text-white fw-bold mb-4">Contact Directory</h5>
+                    <p><i class="fa-solid fa-location-dot"></i> RS Tower, Khajanchi Chowk, Gorakhpur</p>
+                    <p><i class="fa-solid fa-phone"></i> +91 9453080133</p>
+                    <p><i class="fa-solid fa-phone"></i> +91 8840068514</p>
+                    <p><i class="fa-solid fa-envelope"></i> Director: Sandesh Samant</p>
+                </div>
+                <div class="col-lg-3 col-md-12">
+                    <h5 class="text-white fw-bold mb-4">Quick Links</h5>
+                    <ul class="list-unstyled" style="line-height: 2;">
+                        <li><a href="#" class="text-decoration-none text-muted">Home</a></li>
+                        <li><a href="#enroll" class="text-decoration-none text-muted">Admissions</a></li>
+                        <li><a href="#" class="text-decoration-none text-muted">Privacy Policy</a></li>
+                    </ul>
+                </div>
+            </div>
+            <hr style="border-color: rgba(255,255,255,0.1); margin-top: 20px;">
+            <div class="text-center small mt-4 text-muted">
+                &copy; 2026 Sky Classes, Gorakhpur. Crafted with Excellence.
+            </div>
+        </div>
+    </footer>
+
+    <div class="modal fade" id="physicsModal" tabindex="-1" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title"><i class="fa-solid fa-atom me-2 text-warning"></i> Complete Physics Program</h5>
+            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            <div class="row">
+                <div class="col-md-7">
+                    <h6 class="fw-bold text-primary mb-3">Curriculum Highlights:</h6>
+                    <ul>
+                        <li>Complete NCERT line-by-line coverage for Board Exams.</li>
+                        <li>Special mathematical tool & numerical practice sessions.</li>
+                        <li>Strong foundation building for future NEET/JEE.</li>
+                        <li>Weekly test series and performance tracking system.</li>
+                    </ul>
+                </div>
+                <div class="col-md-5 bg-light p-4 rounded text-center border">
+                    <h2 class="text-primary fw-bold mb-0">₹2,000</h2>
+                    <p class="text-muted small">Per Month</p>
+                    <hr>
+                    <p class="mb-1 small"><strong><i class="fa-regular fa-clock text-danger me-1"></i> Duration:</strong> 1 Year</p>
+                    <p class="mb-0 small"><strong><i class="fa-solid fa-book text-success me-1"></i> Pattern:</strong> CBSC/UP Board</p>
+                </div>
+            </div>
+          </div>
+          <div class="modal-footer justify-content-between">
+            <button type="button" class="btn btn-light" data-bs-dismiss="modal">Close Window</button>
+            <button type="button" class="btn btn-primary px-4 fw-bold" data-bs-dismiss="modal" onclick="scrollToEnroll('Only Physics (Single)')">Proceed to Enroll <i class="fa-solid fa-arrow-right ms-2"></i></button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="modal fade" id="chemistryModal" tabindex="-1" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title"><i class="fa-solid fa-flask me-2 text-warning"></i> Complete Chemistry Program</h5>
+            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            <div class="row">
+                <div class="col-md-7">
+                    <h6 class="fw-bold text-primary mb-3">Curriculum Highlights:</h6>
+                    <ul>
+                        <li>Master Organic, Inorganic & Physical Chemistry effortlessly.</li>
+                        <li>Special mnemonics to remember the Periodic Table and Equations.</li>
+                        <li>Thorough preparation tailored for 12th Board examinations.</li>
+                        <li>Dedicated doubt solving sessions after every major chapter.</li>
+                    </ul>
+                </div>
+                <div class="col-md-5 bg-light p-4 rounded text-center border">
+                    <h2 class="text-primary fw-bold mb-0">₹2,000</h2>
+                    <p class="text-muted small">Per Month</p>
+                    <hr>
+                    <p class="mb-1 small"><strong><i class="fa-regular fa-clock text-danger me-1"></i> Duration:</strong> 1 Year</p>
+                    <p class="mb-0 small"><strong><i class="fa-solid fa-book text-success me-1"></i> Pattern:</strong> CBSC/UP Board</p>
+                </div>
+            </div>
+          </div>
+          <div class="modal-footer justify-content-between">
+            <button type="button" class="btn btn-light" data-bs-dismiss="modal">Close Window</button>
+            <button type="button" class="btn btn-primary px-4 fw-bold" data-bs-dismiss="modal" onclick="scrollToEnroll('Only Chemistry (Single)')">Proceed to Enroll <i class="fa-solid fa-arrow-right ms-2"></i></button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="modal fade" id="biologyModal" tabindex="-1" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title"><i class="fa-solid fa-microscope me-2 text-warning"></i> Complete Biology Program</h5>
+            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            <div class="row">
+                <div class="col-md-7">
+                    <h6 class="fw-bold text-primary mb-3">Curriculum Highlights:</h6>
+                    <ul>
+                        <li>Detailed and scoring study methods for Botany and Zoology.</li>
+                        <li>Extreme focus on diagrams and precise labeling for Boards.</li>
+                        <li>NEET-oriented objective questions and PYQ practice.</li>
+                        <li>Interactive learning with visual aids and 3D concept mapping.</li>
+                    </ul>
+                </div>
+                <div class="col-md-5 bg-light p-4 rounded text-center border">
+                    <h2 class="text-primary fw-bold mb-0">₹2,000</h2>
+                    <p class="text-muted small">Per Month</p>
+                    <hr>
+                    <p class="mb-1 small"><strong><i class="fa-regular fa-clock text-danger me-1"></i> Duration:</strong> 1 Year</p>
+                    <p class="mb-0 small"><strong><i class="fa-solid fa-book text-success me-1"></i> Pattern:</strong> CBSC/UP Board</p>
+                </div>
+            </div>
+          </div>
+          <div class="modal-footer justify-content-between">
+            <button type="button" class="btn btn-light" data-bs-dismiss="modal">Close Window</button>
+            <button type="button" class="btn btn-primary px-4 fw-bold" data-bs-dismiss="modal" onclick="scrollToEnroll('Only Biology (Single)')">Proceed to Enroll <i class="fa-solid fa-arrow-right ms-2"></i></button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+
+    <script>
+        // 1. Initialize Animations
+        AOS.init({ once: true, offset: 100 });
+
+        // 2. Glassmorphism Navbar Scroll Effect
+        window.addEventListener('scroll', function() {
+            if (window.scrollY > 50) {
+                document.getElementById('navbar').classList.add('scrolled');
+            } else {
+                document.getElementById('navbar').classList.remove('scrolled');
+            }
+        });
+
+        // 3. Firebase Initialization
+        const firebaseConfig = {
+          apiKey: "AIzaSyC6bcqETEnTjLEQnISXjnWR2brPrVOAm-Y",
+          authDomain: "sky-classes-db-d6140.firebaseapp.com",
+          databaseURL: "https://sky-classes-db-d6140-default-rtdb.firebaseio.com",
+          projectId: "sky-classes-db-d6140",
+          storageBucket: "sky-classes-db-d6140.firebasestorage.app",
+          messagingSenderId: "915411828634",
+          appId: "1:915411828634:web:44aadc81aa911cdebcc423",
+          measurementId: "G-1BZRVGG89N"
+        };
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.database();
+
+        // 4. EmailJS Initialize
+        (function(){
+            emailjs.init("RNJWSUbvZx9K-RKFm"); 
+        })();
+
+        // 5. Smooth Scroll Function
+        function scrollToEnroll(courseValue) {
+            document.getElementById('courseSelect').value = courseValue;
+            setTimeout(() => {
+                document.getElementById('enroll').scrollIntoView({ behavior: 'smooth', block: 'start' });
+                document.getElementById('courseSelect').focus();
+            }, 300);
+        }
+
+        // 6. Final Submit Application (Firebase + EmailJS + WhatsApp)
+        function submitAdmission() {
+            const name = document.getElementById('studentName').value;
+            const phone = document.getElementById('studentPhone').value;
+            const course = document.getElementById('courseSelect').value;
+            const btn = document.getElementById('submitBtn');
+            const msg = document.getElementById('statusMessage');
+
+            if(!name || !phone) {
+                msg.innerHTML = "<i class='fa-solid fa-triangle-exclamation'></i> Please fill both Name and Phone Number!";
+                msg.className = "mt-4 text-center fw-bold text-danger";
+                return;
+            }
+
+            btn.innerHTML = "<i class='fa-solid fa-spinner fa-spin me-2'></i> Processing...";
+            btn.disabled = true;
+            msg.innerHTML = "";
+
+            // STEP 1: Firebase me Data Save Karna
+            db.ref('Student_Admissions').push({
+                Name: name,
+                Phone: phone,
+                Course: course,
+                Date: new Date().toLocaleString()
+            }).then(() => {
+                console.log("Data successfully saved to Firebase!");
+            }).catch((error) => {
+                console.error("Firebase error: ", error);
+            });
+
+            // STEP 2: Email Bhejne ka Code
+            const templateParams = { name: name, phone: phone, course: course };
+            emailjs.send('service_29mekw9', 'template_yrhieyg', templateParams)
+                .then(function() {
+                   console.log("Email safely sent to Admin.");
+                }, function(error) {
+                   console.log("Email sending failed:", error);
+                });
+
+            // STEP 3: WhatsApp Kholne ka Code
+            const whatsappNumber = "919453080133"; 
+            const whatsappMessage = `*New Admission Enquiry!* 🎓%0A%0A*Name:* ${name}%0A*Phone:* ${phone}%0A*Course Selected:* ${course}%0A%0A_Sent via Sky Classes Website_`;
+            const whatsappURL = `https://wa.me/${whatsappNumber}?text=${whatsappMessage}`;
+            
+            window.open(whatsappURL, '_blank');
+
+            // Success Message dikhana
+            msg.innerHTML = "<i class='fa-solid fa-circle-check'></i> Request sent! WhatsApp is opening...";
+            msg.className = "mt-4 text-center fw-bold text-success";
+            
+            document.getElementById('admissionForm').reset();
+            setTimeout(() => {
+                btn.innerHTML = "SUBMIT APPLICATION <i class='fa-solid fa-arrow-right ms-2'></i>";
+                btn.disabled = false;
+            }, 3000);
+        }
+    </script>
+</body>
+</html>
