@@ -3,32 +3,137 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sky Classes | Student Result Portal</title>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <title>Sky Classes | Student Portal</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <script src="https://www.gstatic.com/firebasejs/10.11.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.11.0/firebase-database-compat.js"></script>
+    
     <style>
-        body { font-family: 'Poppins', sans-serif; background-color: #0A2540; color: white; display: flex; justify-content: center; align-items: center; min-height: 100vh;}
-        .portal-card { background: white; color: #333; padding: 40px; border-radius: 20px; max-width: 500px; width: 100%; box-shadow: 0 10px 40px rgba(0,0,0,0.3); text-align: center; }
-        .btn-check { background: #D90429; color: white; width: 100%; font-weight: bold; padding: 12px; border-radius: 8px; border: none; margin-top: 15px;}
-        .result-box { display: none; margin-top: 20px; text-align: left; background: #f8fafc; padding: 20px; border-radius: 10px; border: 1px solid #e2e8f0;}
+        :root { --primary-dark: #07192F; --primary-blue: #0A2540; --accent-gold: #E6B31E; --accent-red: #D90429; }
+        body { font-family: 'Poppins', sans-serif; background-color: #f0f4f8; margin: 0; padding-bottom: 80px; overflow-x: hidden;}
+        
+        /* LOGIN UI */
+        #loginScreen { position: fixed; top: 0; left: 0; width: 100%; height: 100vh; background: linear-gradient(135deg, var(--primary-dark), var(--primary-blue)); display: flex; justify-content: center; align-items: center; z-index: 9999; }
+        .login-box { background: white; padding: 40px 30px; border-radius: 24px; text-align: center; width: 90%; max-width: 400px; box-shadow: 0 25px 50px rgba(0,0,0,0.5); }
+        .login-box h2 { font-weight: 800; color: var(--primary-blue); margin-bottom: 5px; }
+        .login-box span { color: var(--accent-red); }
+        .btn-login { background: var(--accent-red); color: white; width: 100%; padding: 14px; border: none; border-radius: 12px; font-weight: 700; margin-top: 15px; transition: 0.3s; }
+        .btn-login:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(217, 4, 41, 0.3); }
+
+        /* PORTAL UI */
+        #portalScreen { display: none; }
+        .portal-header { background: var(--primary-dark); color: white; padding: 20px; text-align: center; border-bottom: 4px solid var(--accent-gold); position: sticky; top: 0; z-index: 1000; }
+        .section-container { padding: 20px; display: none; animation: slideUp 0.4s ease-out; }
+        .active-section { display: block; }
+        @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* CARDS & COMPONENTS */
+        .glass-card { background: white; border-radius: 20px; padding: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.05); margin-bottom: 20px; border: 1px solid rgba(255,255,255,0.8); }
+        .profile-hero { background: linear-gradient(135deg, var(--primary-blue), #1e40af); color: white; padding: 30px 20px; border-radius: 0 0 30px 30px; margin-bottom: 25px; text-align: center; }
+        .course-badge { background: var(--accent-gold); color: var(--primary-dark); padding: 4px 15px; border-radius: 50px; font-size: 12px; font-weight: 700; display: inline-block; margin-top: 10px; }
+        
+        .stat-box { text-align: center; padding: 15px; border-radius: 15px; background: #f8fafc; border: 1px solid #e2e8f0; }
+        .stat-box h4 { margin: 0; color: var(--primary-blue); font-weight: 800; }
+        .stat-box p { margin: 0; font-size: 11px; font-weight: 600; color: #64748b; text-transform: uppercase; }
+
+        /* BOTTOM NAV */
+        .bottom-nav { position: fixed; bottom: 0; left: 0; width: 100%; background: white; display: flex; justify-content: space-around; padding: 12px 0; box-shadow: 0 -5px 20px rgba(0,0,0,0.08); z-index: 1000; border-radius: 20px 20px 0 0; }
+        .nav-item { text-align: center; color: #94a3b8; font-size: 11px; cursor: pointer; transition: 0.3s; flex: 1; }
+        .nav-item i { font-size: 22px; display: block; margin-bottom: 4px; }
+        .nav-item.active { color: var(--accent-red); font-weight: 700; }
+
+        /* DATA STYLING */
+        .fee-row { display: flex; justify-content: space-between; align-items: center; padding: 12px 0; border-bottom: 1px dashed #e2e8f0; }
+        .res-pill { background: #f1f5f9; padding: 10px; border-radius: 12px; margin-bottom: 10px; border-left: 4px solid var(--primary-blue); }
+        .att-dot { width: 10px; height: 10px; border-radius: 50%; display: inline-block; margin-right: 8px; }
     </style>
 </head>
 <body>
-    <div class="portal-card">
-        <h2 class="fw-bold" style="color:#0A2540;">SKY CLASSES</h2>
-        <p class="text-muted">Student Result Portal</p>
-        
-        <input type="text" id="rollInput" class="form-control text-center mb-3" placeholder="Enter Roll No (e.g. SKY-48291)" style="font-size: 18px; text-transform: uppercase;">
-        <button class="btn-check" onclick="checkResult()">Get Result</button>
-        
-        <div id="resultDisplay" class="result-box">
+
+    <div id="loginScreen">
+        <div class="login-box">
+            <h2>SKY <span>CLASSES</span></h2>
+            <p class="text-muted small">Student Learning Portal</p>
+            <div class="mt-4">
+                <input type="text" id="stuRoll" class="form-control mb-3 text-center py-3" placeholder="Roll Number (e.g. SKY12345)" style="border-radius:12px;">
+                <input type="password" id="stuPhone" class="form-control mb-3 text-center py-3" placeholder="Phone Number (Password)" style="border-radius:12px;">
+                <button class="btn-login" onclick="studentLogin()">DASHBOARD LOGIN</button>
+                <p id="loginErr" class="text-danger mt-3 small" style="display:none;"></p>
             </div>
+        </div>
+    </div>
+
+    <div id="portalScreen">
+        
+        <div class="portal-header">
+            <h5 class="m-0 fw-bold">SKY CLASSES</h5>
+            <i class="fa-solid fa-power-off" style="position:absolute; right:25px; top:22px; color:var(--accent-red);" onclick="location.reload()"></i>
+        </div>
+
+        <div id="sec-home" class="section-container active-section" style="padding:0;">
+            <div class="profile-hero">
+                <div class="mb-2"><i class="fa-solid fa-circle-user" style="font-size: 60px; color: var(--accent-gold);"></i></div>
+                <h3 class="fw-bold m-0" id="dispName">---</h3>
+                <p class="small opacity-75 m-0" id="dispRoll">Roll No: ---</p>
+                <div class="course-badge" id="dispCourse">COURSE LOADING...</div>
+            </div>
+
+            <div class="container">
+                <div class="row g-3 mb-4">
+                    <div class="col-6"><div class="stat-box"> <h4 id="statAtt">0</h4> <p>Attendance</p> </div></div>
+                    <div class="col-6"><div class="stat-box"> <h4 id="statFee">₹0</h4> <p>Fees Paid</p> </div></div>
+                </div>
+
+                <div class="glass-card">
+                    <h6 class="fw-bold border-bottom pb-2 mb-3"><i class="fa-solid fa-bullhorn text-danger me-2"></i> Notice Board</h6>
+                    <div id="noticeContent" class="small text-muted">Aapka portal update ho gaya hai! Ab aap yahan se marks aur fees check kar sakte hain.</div>
+                </div>
+            </div>
+        </div>
+
+        <div id="sec-attendance" class="section-container">
+            <h5 class="fw-bold mb-3">Attendance History</h5>
+            <div id="attendanceList">
+                <p class="text-center text-muted py-5">Loading logs...</p>
+            </div>
+        </div>
+
+        <div id="sec-result" class="section-container">
+            <h5 class="fw-bold mb-3">My Test Reports</h5>
+            <div id="resultBox">
+                <p class="text-center text-muted py-5">Checking for results...</p>
+            </div>
+        </div>
+
+        <div id="sec-fees" class="section-container">
+            <h5 class="fw-bold mb-3">Fees & Payments</h5>
+            <div class="glass-card bg-primary text-white mb-3" style="border:none;">
+                <p class="small mb-1 opacity-75">Total Fees Paid</p>
+                <h2 class="fw-bold mb-0" id="feeTotalSum">₹0</h2>
+            </div>
+            <div class="glass-card">
+                <h6 class="fw-bold small text-muted mb-3 uppercase">Payment History</h6>
+                <div id="feeHistory">
+                    <p class="text-center text-muted py-3 small">No transactions found.</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="bottom-nav">
+            <div class="nav-item active" id="nav-home" onclick="tab('home')"><i class="fa-solid fa-house"></i>Home</div>
+            <div class="nav-item" id="nav-attendance" onclick="tab('attendance')"><i class="fa-solid fa-calendar-check"></i>Attendance</div>
+            <div class="nav-item" id="nav-result" onclick="tab('result')"><i class="fa-solid fa-chart-line"></i>Results</div>
+            <div class="nav-item" id="nav-fees" onclick="tab('fees')"><i class="fa-solid fa-indian-rupee-sign"></i>Fees</div>
+        </div>
+
     </div>
 
     <script>
+        // --- FIREBASE CONFIG (Dhyan se replace karein) ---
         const firebaseConfig = {
           apiKey: "AIzaSyC6bcqETEnTjLEQnISXjnWR2brPrVOAm-Y",
           authDomain: "sky-classes-db-d6140.firebaseapp.com",
@@ -39,32 +144,141 @@
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
 
-        function checkResult() {
-            let roll = document.getElementById('rollInput').value.trim().toUpperCase();
-            if(!roll) return alert("Please enter Roll Number!");
+        let currentStudent = null;
 
-            db.ref('Student_Results/' + roll).once('value').then(snap => {
-                const res = snap.val();
-                const box = document.getElementById('resultDisplay');
-                
-                if(res) {
-                    let subHtml = `<table class="table table-bordered text-center table-sm mt-3"><tr class="table-dark"><th>Subject</th><th>Obtained</th><th>Max</th></tr>`;
-                    res.Subjects.forEach(s => { subHtml += `<tr><td>${s[0]}</td><td>${s[1]}</td><td>${s[2]}</td></tr>`; });
-                    subHtml += `</table>`;
+        // 1. LOGIN LOGIC
+        function studentLogin() {
+            const roll = document.getElementById('stuRoll').value.trim().toUpperCase();
+            const phone = document.getElementById('stuPhone').value.trim();
+            const err = document.getElementById('loginErr');
 
-                    box.innerHTML = `
-                        <h5 class="fw-bold text-primary">${res.Name}</h5>
-                        <p class="mb-1 small text-muted">Exam: <b>${res.Exam}</b></p>
-                        ${subHtml}
-                        <div class="alert alert-success py-2 text-center">
-                            <b>Total:</b> ${res.Total}/${res.Max} &nbsp; | &nbsp; <b>${res.Percentage}%</b>
-                        </div>
-                    `;
-                    box.style.display = "block";
-                } else {
-                    box.innerHTML = `<h6 class="text-danger text-center mt-3">Result Not Found for Roll No: ${roll}</h6>`;
-                    box.style.display = "block";
+            if(!roll || !phone) { alert("Roll No aur Phone daaliye bhai!"); return; }
+
+            db.ref('Face_Data').once('value', snap => {
+                const students = snap.val();
+                let found = false;
+
+                if(students) {
+                    for(let keyPhone in students) {
+                        let st = students[keyPhone];
+                        // Roll No aur Password (Phone) matching check
+                        if(st.RollNo === roll && keyPhone === phone) {
+                            found = true;
+                            currentStudent = { ...st, phone: keyPhone };
+                            setupPortal();
+                            break;
+                        }
+                    }
                 }
+
+                if(!found) {
+                    err.innerText = "Galt Roll Number ya Password! Dobara check karein.";
+                    err.style.display = "block";
+                }
+            });
+        }
+
+        // Enter key to login
+        document.getElementById("stuPhone").addEventListener("keypress", function(e) {
+            if (e.key === "Enter") studentLogin();
+        });
+
+        // 2. SETUP DATA AFTER LOGIN
+        function setupPortal() {
+            document.getElementById('loginScreen').style.display = "none";
+            document.getElementById('portalScreen').style.display = "block";
+            
+            document.getElementById('dispName').innerText = currentStudent.Name;
+            document.getElementById('dispRoll').innerText = `Roll: ${currentStudent.RollNo}`;
+            document.getElementById('dispCourse').innerText = currentStudent.Course || "General Course";
+
+            loadAttendance();
+            loadResults();
+            loadFees();
+        }
+
+        // 3. TAB NAVIGATION
+        function tab(id) {
+            document.querySelectorAll('.section-container').forEach(s => s.classList.remove('active-section'));
+            document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+            document.getElementById('sec-' + id).classList.add('active-section');
+            document.getElementById('nav-' + id).classList.add('active');
+        }
+
+        // 4. LOAD ATTENDANCE
+        function loadAttendance() {
+            db.ref('Daily_Attendance').on('value', snap => {
+                const list = document.getElementById('attendanceList');
+                list.innerHTML = '';
+                let presentCount = 0;
+
+                if(snap.val()) {
+                    Object.values(snap.val()).reverse().forEach(at => {
+                        if(at.Phone === currentStudent.phone) {
+                            presentCount++;
+                            let color = at.ScanType === "OUT" ? "text-danger" : "text-success";
+                            list.innerHTML += `
+                                <div class="fee-row">
+                                    <div><b class="small">${at.Date}</b><br><span class="text-muted" style="font-size:10px;">Status Recorded</span></div>
+                                    <div class="text-end fw-bold ${color}">${at.ScanType || "IN"} @ ${at.Time}</div>
+                                </div>`;
+                        }
+                    });
+                }
+                document.getElementById('statAtt').innerText = presentCount;
+                if(list.innerHTML === '') list.innerHTML = '<p class="text-center text-muted py-5 small">Abhi tak koi attendance nahi lagi hai.</p>';
+            });
+        }
+
+        // 5. LOAD RESULTS
+        function loadResults() {
+            db.ref('Student_Results/' + currentStudent.RollNo).on('value', snap => {
+                const res = snap.val();
+                const box = document.getElementById('resultBox');
+                if(res) {
+                    let subHtml = '';
+                    res.Subjects.forEach(s => {
+                        subHtml += `<div class="d-flex justify-content-between small mb-1"><span>${s[0]}</span><b>${s[1]}/${s[2]}</b></div>`;
+                    });
+                    box.innerHTML = `
+                        <div class="glass-card">
+                            <div class="d-flex justify-content-between mb-2 align-items-start">
+                                <span class="badge bg-danger">${res.Exam}</span>
+                                <h4 class="fw-bold text-success m-0">${res.Percentage}%</h4>
+                            </div>
+                            <div class="mt-3">${subHtml}</div>
+                            <div class="mt-2 pt-2 border-top fw-bold text-center">Total: ${res.Total}/${res.Max}</div>
+                        </div>`;
+                } else {
+                    box.innerHTML = '<p class="text-center text-muted py-5 small">Result abhi declare nahi hua hai.</p>';
+                }
+            });
+        }
+
+        // 6. LOAD FEES
+        function loadFees() {
+            db.ref('Finance_Data').on('value', snap => {
+                const list = document.getElementById('feeHistory');
+                list.innerHTML = '';
+                let totalPaid = 0;
+
+                if(snap.val()) {
+                    Object.values(snap.val()).forEach(f => {
+                        // Agar title me bachhe ka naam hai (Jo admin receipt se generate hota hai)
+                        if(f.Title.includes(currentStudent.Name) && f.Type === "Income") {
+                            let amt = parseInt(f.Amount);
+                            totalPaid += amt;
+                            list.innerHTML += `
+                                <div class="fee-row">
+                                    <div class="small fw-bold">${f.Date}<br><span class="text-muted" style="font-size:10px;">Electronic Receipt</span></div>
+                                    <div class="text-success fw-bold">₹${f.Amount}</div>
+                                </div>`;
+                        }
+                    });
+                }
+                document.getElementById('feeTotalSum').innerText = "₹" + totalPaid;
+                document.getElementById('statFee').innerText = "₹" + totalPaid;
+                if(list.innerHTML === '') list.innerHTML = '<p class="text-center text-muted py-3 small">Koi payment history nahi mili.</p>';
             });
         }
     </script>
