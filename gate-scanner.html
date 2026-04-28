@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sky Classes | Fast AI Gate Scanner + GPS</title>
+    <title>Sky Classes | AI Gate Scanner</title>
     
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700;800&display=swap" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -11,16 +11,21 @@
     
     <script src="https://www.gstatic.com/firebasejs/10.11.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.11.0/firebase-database-compat.js"></script>
+    
     <script src="https://cdn.jsdelivr.net/npm/@vladmandic/face-api/dist/face-api.js"></script>
 
     <style>
         body { 
-            font-family: 'Poppins', sans-serif; background: #000; 
+            font-family: 'Poppins', sans-serif; 
+            background: #000; /* Dark sci-fi background */
             height: 100vh; margin: 0; overflow: hidden;
             display: flex; flex-direction: column; align-items: center; justify-content: center;
         }
         
-        .header { position: absolute; top: 20px; left: 0; width: 100%; text-align: center; z-index: 10; }
+        /* Top Header */
+        .header {
+            position: absolute; top: 20px; left: 0; width: 100%; text-align: center; z-index: 10;
+        }
         .header h1 { color: white; font-weight: 800; font-size: 35px; letter-spacing: 2px; text-shadow: 0 0 15px rgba(230, 179, 30, 0.5); }
         .header h1 span { color: #E6B31E; }
         .live-badge {
@@ -29,33 +34,40 @@
         }
         @keyframes blink { 0% { opacity: 1; } 50% { opacity: 0.5; } 100% { opacity: 1; } }
 
+        /* Camera Scanner Design */
         .scanner-container {
             position: relative; width: 90vw; max-width: 600px; height: 60vh; 
             border: 4px solid #0A2540; border-radius: 20px; overflow: hidden;
             box-shadow: 0 0 40px rgba(10, 37, 64, 0.8);
         }
         
-        /* Mirror Fix */
-        video, canvas { position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; transform: scaleX(-1); }
+        /* YAHAN FIX KIYA HAI: scaleX(-1) se camera bilkul mirror jaisa seedha dikhega */
+        video, canvas { 
+            position: absolute; top: 0; left: 0; 
+            width: 100%; height: 100%; 
+            object-fit: cover; 
+            transform: scaleX(-1); 
+        }
         
+        /* Scanning overlay effect */
         .scan-line {
             position: absolute; top: 0; left: 0; width: 100%; height: 5px; background: #E6B31E;
             box-shadow: 0 0 15px #E6B31E, 0 0 30px #E6B31E; opacity: 0.7; z-index: 5;
-            animation: scan 2s linear infinite;
+            animation: scan 3s linear infinite;
         }
         @keyframes scan { 0% { top: 0%; } 100% { top: 100%; } }
 
+        /* Status & Logs */
         .status-box {
             position: absolute; bottom: 30px; width: 90vw; max-width: 600px;
             background: rgba(10, 37, 64, 0.9); padding: 20px; border-radius: 15px;
             text-align: center; color: white; border: 1px solid #1a365d;
         }
-        #recognitionStatus { font-size: 20px; font-weight: 700; margin: 0; color: #E6B31E; }
-        #gpsStatus { font-size: 12px; color: #17a2b8; margin-top: 5px; font-weight: 600; }
+        #recognitionStatus { font-size: 24px; font-weight: 700; margin: 0; color: #E6B31E; }
         
         .loading-overlay {
             position: fixed; top:0; left:0; width:100%; height:100%; background: #07192F;
-            display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 1000; color: white; text-align: center;
+            display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 1000; color: white;
         }
     </style>
 </head>
@@ -63,13 +75,13 @@
 
     <div class="loading-overlay" id="loadingScreen">
         <i class="fa-solid fa-satellite-dish fa-spin" style="font-size: 60px; color: #E6B31E; margin-bottom: 20px;"></i>
-        <h2 class="fw-bold">Initializing Sky Security...</h2>
-        <p class="text-muted" id="loadingText">Syncing Face Data & GPS Module</p>
+        <h2 class="fw-bold">Initializing Gate Scanner...</h2>
+        <p class="text-muted" id="loadingText">Syncing Face Data from Server</p>
     </div>
 
     <div class="header">
         <h1>SKY <span>CLASSES</span></h1>
-        <div class="live-badge"><i class="fa-solid fa-record-vinyl me-2"></i> AI SCANNER + GPS LIVE</div>
+        <div class="live-badge"><i class="fa-solid fa-record-vinyl me-2"></i> AI GATE SCANNER LIVE</div>
     </div>
 
     <div class="scanner-container">
@@ -80,10 +92,10 @@
 
     <div class="status-box">
         <p id="recognitionStatus"><i class="fa-solid fa-face-viewfinder me-2"></i> Looking for students...</p>
-        <p id="gpsStatus"><i class="fa-solid fa-location-crosshairs fa-spin me-1"></i> Waiting for GPS signal...</p>
     </div>
 
     <script>
+        // Firebase Setup
         const firebaseConfig = {
           apiKey: "AIzaSyC6bcqETEnTjLEQnISXjnWR2brPrVOAm-Y",
           authDomain: "sky-classes-db-d6140.firebaseapp.com",
@@ -100,123 +112,110 @@
         const canvas = document.getElementById('canvas');
         const statusText = document.getElementById('recognitionStatus');
         const loadingText = document.getElementById('loadingText');
-        const gpsStatus = document.getElementById('gpsStatus');
         
         let faceMatcher = null;
-        let recentlyScanned = {}; 
-        let deviceLocation = "Fetching Location..."; 
+        let recentlyScanned = {}; // Anti-spam system
 
-        // GPS Location Fetcher
-        function getDeviceLocation() {
-            if (navigator.geolocation) {
-                navigator.geolocation.getCurrentPosition(
-                    (position) => {
-                        const lat = position.coords.latitude;
-                        const lng = position.coords.longitude;
-                        deviceLocation = `https://www.google.com/maps?q=${lat},${lng}`;
-                        gpsStatus.innerHTML = "<i class='fa-solid fa-map-location-dot me-1'></i> GPS Locked Successfully";
-                        gpsStatus.style.color = "#28a745";
-                    },
-                    (error) => {
-                        deviceLocation = "Location Denied by User";
-                        gpsStatus.innerHTML = "<i class='fa-solid fa-triangle-exclamation me-1'></i> GPS Permission Denied";
-                        gpsStatus.style.color = "#D90429";
-                    }
-                );
-            } else {
-                deviceLocation = "GPS Not Supported";
-            }
-        }
-
+        // Step 1: Load AI Models
         const MODEL_URL = 'https://cdn.jsdelivr.net/npm/@vladmandic/face-api/model/';
         
-        // Fast TinyFaceDetector load kiya
         Promise.all([
-            faceapi.nets.tinyFaceDetector.loadFromUri(MODEL_URL),
+            faceapi.nets.ssdMobilenetv1.loadFromUri(MODEL_URL),
             faceapi.nets.faceLandmark68Net.loadFromUri(MODEL_URL),
             faceapi.nets.faceRecognitionNet.loadFromUri(MODEL_URL)
         ]).then(fetchRegisteredFaces).catch(err => {
-            loadingText.innerHTML = "Error loading AI. Please refresh.";
+            loadingText.innerHTML = "Error loading AI Models. Please refresh.";
             loadingText.style.color = "red";
         });
 
+        // Step 2: Fetch Data from Firebase and Train the AI Matcher
         function fetchRegisteredFaces() {
-            loadingText.innerHTML = "Training AI with Fast Database...";
+            loadingText.innerHTML = "Training AI with Sky Classes Students...";
             
             db.ref('Face_Data').once('value').then(snapshot => {
                 const data = snapshot.val();
                 if (!data) {
-                    loadingText.innerHTML = "No students registered yet!";
+                    loadingText.innerHTML = "No students registered yet! Please use Registration Page.";
+                    loadingText.style.color = "red";
                     return;
                 }
 
                 const labeledFaceDescriptors = [];
+                
                 for (const phone in data) {
                     const student = data[phone];
                     const floatArray = new Float32Array(student.FaceDescriptor);
                     const label = student.Name + "||" + phone + "||" + (student.Parent_Phone || ""); 
-                    labeledFaceDescriptors.push(new faceapi.LabeledFaceDescriptors(label, [floatArray]));
+                    
+                    labeledFaceDescriptors.push(
+                        new faceapi.LabeledFaceDescriptors(label, [floatArray])
+                    );
                 }
 
-                faceMatcher = new faceapi.FaceMatcher(labeledFaceDescriptors, 0.45); // 0.45 for strict match
-                getDeviceLocation(); // Get GPS
+                faceMatcher = new faceapi.FaceMatcher(labeledFaceDescriptors, 0.5);
                 startVideo();
             });
         }
 
+        // Step 3: Start Camera
         function startVideo() {
             navigator.mediaDevices.getUserMedia({ video: { facingMode: "user" } })
-                .then(stream => { video.srcObject = stream; })
+                .then(stream => {
+                    video.srcObject = stream;
+                })
                 .catch(err => {
-                    loadingText.innerHTML = "Camera permission required!";
+                    loadingText.innerHTML = "Camera permission required for Gate Scanner!";
+                    loadingText.style.color = "red";
                 });
         }
 
+        // Step 4: The Core Scanning Loop
         video.addEventListener('play', () => {
             document.getElementById('loadingScreen').style.display = 'none';
             
             const displaySize = { width: video.videoWidth || 600, height: video.videoHeight || 450 };
             faceapi.matchDimensions(canvas, displaySize);
 
-            // Fast Scan Loop (Every 0.5 seconds)
             setInterval(async () => {
                 if (!faceMatcher) return;
 
-                const detections = await faceapi.detectAllFaces(video, new faceapi.TinyFaceDetectorOptions()).withFaceLandmarks().withFaceDescriptors();
+                const detections = await faceapi.detectAllFaces(video).withFaceLandmarks().withFaceDescriptors();
                 const resizedDetections = faceapi.resizeResults(detections, displaySize);
                 
                 canvas.getContext('2d').clearRect(0, 0, canvas.width, canvas.height);
 
-                if(resizedDetections.length === 0) {
+                const results = resizedDetections.map(d => faceMatcher.findBestMatch(d.descriptor));
+                
+                if(results.length === 0) {
                     statusText.innerHTML = "<i class='fa-solid fa-face-viewfinder me-2'></i> Looking for students...";
                     statusText.style.color = "#E6B31E";
                 }
 
-                resizedDetections.forEach((d) => {
-                    const result = faceMatcher.findBestMatch(d.descriptor);
-                    
+                results.forEach((result, i) => {
                     if (result.label !== 'unknown') {
                         const splitData = result.label.split("||");
                         const name = splitData[0];
                         const phone = splitData[1];
                         const parentPhone = splitData[2];
 
-                        // Cooldown (5 Minutes)
-                        if (recentlyScanned[phone] && (Date.now() - recentlyScanned[phone] < 300000)) {
-                            statusText.innerHTML = `<i class='fa-solid fa-clock-rotate-left me-2'></i> ${name}, already marked!`;
+                        // Cooldown Check (5 Minutes)
+                        const nowTime = Date.now();
+                        if (recentlyScanned[phone] && (nowTime - recentlyScanned[phone] < 300000)) {
+                            statusText.innerHTML = `<i class='fa-solid fa-clock-rotate-left me-2'></i> ${name}, already marked today!`;
                             statusText.style.color = "#ffc107";
                             return;
                         }
 
                         markAttendance(name, phone, parentPhone);
                     } else {
-                        statusText.innerHTML = "<i class='fa-solid fa-user-secret me-2'></i> Unknown Face!";
+                        statusText.innerHTML = "<i class='fa-solid fa-user-secret me-2'></i> Unknown Face Detected!";
                         statusText.style.color = "#D90429";
                     }
                 });
-            }, 500); 
+            }, 1000); 
         });
 
+        // Step 5: Save to Firebase
         function markAttendance(name, phone, parentPhone) {
             recentlyScanned[phone] = Date.now(); 
             
@@ -227,7 +226,6 @@
             const dateStr = now.toLocaleDateString('en-IN'); 
             const timeStr = now.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' });
 
-            // Saving to Firebase with Location Links
             db.ref('Daily_Attendance').push({
                 Name: name,
                 Phone: phone,
@@ -235,15 +233,14 @@
                 Date: dateStr,
                 Time: timeStr,
                 Timestamp: Date.now(),
-                Method: "Face ID",
-                LocationMap: deviceLocation  // Google Maps link saved here
+                Method: "Face ID" 
             }).then(() => {
                 const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
                 const oscillator = audioCtx.createOscillator();
                 oscillator.type = 'sine'; oscillator.frequency.setValueAtTime(800, audioCtx.currentTime);
                 oscillator.connect(audioCtx.destination);
                 oscillator.start(); oscillator.stop(audioCtx.currentTime + 0.2);
-            });
+            }).catch(err => console.error("Firebase Error: ", err));
         }
     </script>
 </body>
