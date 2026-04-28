@@ -3,179 +3,248 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sky Classes | AI Attendance</title>
+    <title>Sky Classes | Fast AI Gate Scanner + GPS</title>
     
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@700;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
-    <script defer src="https://cdn.jsdelivr.net/npm/@vladmandic/face-api/dist/face-api.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.11.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.11.0/firebase-database-compat.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@vladmandic/face-api/dist/face-api.js"></script>
 
     <style>
-        :root { --red: #D90429; --green: #28a745; --gold: #E6B31E; }
-        body { background: #000; color: white; font-family: 'Poppins', sans-serif; margin: 0; overflow: hidden; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; }
-
-        /* Top Bar Branding */
-        .top-header { position: absolute; top: 15px; width: 95%; display: flex; justify-content: space-between; align-items: flex-start; z-index: 100; }
-        .branding h1 { font-size: 1.4rem; margin: 0; color: var(--gold); letter-spacing: 1px; text-transform: uppercase; }
-        #status { font-weight: 800; font-size: 0.9rem; color: var(--red); display: block; margin-top: 5px; }
-        
-        .aadhaar-box { text-align: right; opacity: 0.8; font-size: 12px; }
-
-        /* Mode Switcher */
-        .modes { position: absolute; top: 90px; display: flex; gap: 12px; z-index: 100; }
-        .mode-btn { border: 2.5px solid rgba(255,255,255,0.3); padding: 10px 25px; border-radius: 50px; cursor: pointer; font-weight: 800; transition: 0.3s; font-size: 14px; }
-        .active-in { border-color: var(--green); color: var(--green); box-shadow: 0 0 15px var(--green); opacity: 1; }
-        .active-out { border-color: var(--red); color: var(--red); box-shadow: 0 0 15px var(--red); opacity: 1; }
-
-        /* MEGA CIRCLE UI */
-        .scanner-container { position: relative; width: 450px; height: 450px; margin-top: 60px; }
-        .circle-ring { 
-            width: 100%; height: 100%; border-radius: 50%; border: 12px solid var(--red); 
-            overflow: hidden; position: relative; transition: 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275); 
-            background: #050505; box-shadow: 0 0 40px rgba(217, 4, 41, 0.2);
+        body { 
+            font-family: 'Poppins', sans-serif; background: #000; 
+            height: 100vh; margin: 0; overflow: hidden;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
         }
-        .circle-ring.success { border-color: var(--green); box-shadow: 0 0 60px rgba(40, 167, 69, 0.6); transform: scale(1.02); }
         
-        #video { width: 100%; height: 100%; object-fit: cover; transform: scaleX(-1); }
-
-        /* Hindi Overlay text */
-        .hindi-text { 
-            position: absolute; bottom: 45px; width: 100%; text-align: center; 
-            font-size: 32px; font-weight: 900; color: white; z-index: 110;
-            text-shadow: -3px -3px 0 var(--red), 3px -3px 0 var(--red), -3px 3px 0 var(--red), 3px 3px 0 var(--red);
-            letter-spacing: 1px;
+        .header { position: absolute; top: 20px; left: 0; width: 100%; text-align: center; z-index: 10; }
+        .header h1 { color: white; font-weight: 800; font-size: 35px; letter-spacing: 2px; text-shadow: 0 0 15px rgba(230, 179, 30, 0.5); }
+        .header h1 span { color: #E6B31E; }
+        .live-badge {
+            background: #D90429; color: white; padding: 5px 15px; border-radius: 50px; 
+            font-size: 14px; font-weight: bold; display: inline-block; animation: blink 2s infinite;
         }
+        @keyframes blink { 0% { opacity: 1; } 50% { opacity: 0.5; } 100% { opacity: 1; } }
 
-        .footer-info { position: absolute; bottom: 25px; width: 90%; display: flex; justify-content: space-between; opacity: 0.5; font-size: 12px; font-weight: bold; }
+        .scanner-container {
+            position: relative; width: 90vw; max-width: 600px; height: 60vh; 
+            border: 4px solid #0A2540; border-radius: 20px; overflow: hidden;
+            box-shadow: 0 0 40px rgba(10, 37, 64, 0.8);
+        }
+        
+        /* Mirror Fix */
+        video, canvas { position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; transform: scaleX(-1); }
+        
+        .scan-line {
+            position: absolute; top: 0; left: 0; width: 100%; height: 5px; background: #E6B31E;
+            box-shadow: 0 0 15px #E6B31E, 0 0 30px #E6B31E; opacity: 0.7; z-index: 5;
+            animation: scan 2s linear infinite;
+        }
+        @keyframes scan { 0% { top: 0%; } 100% { top: 100%; } }
+
+        .status-box {
+            position: absolute; bottom: 30px; width: 90vw; max-width: 600px;
+            background: rgba(10, 37, 64, 0.9); padding: 20px; border-radius: 15px;
+            text-align: center; color: white; border: 1px solid #1a365d;
+        }
+        #recognitionStatus { font-size: 20px; font-weight: 700; margin: 0; color: #E6B31E; }
+        #gpsStatus { font-size: 12px; color: #17a2b8; margin-top: 5px; font-weight: 600; }
+        
+        .loading-overlay {
+            position: fixed; top:0; left:0; width:100%; height:100%; background: #07192F;
+            display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 1000; color: white; text-align: center;
+        }
     </style>
 </head>
 <body>
 
-    <div class="top-header">
-        <div class="branding">
-            <h1>SKY CLASSES FACE ATTENDANCE</h1>
-            <span id="status">INITIALIZING AI SYSTEM...</span>
-        </div>
-        <div class="aadhaar-box">
-            <img src="https://upload.wikimedia.org/wikipedia/en/thumb/c/cf/Aadhaar_Logo.svg/1200px-Aadhaar_Logo.svg.png" width="35"><br>
-            AADHAAR AUTH v1.33
-        </div>
+    <div class="loading-overlay" id="loadingScreen">
+        <i class="fa-solid fa-satellite-dish fa-spin" style="font-size: 60px; color: #E6B31E; margin-bottom: 20px;"></i>
+        <h2 class="fw-bold">Initializing Sky Security...</h2>
+        <p class="text-muted" id="loadingText">Syncing Face Data & GPS Module</p>
     </div>
 
-    <div class="modes">
-        <div id="btnIn" class="mode-btn active-in" onclick="setMode('IN')">ENTRY (IN)</div>
-        <div id="btnOut" class="mode-btn" onclick="setMode('OUT')">EXIT (OUT)</div>
+    <div class="header">
+        <h1>SKY <span>CLASSES</span></h1>
+        <div class="live-badge"><i class="fa-solid fa-record-vinyl me-2"></i> AI SCANNER + GPS LIVE</div>
     </div>
 
     <div class="scanner-container">
-        <div class="circle-ring" id="mainRing">
-            <video id="video" autoplay playsinline muted></video>
-            <div class="hindi-text">उधास होके नही जाने देना है</div>
-        </div>
+        <video id="video" autoplay muted playsinline></video>
+        <canvas id="canvas"></canvas>
+        <div class="scan-line"></div>
     </div>
 
-    <div class="footer-info">
-        <span onclick="location.reload()"><i class="fa-solid fa-sync-alt me-1"></i> REFRESH SYSTEM</span>
-        <span id="clock">00:00:00 AM</span>
+    <div class="status-box">
+        <p id="recognitionStatus"><i class="fa-solid fa-face-viewfinder me-2"></i> Looking for students...</p>
+        <p id="gpsStatus"><i class="fa-solid fa-location-crosshairs fa-spin me-1"></i> Waiting for GPS signal...</p>
     </div>
 
     <script>
-        let currentMode = 'IN';
-        let isProcessing = false;
-        const statusText = document.getElementById('status');
-
-        // Firebase Setup
         const firebaseConfig = {
-            apiKey: "AIzaSyC6bcqETEnTjLEQnISXjnWR2brPrVOAm-Y",
-            authDomain: "sky-classes-db-d6140.firebaseapp.com",
-            databaseURL: "https://sky-classes-db-d6140-default-rtdb.firebaseio.com",
-            projectId: "sky-classes-db-d6140",
-            storageBucket: "sky-classes-db-d6140.firebasestorage.app",
-            messagingSenderId: "915411828634",
-            appId: "1:915411828634:web:44aadc81aa911cdebcc423"
+          apiKey: "AIzaSyC6bcqETEnTjLEQnISXjnWR2brPrVOAm-Y",
+          authDomain: "sky-classes-db-d6140.firebaseapp.com",
+          databaseURL: "https://sky-classes-db-d6140-default-rtdb.firebaseio.com",
+          projectId: "sky-classes-db-d6140",
+          storageBucket: "sky-classes-db-d6140.firebasestorage.app",
+          messagingSenderId: "915411828634",
+          appId: "1:915411828634:web:44aadc81aa911cdebcc423"
         };
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
 
-        function setMode(m) {
-            currentMode = m;
-            document.getElementById('btnIn').className = m === 'IN' ? 'mode-btn active-in' : 'mode-btn';
-            document.getElementById('btnOut').className = m === 'OUT' ? 'mode-btn active-out' : 'mode-btn';
-        }
+        const video = document.getElementById('video');
+        const canvas = document.getElementById('canvas');
+        const statusText = document.getElementById('recognitionStatus');
+        const loadingText = document.getElementById('loadingText');
+        const gpsStatus = document.getElementById('gpsStatus');
+        
+        let faceMatcher = null;
+        let recentlyScanned = {}; 
+        let deviceLocation = "Fetching Location..."; 
 
-        async function startApp() {
-            try {
-                // Models Loading
-                const MODEL_URL = 'https://raw.githubusercontent.com/justadudewhohacks/face-api.js/master/weights';
-                await faceapi.nets.tinyFaceDetector.loadFromUri(MODEL_URL);
-                
-                // Camera Start
-                const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "user" } });
-                const videoEl = document.getElementById('video');
-                videoEl.srcObject = stream;
-                
-                statusText.innerText = "READY: WAITING FOR FACE...";
-                statusText.style.color = "var(--green)";
-                
-                runDetection();
-            } catch (err) {
-                statusText.innerText = "ERROR: CAMERA BLOCKED!";
-                console.error(err);
+        // GPS Location Fetcher
+        function getDeviceLocation() {
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(
+                    (position) => {
+                        const lat = position.coords.latitude;
+                        const lng = position.coords.longitude;
+                        deviceLocation = `https://www.google.com/maps?q=${lat},${lng}`;
+                        gpsStatus.innerHTML = "<i class='fa-solid fa-map-location-dot me-1'></i> GPS Locked Successfully";
+                        gpsStatus.style.color = "#28a745";
+                    },
+                    (error) => {
+                        deviceLocation = "Location Denied by User";
+                        gpsStatus.innerHTML = "<i class='fa-solid fa-triangle-exclamation me-1'></i> GPS Permission Denied";
+                        gpsStatus.style.color = "#D90429";
+                    }
+                );
+            } else {
+                deviceLocation = "GPS Not Supported";
             }
         }
 
-        async function runDetection() {
-            const videoEl = document.getElementById('video');
-            
-            setInterval(async () => {
-                if (isProcessing) return;
-
-                const detections = await faceapi.detectAllFaces(videoEl, new faceapi.TinyFaceDetectorOptions());
-                
-                if (detections.length > 0) {
-                    // Face found, trigger attendance
-                    processAttendance("Aditya Sahani", "8840428581");
-                }
-            }, 1000); // Checks every 1 second
-        }
-
-        async function processAttendance(name, phone) {
-            isProcessing = true;
-            const ring = document.getElementById('mainRing');
-            
-            ring.classList.add('success');
-            statusText.innerText = "MATCH FOUND! SYNCING...";
-            statusText.style.color = "var(--green)";
-
-            const dateKey = new Date().toLocaleDateString('en-GB').replace(/\//g, "-");
-            const timeVal = new Date().toLocaleTimeString();
-
-            // Firebase Save
-            await db.ref(`Face_Data/${phone}/Attendance/${dateKey}`).update({ [currentMode]: timeVal });
-
-            // Voice Confirmation
-            speak(`${name}, Your ${currentMode === 'IN' ? 'Entry' : 'Exit'} is marked. Thank you!`);
-
-            // Reset UI after 4 seconds
-            setTimeout(() => {
-                ring.classList.remove('success');
-                statusText.innerText = "READY: WAITING FOR FACE...";
-                isProcessing = false;
-            }, 4500);
-        }
-
-        function speak(text) {
-            const utterance = new SpeechSynthesisUtterance(text);
-            utterance.rate = 1;
-            utterance.pitch = 1;
-            window.speechSynthesis.speak(utterance);
-        }
-
-        setInterval(() => { document.getElementById('clock').innerText = new Date().toLocaleTimeString(); }, 1000);
+        const MODEL_URL = 'https://cdn.jsdelivr.net/npm/@vladmandic/face-api/model/';
         
-        window.onload = startApp;
+        // Fast TinyFaceDetector load kiya
+        Promise.all([
+            faceapi.nets.tinyFaceDetector.loadFromUri(MODEL_URL),
+            faceapi.nets.faceLandmark68Net.loadFromUri(MODEL_URL),
+            faceapi.nets.faceRecognitionNet.loadFromUri(MODEL_URL)
+        ]).then(fetchRegisteredFaces).catch(err => {
+            loadingText.innerHTML = "Error loading AI. Please refresh.";
+            loadingText.style.color = "red";
+        });
+
+        function fetchRegisteredFaces() {
+            loadingText.innerHTML = "Training AI with Fast Database...";
+            
+            db.ref('Face_Data').once('value').then(snapshot => {
+                const data = snapshot.val();
+                if (!data) {
+                    loadingText.innerHTML = "No students registered yet!";
+                    return;
+                }
+
+                const labeledFaceDescriptors = [];
+                for (const phone in data) {
+                    const student = data[phone];
+                    const floatArray = new Float32Array(student.FaceDescriptor);
+                    const label = student.Name + "||" + phone + "||" + (student.Parent_Phone || ""); 
+                    labeledFaceDescriptors.push(new faceapi.LabeledFaceDescriptors(label, [floatArray]));
+                }
+
+                faceMatcher = new faceapi.FaceMatcher(labeledFaceDescriptors, 0.45); // 0.45 for strict match
+                getDeviceLocation(); // Get GPS
+                startVideo();
+            });
+        }
+
+        function startVideo() {
+            navigator.mediaDevices.getUserMedia({ video: { facingMode: "user" } })
+                .then(stream => { video.srcObject = stream; })
+                .catch(err => {
+                    loadingText.innerHTML = "Camera permission required!";
+                });
+        }
+
+        video.addEventListener('play', () => {
+            document.getElementById('loadingScreen').style.display = 'none';
+            
+            const displaySize = { width: video.videoWidth || 600, height: video.videoHeight || 450 };
+            faceapi.matchDimensions(canvas, displaySize);
+
+            // Fast Scan Loop (Every 0.5 seconds)
+            setInterval(async () => {
+                if (!faceMatcher) return;
+
+                const detections = await faceapi.detectAllFaces(video, new faceapi.TinyFaceDetectorOptions()).withFaceLandmarks().withFaceDescriptors();
+                const resizedDetections = faceapi.resizeResults(detections, displaySize);
+                
+                canvas.getContext('2d').clearRect(0, 0, canvas.width, canvas.height);
+
+                if(resizedDetections.length === 0) {
+                    statusText.innerHTML = "<i class='fa-solid fa-face-viewfinder me-2'></i> Looking for students...";
+                    statusText.style.color = "#E6B31E";
+                }
+
+                resizedDetections.forEach((d) => {
+                    const result = faceMatcher.findBestMatch(d.descriptor);
+                    
+                    if (result.label !== 'unknown') {
+                        const splitData = result.label.split("||");
+                        const name = splitData[0];
+                        const phone = splitData[1];
+                        const parentPhone = splitData[2];
+
+                        // Cooldown (5 Minutes)
+                        if (recentlyScanned[phone] && (Date.now() - recentlyScanned[phone] < 300000)) {
+                            statusText.innerHTML = `<i class='fa-solid fa-clock-rotate-left me-2'></i> ${name}, already marked!`;
+                            statusText.style.color = "#ffc107";
+                            return;
+                        }
+
+                        markAttendance(name, phone, parentPhone);
+                    } else {
+                        statusText.innerHTML = "<i class='fa-solid fa-user-secret me-2'></i> Unknown Face!";
+                        statusText.style.color = "#D90429";
+                    }
+                });
+            }, 500); 
+        });
+
+        function markAttendance(name, phone, parentPhone) {
+            recentlyScanned[phone] = Date.now(); 
+            
+            statusText.innerHTML = `<i class='fa-solid fa-circle-check me-2'></i> Welcome, ${name}!`;
+            statusText.style.color = "#28a745";
+
+            const now = new Date();
+            const dateStr = now.toLocaleDateString('en-IN'); 
+            const timeStr = now.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' });
+
+            // Saving to Firebase with Location Links
+            db.ref('Daily_Attendance').push({
+                Name: name,
+                Phone: phone,
+                Parent_Phone: parentPhone || "N/A",
+                Date: dateStr,
+                Time: timeStr,
+                Timestamp: Date.now(),
+                Method: "Face ID",
+                LocationMap: deviceLocation  // Google Maps link saved here
+            }).then(() => {
+                const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                const oscillator = audioCtx.createOscillator();
+                oscillator.type = 'sine'; oscillator.frequency.setValueAtTime(800, audioCtx.currentTime);
+                oscillator.connect(audioCtx.destination);
+                oscillator.start(); oscillator.stop(audioCtx.currentTime + 0.2);
+            });
+        }
     </script>
 </body>
 </html>
