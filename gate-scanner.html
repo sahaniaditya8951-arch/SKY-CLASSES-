@@ -3,161 +3,78 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sky Classes | Gate Face Scanner v1.33</title>
+    <title>Sky Classes | AI Gate v2.0</title>
     
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700;800&display=swap" rel="stylesheet">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@600;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
+    <script defer src="https://cdn.jsdelivr.net/npm/@vladmandic/face-api/dist/face-api.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.11.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.11.0/firebase-database-compat.js"></script>
 
     <style>
-        :root {
-            --status-red: #D90429;
-            --status-green: #28a745;
-            --sky-dark: #07192F;
-        }
+        :root { --red: #D90429; --green: #28a745; }
+        body { background: #000; color: white; font-family: 'Poppins', sans-serif; margin: 0; overflow: hidden; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; }
 
-        body { 
-            background-color: #000; 
-            color: white; 
-            font-family: 'Poppins', sans-serif; 
-            height: 100vh;
-            margin: 0;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            overflow: hidden;
-        }
-
-        /* --- Top Bar Styling --- */
-        .scanner-top-bar {
-            width: 100%;
-            max-width: 450px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 15px 25px;
-            position: absolute;
-            top: 10px;
-        }
-        .status-text { font-weight: 700; transition: 0.3s; }
-        .status-red { color: var(--status-red); }
-        .status-green { color: var(--status-green); text-shadow: 0 0 10px var(--status-green); }
+        /* Top Bar */
+        .top-bar { position: absolute; top: 20px; width: 90%; display: flex; justify-content: space-between; align-items: center; z-index: 10; }
+        #status { font-weight: 800; font-size: 1.2rem; color: var(--red); }
         
-        .aadhaar-auth-title { text-align: right; font-size: 14px; opacity: 0.8; }
-        .version-small { display: block; font-size: 10px; font-weight: 400; }
+        /* Mode Switcher */
+        .modes { position: absolute; top: 80px; display: flex; gap: 10px; z-index: 10; }
+        .mode-btn { border: 2px solid white; padding: 8px 20px; border-radius: 50px; cursor: pointer; font-weight: bold; opacity: 0.5; transition: 0.3s; }
+        .active-in { border-color: var(--green); color: var(--green); opacity: 1; box-shadow: 0 0 10px var(--green); }
+        .active-out { border-color: var(--red); color: var(--red); opacity: 1; box-shadow: 0 0 10px var(--red); }
 
-        /* --- IN/OUT Mode Switcher --- */
-        .mode-container {
-            position: absolute;
-            top: 80px;
-            z-index: 10;
+        /* BIG CIRCLE UI */
+        .scanner-container { position: relative; width: 380px; height: 380px; margin-top: 50px; }
+        .circle { 
+            width: 100%; height: 100%; border-radius: 50%; border: 10px solid var(--red); 
+            overflow: hidden; position: relative; transition: 0.4s; box-shadow: 0 0 30px rgba(217, 4, 41, 0.4); 
         }
-        .btn-check:checked + .btn-outline-success { background-color: var(--status-green); color: white; border-color: var(--status-green); }
-        .btn-check:checked + .btn-outline-danger { background-color: var(--status-red); color: white; border-color: var(--status-red); }
+        .circle.success { border-color: var(--green); box-shadow: 0 0 50px rgba(40, 167, 69, 0.7); }
+        
+        #video { width: 100%; height: 100%; object-fit: cover; transform: scaleX(-1); }
+        canvas { position: absolute; top: 0; left: 0; }
 
-        /* --- Main Circular Scanner (THE BAVAL PART) --- */
-        .camera-wrapper {
-            position: relative;
-            width: 320px;
-            height: 320px;
-            margin-top: 40px;
-        }
-
-        .camera-circle-container {
-            width: 100%;
-            height: 100%;
-            border-radius: 50%;
-            overflow: hidden;
-            position: relative;
-            border: 8px solid var(--status-red); /* Default Red */
-            transition: border-color 0.4s ease, box-shadow 0.4s ease;
-            box-shadow: 0 0 20px rgba(217, 4, 41, 0.3);
+        .overlay-text { 
+            position: absolute; bottom: 25px; width: 100%; text-align: center; 
+            font-size: 30px; font-weight: 800; color: white; z-index: 20;
+            text-shadow: -3px -3px 0 var(--red), 3px -3px 0 var(--red), -3px 3px 0 var(--red), 3px 3px 0 var(--red);
         }
 
-        /* Success State for Ring */
-        .camera-circle-container.success-ring {
-            border-color: var(--status-green);
-            box-shadow: 0 0 40px rgba(40, 167, 69, 0.6);
-        }
-
-        #webcam {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            transform: scaleX(-1); /* Mirror view */
-        }
-
-        /* --- Hindi Text Overlay (Exact as Image) --- */
-        .hindi-overlay-text {
-            position: absolute;
-            bottom: 15px;
-            left: 50%;
-            transform: translateX(-50%);
-            color: white;
-            font-size: 28px;
-            font-weight: 800;
-            white-space: nowrap;
-            z-index: 100;
-            /* White text with thick Red outline */
-            text-shadow: 
-                -3px -3px 0 var(--status-red), 3px -3px 0 var(--status-red),
-                -3px 3px 0 var(--status-red), 3px 3px 0 var(--status-red),
-                0px 0px 15px rgba(0,0,0,0.5);
-        }
-
-        /* --- Bottom Bar --- */
-        .scanner-bottom-bar {
-            position: absolute;
-            bottom: 30px;
-            width: 100%;
-            max-width: 450px;
-            display: flex;
-            justify-content: space-between;
-            padding: 0 30px;
-            opacity: 0.6;
-        }
-        .btn-refresh { background: none; border: none; color: white; font-size: 24px; cursor: pointer; }
+        .footer { position: absolute; bottom: 30px; width: 90%; display: flex; justify-content: space-between; opacity: 0.6; font-size: 14px; }
     </style>
 </head>
 <body>
 
-    <div class="scanner-top-bar">
-        <div id="statusLabel" class="status-text status-red">Face Not Detected</div>
-        <div class="aadhaar-auth-title text-uppercase">
-            <img src="https://upload.wikimedia.org/wikipedia/en/thumb/c/cf/Aadhaar_Logo.svg/1200px-Aadhaar_Logo.svg.png" width="30" class="mb-1"><br>
-            Aadhaar Auth <span class="version-small">v1.33</span>
+    <div class="top-bar">
+        <div id="status">INITIALIZING AI...</div>
+        <div style="text-align:right">AADHAAR AUTH<br><small>v1.33</small></div>
+    </div>
+
+    <div class="modes">
+        <div id="btnIn" class="mode-btn active-in" onclick="setMode('IN')">ENTRY (IN)</div>
+        <div id="btnOut" class="mode-btn" onclick="setMode('OUT')">EXIT (OUT)</div>
+    </div>
+
+    <div class="scanner-container">
+        <div class="circle" id="mainCircle">
+            <video id="video" autoplay muted></video>
+            <div class="overlay-text">उधास होके नही जाने देना है</div>
         </div>
     </div>
 
-    <div class="mode-container d-flex gap-2">
-        <input type="radio" class="btn-check" name="gateMode" id="modeIn" value="IN" checked>
-        <label class="btn btn-outline-success btn-sm px-3 fw-bold rounded-pill" for="modeIn">ENTRY (IN)</label>
-
-        <input type="radio" class="btn-check" name="gateMode" id="modeOut" value="OUT">
-        <label class="btn btn-outline-danger btn-sm px-3 fw-bold rounded-pill" for="modeOut">EXIT (OUT)</label>
+    <div class="footer">
+        <i class="fa-solid fa-rotate-right" onclick="location.reload()"></i>
+        <div id="clock">00:00:00</div>
     </div>
-
-    <div class="camera-wrapper">
-        <div class="camera-circle-container" id="ring">
-            <video id="webcam" autoplay muted></video>
-            <div class="hindi-overlay-text">उधास होके नही जाने देना है</div>
-        </div>
-    </div>
-
-    <div class="scanner-bottom-bar">
-        <button class="btn-refresh" onclick="location.reload()"><i class="fa-solid fa-rotate-right"></i></button>
-        <div id="clock" class="small fw-bold">00:00:00</div>
-    </div>
-
-    <audio id="beepSuccess" src="https://www.soundjay.com/buttons/sounds/button-3.mp3"></audio>
-    <audio id="beepError" src="https://www.soundjay.com/buttons/sounds/button-10.mp3"></audio>
 
     <script>
-        // --- 1. Firebase Configuration ---
+        let currentMode = 'IN';
+        let isProcessing = false;
+
+        // Firebase Config
         const firebaseConfig = {
             apiKey: "AIzaSyC6bcqETEnTjLEQnISXjnWR2brPrVOAm-Y",
             authDomain: "sky-classes-db-d6140.firebaseapp.com",
@@ -170,62 +87,87 @@
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
 
-        // --- 2. Camera Setup ---
-        const video = document.getElementById('webcam');
-        async function startCamera() {
-            try {
-                const stream = await navigator.mediaDevices.getUserMedia({ video: true });
-                video.srcObject = stream;
-            } catch (err) {
-                console.error("Camera Access Denied:", err);
-                alert("Bhai, camera chalu nahi ho raha!");
-            }
+        function setMode(m) {
+            currentMode = m;
+            document.getElementById('btnIn').className = m === 'IN' ? 'mode-btn active-in' : 'mode-btn';
+            document.getElementById('btnOut').className = m === 'OUT' ? 'mode-btn active-out' : 'mode-btn';
         }
-        startCamera();
 
-        // --- 3. Live Clock ---
-        setInterval(() => {
-            document.getElementById('clock').innerText = new Date().toLocaleTimeString();
-        }, 1000);
-
-        // --- 4. Core Attendance Logic (Baval Animation & Sound) ---
-        function markAttendance(phone, studentName) {
-            const today = new Date().toLocaleDateString('en-GB').replace(/\//g, "-");
-            const currentTime = new Date().toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' });
-            const selectedMode = document.querySelector('input[name="gateMode"]:checked').value;
+        async function init() {
+            // Load AI Models
+            const MODEL_URL = 'https://raw.githubusercontent.com/justadudewhohacks/face-api.js/master/weights';
+            await faceapi.nets.tinyFaceDetector.loadFromUri(MODEL_URL);
+            await faceapi.nets.faceLandmark68Net.loadFromUri(MODEL_URL);
+            await faceapi.nets.faceRecognitionNet.loadFromUri(MODEL_URL);
             
-            const ring = document.getElementById('ring');
-            const statusLabel = document.getElementById('statusLabel');
-
-            // Save to Firebase
-            db.ref(`Face_Data/${phone}/Attendance/${today}`).update({
-                [selectedMode]: currentTime
-            }).then(() => {
-                // UI Feedback (Baval Look)
-                ring.classList.add('success-ring');
-                statusLabel.innerText = `${selectedMode} SUCCESS: ${studentName}`;
-                statusLabel.classList.remove('status-red');
-                statusLabel.classList.add('status-green');
-                
-                document.getElementById('beepSuccess').play();
-
-                // Reset back after 3 seconds
-                setTimeout(() => {
-                    ring.classList.remove('success-ring');
-                    statusLabel.innerText = "Face Not Detected";
-                    statusLabel.classList.remove('status-green');
-                    statusLabel.classList.add('status-red');
-                }, 3000);
-            }).catch((err) => {
-                document.getElementById('beepError').play();
-                alert("Database Error!");
-            });
+            startVideo();
         }
 
-        // --- NOTE FOR ADITYA ---
-        // Aapne jo bhi Face API library use ki hai, uske 'detection' wale 
-        // loop ke andar bas ye function call kar dena:
-        // Example: markAttendance("9876543210", "Rahul Kumar");
+        function startVideo() {
+            navigator.mediaDevices.getUserMedia({ video: {} })
+                .then(stream => { 
+                    document.getElementById('video').srcObject = stream;
+                    document.getElementById('status').innerText = "READY: SCAN FACE";
+                });
+        }
+
+        const video = document.getElementById('video');
+        video.addEventListener('play', () => {
+            setInterval(async () => {
+                if (isProcessing) return;
+
+                const detections = await faceapi.detectAllFaces(video, new faceapi.TinyFaceDetectorOptions()).withFaceLandmarks();
+                
+                if (detections.length > 0) {
+                    document.getElementById('status').innerText = "FACE DETECTED...";
+                    document.getElementById('status').style.color = "var(--green)";
+                    
+                    // Trigger Attendance (Adding small delay to act as "Blink/Auto-pick")
+                    handleAttendance();
+                } else {
+                    document.getElementById('status').innerText = "Face Not Detected";
+                    document.getElementById('status').style.color = "var(--red)";
+                }
+            }, 1000);
+        });
+
+        async function handleAttendance() {
+            isProcessing = true;
+            
+            // NOTE: Yahan 'Aditya' example hai, asliyat mein aapka Matching Logic lagega
+            const studentName = "Aditya"; 
+            const phone = "8840428581"; 
+
+            const today = new Date().toLocaleDateString('en-GB').replace(/\//g, "-");
+            const time = new Date().toLocaleTimeString();
+
+            // Firebase Save
+            await db.ref(`Face_Data/${phone}/Attendance/${today}`).update({ [currentMode]: time });
+
+            // UI Success Look
+            const circle = document.getElementById('mainCircle');
+            circle.classList.add('success');
+            document.getElementById('status').innerText = `WELCOME ${studentName}!`;
+
+            // VOICE OUTPUT (Bolega: Aditya Present, Thank You)
+            speak(`${studentName}, Present. Thank you!`);
+
+            setTimeout(() => {
+                circle.classList.remove('success');
+                isProcessing = false;
+            }, 5000);
+        }
+
+        function speak(text) {
+            const msg = new SpeechSynthesisUtterance();
+            msg.text = text;
+            msg.rate = 0.9;
+            window.speechSynthesis.speak(msg);
+        }
+
+        setInterval(() => { document.getElementById('clock').innerText = new Date().toLocaleTimeString(); }, 1000);
+        
+        init();
     </script>
 </body>
 </html>
