@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sky Classes | Student Result Portal</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <script src="https://www.gstatic.com/firebasejs/10.11.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.11.0/firebase-database-compat.js"></script>
+    <style>
+        body { font-family: 'Poppins', sans-serif; background-color: #0A2540; color: white; display: flex; justify-content: center; align-items: center; min-height: 100vh;}
+        .portal-card { background: white; color: #333; padding: 40px; border-radius: 20px; max-width: 500px; width: 100%; box-shadow: 0 10px 40px rgba(0,0,0,0.3); text-align: center; }
+        .btn-check { background: #D90429; color: white; width: 100%; font-weight: bold; padding: 12px; border-radius: 8px; border: none; margin-top: 15px;}
+        .result-box { display: none; margin-top: 20px; text-align: left; background: #f8fafc; padding: 20px; border-radius: 10px; border: 1px solid #e2e8f0;}
+    </style>
+</head>
+<body>
+    <div class="portal-card">
+        <h2 class="fw-bold" style="color:#0A2540;">SKY CLASSES</h2>
+        <p class="text-muted">Student Result Portal</p>
+        
+        <input type="text" id="rollInput" class="form-control text-center mb-3" placeholder="Enter Roll No (e.g. SKY-48291)" style="font-size: 18px; text-transform: uppercase;">
+        <button class="btn-check" onclick="checkResult()">Get Result</button>
+        
+        <div id="resultDisplay" class="result-box">
+            </div>
+    </div>
+
+    <script>
+        const firebaseConfig = {
+          apiKey: "AIzaSyC6bcqETEnTjLEQnISXjnWR2brPrVOAm-Y",
+          authDomain: "sky-classes-db-d6140.firebaseapp.com",
+          databaseURL: "https://sky-classes-db-d6140-default-rtdb.firebaseio.com",
+          projectId: "sky-classes-db-d6140",
+          storageBucket: "sky-classes-db-d6140.firebasestorage.app"
+        };
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.database();
+
+        function checkResult() {
+            let roll = document.getElementById('rollInput').value.trim().toUpperCase();
+            if(!roll) return alert("Please enter Roll Number!");
+
+            db.ref('Student_Results/' + roll).once('value').then(snap => {
+                const res = snap.val();
+                const box = document.getElementById('resultDisplay');
+                
+                if(res) {
+                    let subHtml = `<table class="table table-bordered text-center table-sm mt-3"><tr class="table-dark"><th>Subject</th><th>Obtained</th><th>Max</th></tr>`;
+                    res.Subjects.forEach(s => { subHtml += `<tr><td>${s[0]}</td><td>${s[1]}</td><td>${s[2]}</td></tr>`; });
+                    subHtml += `</table>`;
+
+                    box.innerHTML = `
+                        <h5 class="fw-bold text-primary">${res.Name}</h5>
+                        <p class="mb-1 small text-muted">Exam: <b>${res.Exam}</b></p>
+                        ${subHtml}
+                        <div class="alert alert-success py-2 text-center">
+                            <b>Total:</b> ${res.Total}/${res.Max} &nbsp; | &nbsp; <b>${res.Percentage}%</b>
+                        </div>
+                    `;
+                    box.style.display = "block";
+                } else {
+                    box.innerHTML = `<h6 class="text-danger text-center mt-3">Result Not Found for Roll No: ${roll}</h6>`;
+                    box.style.display = "block";
+                }
+            });
+        }
+    </script>
+</body>
+</html>
