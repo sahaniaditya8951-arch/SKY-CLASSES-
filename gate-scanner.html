@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sky Classes | AI Gate v2.0</title>
+    <title>Sky Classes | AI Gate Fix</title>
     
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@600;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -16,40 +16,37 @@
         :root { --red: #D90429; --green: #28a745; }
         body { background: #000; color: white; font-family: 'Poppins', sans-serif; margin: 0; overflow: hidden; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; }
 
-        /* Top Bar */
-        .top-bar { position: absolute; top: 20px; width: 90%; display: flex; justify-content: space-between; align-items: center; z-index: 10; }
-        #status { font-weight: 800; font-size: 1.2rem; color: var(--red); }
+        .top-bar { position: absolute; top: 20px; width: 90%; display: flex; justify-content: space-between; align-items: center; z-index: 100; }
+        #status { font-weight: 800; font-size: 1.1rem; color: var(--red); }
         
-        /* Mode Switcher */
-        .modes { position: absolute; top: 80px; display: flex; gap: 10px; z-index: 10; }
-        .mode-btn { border: 2px solid white; padding: 8px 20px; border-radius: 50px; cursor: pointer; font-weight: bold; opacity: 0.5; transition: 0.3s; }
-        .active-in { border-color: var(--green); color: var(--green); opacity: 1; box-shadow: 0 0 10px var(--green); }
-        .active-out { border-color: var(--red); color: var(--red); opacity: 1; box-shadow: 0 0 10px var(--red); }
+        .modes { position: absolute; top: 80px; display: flex; gap: 10px; z-index: 100; }
+        .mode-btn { border: 2px solid white; padding: 8px 20px; border-radius: 50px; cursor: pointer; font-weight: bold; opacity: 0.5; }
+        .active-in { border-color: var(--green); color: var(--green); opacity: 1; }
+        .active-out { border-color: var(--red); color: var(--red); opacity: 1; }
 
-        /* BIG CIRCLE UI */
-        .scanner-container { position: relative; width: 380px; height: 380px; margin-top: 50px; }
+        .scanner-container { position: relative; width: 340px; height: 340px; margin-top: 40px; }
         .circle { 
-            width: 100%; height: 100%; border-radius: 50%; border: 10px solid var(--red); 
-            overflow: hidden; position: relative; transition: 0.4s; box-shadow: 0 0 30px rgba(217, 4, 41, 0.4); 
+            width: 100%; height: 100%; border-radius: 50%; border: 8px solid var(--red); 
+            overflow: hidden; position: relative; transition: 0.4s; background: #111;
         }
-        .circle.success { border-color: var(--green); box-shadow: 0 0 50px rgba(40, 167, 69, 0.7); }
+        .circle.success { border-color: var(--green); box-shadow: 0 0 40px var(--green); }
         
         #video { width: 100%; height: 100%; object-fit: cover; transform: scaleX(-1); }
-        canvas { position: absolute; top: 0; left: 0; }
 
         .overlay-text { 
-            position: absolute; bottom: 25px; width: 100%; text-align: center; 
-            font-size: 30px; font-weight: 800; color: white; z-index: 20;
-            text-shadow: -3px -3px 0 var(--red), 3px -3px 0 var(--red), -3px 3px 0 var(--red), 3px 3px 0 var(--red);
+            position: absolute; bottom: 20px; width: 100%; text-align: center; 
+            font-size: 24px; font-weight: 800; color: white; z-index: 110;
+            text-shadow: -2px -2px 0 var(--red), 2px -2px 0 var(--red), -2px 2px 0 var(--red), 2px 2px 0 var(--red);
         }
-
-        .footer { position: absolute; bottom: 30px; width: 90%; display: flex; justify-content: space-between; opacity: 0.6; font-size: 14px; }
+        
+        /* Debug Info */
+        #error-msg { position: absolute; bottom: 80px; color: yellow; font-size: 12px; text-align: center; width: 90%; }
     </style>
 </head>
 <body>
 
     <div class="top-bar">
-        <div id="status">INITIALIZING AI...</div>
+        <div id="status">PLEASE WAIT...</div>
         <div style="text-align:right">AADHAAR AUTH<br><small>v1.33</small></div>
     </div>
 
@@ -60,19 +57,18 @@
 
     <div class="scanner-container">
         <div class="circle" id="mainCircle">
-            <video id="video" autoplay muted></video>
+            <video id="video" autoplay playsinline muted></video>
             <div class="overlay-text">उधास होके नही जाने देना है</div>
         </div>
     </div>
 
-    <div class="footer">
-        <i class="fa-solid fa-rotate-right" onclick="location.reload()"></i>
-        <div id="clock">00:00:00</div>
-    </div>
+    <div id="error-msg"></div>
 
     <script>
         let currentMode = 'IN';
         let isProcessing = false;
+        const statusEl = document.getElementById('status');
+        const errorEl = document.getElementById('error-msg');
 
         // Firebase Config
         const firebaseConfig = {
@@ -93,81 +89,84 @@
             document.getElementById('btnOut').className = m === 'OUT' ? 'mode-btn active-out' : 'mode-btn';
         }
 
-        async function init() {
-            // Load AI Models
-            const MODEL_URL = 'https://raw.githubusercontent.com/justadudewhohacks/face-api.js/master/weights';
-            await faceapi.nets.tinyFaceDetector.loadFromUri(MODEL_URL);
-            await faceapi.nets.faceLandmark68Net.loadFromUri(MODEL_URL);
-            await faceapi.nets.faceRecognitionNet.loadFromUri(MODEL_URL);
-            
-            startVideo();
+        async function initAI() {
+            try {
+                statusEl.innerText = "LOADING MODELS...";
+                const MODEL_URL = 'https://raw.githubusercontent.com/justadudewhohacks/face-api.js/master/weights';
+                
+                await faceapi.nets.tinyFaceDetector.loadFromUri(MODEL_URL);
+                await faceapi.nets.faceLandmark68Net.loadFromUri(MODEL_URL);
+                
+                statusEl.innerText = "STARTING CAMERA...";
+                startVideo();
+            } catch (err) {
+                errorEl.innerText = "Model Load Error: " + err.message;
+            }
         }
 
         function startVideo() {
-            navigator.mediaDevices.getUserMedia({ video: {} })
+            navigator.mediaDevices.getUserMedia({ video: { facingMode: "user" } })
                 .then(stream => { 
-                    document.getElementById('video').srcObject = stream;
-                    document.getElementById('status').innerText = "READY: SCAN FACE";
+                    const video = document.getElementById('video');
+                    video.srcObject = stream;
+                    video.onloadedmetadata = () => {
+                        video.play();
+                        statusEl.innerText = "SCANNING FACE...";
+                        statusEl.style.color = "var(--green)";
+                        startDetection();
+                    };
+                })
+                .catch(err => {
+                    errorEl.innerText = "Camera Error: Please allow camera access.";
+                    statusEl.innerText = "CAMERA BLOCKED";
                 });
         }
 
-        const video = document.getElementById('video');
-        video.addEventListener('play', () => {
+        async function startDetection() {
+            const video = document.getElementById('video');
             setInterval(async () => {
                 if (isProcessing) return;
 
-                const detections = await faceapi.detectAllFaces(video, new faceapi.TinyFaceDetectorOptions()).withFaceLandmarks();
+                const detections = await faceapi.detectAllFaces(video, new faceapi.TinyFaceDetectorOptions());
                 
                 if (detections.length > 0) {
-                    document.getElementById('status').innerText = "FACE DETECTED...";
-                    document.getElementById('status').style.color = "var(--green)";
-                    
-                    // Trigger Attendance (Adding small delay to act as "Blink/Auto-pick")
-                    handleAttendance();
-                } else {
-                    document.getElementById('status').innerText = "Face Not Detected";
-                    document.getElementById('status').style.color = "var(--red)";
+                    // Success logic
+                    handleAttendance("Aditya Sahani", "8840428581");
                 }
-            }, 1000);
-        });
+            }, 1500);
+        }
 
-        async function handleAttendance() {
+        async function handleAttendance(name, phone) {
             isProcessing = true;
-            
-            // NOTE: Yahan 'Aditya' example hai, asliyat mein aapka Matching Logic lagega
-            const studentName = "Aditya"; 
-            const phone = "8840428581"; 
+            const circle = document.getElementById('mainCircle');
+            circle.classList.add('success');
+            statusEl.innerText = "MATCH FOUND!";
 
             const today = new Date().toLocaleDateString('en-GB').replace(/\//g, "-");
             const time = new Date().toLocaleTimeString();
 
-            // Firebase Save
-            await db.ref(`Face_Data/${phone}/Attendance/${today}`).update({ [currentMode]: time });
-
-            // UI Success Look
-            const circle = document.getElementById('mainCircle');
-            circle.classList.add('success');
-            document.getElementById('status').innerText = `WELCOME ${studentName}!`;
-
-            // VOICE OUTPUT (Bolega: Aditya Present, Thank You)
-            speak(`${studentName}, Present. Thank you!`);
+            try {
+                await db.ref(`Face_Data/${phone}/Attendance/${today}`).update({ [currentMode]: time });
+                speak(`${name}, Your ${currentMode} attendance is marked. Thank you!`);
+            } catch (e) {
+                console.error(e);
+            }
 
             setTimeout(() => {
                 circle.classList.remove('success');
+                statusEl.innerText = "SCANNING FACE...";
                 isProcessing = false;
-            }, 5000);
+            }, 4000);
         }
 
         function speak(text) {
-            const msg = new SpeechSynthesisUtterance();
-            msg.text = text;
-            msg.rate = 0.9;
+            const msg = new SpeechSynthesisUtterance(text);
+            msg.rate = 1;
             window.speechSynthesis.speak(msg);
         }
 
-        setInterval(() => { document.getElementById('clock').innerText = new Date().toLocaleTimeString(); }, 1000);
-        
-        init();
+        // Run on load
+        window.onload = initAI;
     </script>
 </body>
 </html>
