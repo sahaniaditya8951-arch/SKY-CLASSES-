@@ -5,12 +5,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sky Classes | Master Admin Dashboard</title>
     
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <script src="https://www.gstatic.com/firebasejs/10.11.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.11.0/firebase-database-compat.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     
     <style>
         :root { --primary-dark: #07192F; --primary-blue: #0A2540; --accent-gold: #E6B31E; --accent-red: #D90429; }
@@ -23,7 +24,7 @@
         
         /* Dashboard Sidebar */
         #dashboardScreen { display: none; }
-        .sidebar { height: 100vh; background-color: var(--primary-dark); color: white; padding-top: 20px; position: fixed; width: 260px; z-index: 100; }
+        .sidebar { height: 100vh; background-color: var(--primary-dark); color: white; padding-top: 20px; position: fixed; width: 260px; z-index: 100; overflow-y: auto;}
         .sidebar h4 { text-align: center; font-weight: 800; color: var(--accent-gold); margin-bottom: 30px; }
         .sidebar a { padding: 15px 25px; text-decoration: none; color: #a0aec0; display: block; border-left: 4px solid transparent; cursor: pointer; transition: 0.3s; }
         .sidebar a:hover, .sidebar a.active { background: rgba(255,255,255,0.05); color: white; border-left-color: var(--accent-gold); }
@@ -37,6 +38,16 @@
         .btn-excel:hover { opacity: 0.8; }
         .date-picker { border: 2px solid #e2e8f0; border-radius: 8px; padding: 6px 12px; outline: none; font-weight: 500; color: #0A2540;}
         .date-picker:focus { border-color: var(--accent-gold); }
+
+        /* Tools CSS (Receipt & Paper) */
+        .tool-card { max-width: 700px; margin: auto; border: 1px solid #eee; padding: 30px; border-radius: 15px; }
+        .tool-header { text-align: center; border-bottom: 2px solid #eee; padding-bottom: 15px; margin-bottom: 25px; }
+        .btn-print { background: #0A2540; color: white; padding: 12px; border-radius: 8px; width: 100%; font-weight: 700; border: none; transition: 0.3s; margin-top: 15px;}
+        .btn-print:hover { background: #D90429; color: white; }
+        
+        .question-box { background: #fff; border: 1px solid #e2e8f0; border-left: 4px solid #0A2540; padding: 15px; border-radius: 8px; margin-bottom: 15px; }
+        .btn-add { background: #0A2540; color: white; font-weight: 600; }
+        .btn-add:hover { background: #07192F; color: white; }
     </style>
 </head>
 <body>
@@ -55,6 +66,9 @@
             <h4>SKY CLASSES</h4>
             <a onclick="showSection('admissions')" id="link-admissions" class="active"><i class="fa-solid fa-user-plus me-2"></i> Admissions</a>
             <a onclick="showSection('attendance')" id="link-attendance"><i class="fa-solid fa-calendar-check me-2"></i> Smart Attendance</a>
+            <a onclick="showSection('fee')" id="link-fee"><i class="fa-solid fa-file-invoice-dollar me-2"></i> Fee Receipt</a>
+            <a onclick="showSection('paper')" id="link-paper"><i class="fa-solid fa-file-pen me-2"></i> Paper Generator</a>
+            
             <a onclick="logout()" style="color: #ff4d4d; margin-top: 50px;"><i class="fa-solid fa-lock me-2"></i> Lock Dashboard</a>
         </div>
 
@@ -118,17 +132,104 @@
                 </div>
             </div>
 
+            <div id="section-fee" class="table-container">
+                <div class="tool-card">
+                    <div class="tool-header">
+                        <h4 class="fw-bold" style="color: var(--primary-blue);">Smart Fee Receipt</h4>
+                        <p class="text-muted small mb-0" id="syncStatus">Syncing Database...</p>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label class="form-label fw-bold small">Student Name (Auto-Search)</label>
+                        <input type="text" id="feeName" class="form-control" list="studentList" placeholder="Start typing name..." autocomplete="off">
+                        <datalist id="studentList"></datalist>
+                    </div>
+                    
+                    <div class="row mb-3">
+                        <div class="col-md-6 mb-3 mb-md-0">
+                            <label class="form-label fw-bold small">Course / Batch</label>
+                            <input type="text" id="feeCourse" class="form-control" placeholder="e.g. Physics Class 12">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold small">Amount Paid (₹)</label>
+                            <input type="number" id="feeAmount" class="form-control" placeholder="Enter amount">
+                        </div>
+                    </div>
+                    <div class="mb-4">
+                        <label class="form-label fw-bold small">Payment Mode</label>
+                        <select id="feeMode" class="form-select">
+                            <option>Cash</option>
+                            <option>UPI / PhonePe / GPay</option>
+                            <option>Bank Transfer</option>
+                        </select>
+                    </div>
+                    
+                    <button class="btn-print" onclick="generateReceipt()"><i class="fa-solid fa-file-pdf me-2"></i> Generate & Download PDF</button>
+                </div>
+            </div>
+
+            <div id="section-paper" class="table-container">
+                <div class="tool-card" style="max-width: 800px;">
+                    <div class="tool-header">
+                        <h4 class="fw-bold" style="color: var(--primary-blue);">Question Paper Maker</h4>
+                    </div>
+                    
+                    <div class="row mb-4">
+                        <div class="col-md-6 mb-3">
+                            <label class="fw-bold small text-muted">Exam Name</label>
+                            <input type="text" id="examName" class="form-control" placeholder="e.g., Weekly Test 1">
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="fw-bold small text-muted">Class & Subject</label>
+                            <input type="text" id="subject" class="form-control" placeholder="e.g., Class 12 - Physics">
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="fw-bold small text-muted">Total Marks</label>
+                            <input type="text" id="marks" class="form-control" placeholder="e.g., 50">
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="fw-bold small text-muted">Time Allowed</label>
+                            <input type="text" id="time" class="form-control" placeholder="e.g., 2 Hours">
+                        </div>
+                    </div>
+            
+                    <hr>
+                    <h6 class="fw-bold text-dark mb-3">Add Questions</h6>
+                    
+                    <div id="questionsContainer"></div>
+            
+                    <div class="d-flex gap-2 mb-3">
+                        <button class="btn btn-add w-100" onclick="addQuestion('subjective')"><i class="fa-solid fa-plus me-1"></i> Add Normal Question</button>
+                        <button class="btn btn-secondary w-100" onclick="addQuestion('mcq')"><i class="fa-solid fa-list me-1"></i> Add MCQ</button>
+                    </div>
+            
+                    <button class="btn-print" style="background: var(--accent-red);" onclick="generatePaper()"><i class="fa-solid fa-print me-2"></i> Create PDF Paper</button>
+                </div>
+            </div>
+
         </div>
     </div>
 
     <script>
-        // --- UI Logic ---
+        // --- FIREBASE INITIALIZATION ---
+        const firebaseConfig = {
+          apiKey: "AIzaSyC6bcqETEnTjLEQnISXjnWR2brPrVOAm-Y",
+          authDomain: "sky-classes-db-d6140.firebaseapp.com",
+          databaseURL: "https://sky-classes-db-d6140-default-rtdb.firebaseio.com",
+          projectId: "sky-classes-db-d6140",
+          storageBucket: "sky-classes-db-d6140.firebasestorage.app"
+        };
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.database();
+
+        // --- DASHBOARD UI LOGIC ---
         function checkPassword() {
             if(document.getElementById('adminPassword').value === "SkyAdmin123") {
                 document.getElementById('loginScreen').style.display = 'none';
                 document.getElementById('dashboardScreen').style.display = 'block';
                 setDefaultDate();
                 startRealtimeData();
+                initFeeReceiptData(); // Load student names for Fee Receipt
             } else { alert("Wrong Password!"); }
         }
 
@@ -140,6 +241,11 @@
             document.getElementById('section-' + id).classList.add('active-section');
             document.getElementById('link-' + id).classList.add('active');
         }
+
+        // --- ATTENDANCE & ADMISSION LOGIC ---
+        let admissionsList = [];
+        let allAttendanceList = []; 
+        let currentSmartAttendanceList = []; 
 
         function setDefaultDate() {
             const today = new Date();
@@ -155,26 +261,8 @@
             return `${parts[2]}/${parts[1]}/${parts[0]}`; 
         }
 
-        // --- Firebase Config ---
-        const firebaseConfig = {
-          apiKey: "AIzaSyC6bcqETEnTjLEQnISXjnWR2brPrVOAm-Y",
-          authDomain: "sky-classes-db-d6140.firebaseapp.com",
-          databaseURL: "https://sky-classes-db-d6140-default-rtdb.firebaseio.com",
-          projectId: "sky-classes-db-d6140",
-          storageBucket: "sky-classes-db-d6140.firebasestorage.app",
-          messagingSenderId: "915411828634",
-          appId: "1:915411828634:web:44aadc81aa911cdebcc423"
-        };
-        firebase.initializeApp(firebaseConfig);
-        const db = firebase.database();
-
-        // --- Data Variables ---
-        let admissionsList = [];
-        let allAttendanceList = []; 
-        let currentSmartAttendanceList = []; // For CSV Download
-
         function startRealtimeData() {
-            // Admissions Fetch
+            // Fetch Admissions
             db.ref('Student_Admissions').on('value', snap => {
                 const data = snap.val();
                 const body = document.getElementById('admissionsBody');
@@ -188,108 +276,73 @@
                 document.getElementById('countAdmissions').innerText = admissionsList.length;
             });
 
-            // Attendance Fetch
+            // Fetch Attendance
             db.ref('Daily_Attendance').on('value', snap => {
                 const data = snap.val();
                 allAttendanceList = [];
                 if(data) {
-                    Object.values(data).forEach(at => {
-                        allAttendanceList.push(at);
-                    });
+                    Object.values(data).forEach(at => { allAttendanceList.push(at); });
                 }
                 filterAttendanceData(); 
             });
         }
 
-        // --- MERGED SMART FILTER LOGIC ---
         function filterAttendanceData() {
             const selectedDateVal = document.getElementById('dateFilter').value;
-            const targetFormat1 = formatInputDate(selectedDateVal); // "DD/MM/YYYY"
-            
+            const targetFormat1 = formatInputDate(selectedDateVal); 
             const parts = selectedDateVal.split('-');
             const targetFormat2 = `${parseInt(parts[2])}/${parseInt(parts[1])}/${parts[0]}`; 
 
             let studentRecords = {};
 
-            // Group data by student for the selected date
             allAttendanceList.forEach(record => {
                 if(record.Date === targetFormat1 || record.Date === targetFormat2) {
                     let phone = record.Phone;
-                    
                     if (!studentRecords[phone]) {
-                        studentRecords[phone] = {
-                            date: record.Date, name: record.Name, phone: phone, entryTime: "--", exitTime: "--"
-                        };
+                        studentRecords[phone] = { date: record.Date, name: record.Name, phone: phone, entryTime: "--", exitTime: "--" };
                     }
-
-                    // Assign Entry/Exit based on ScanType
                     if (record.ScanType === "IN" || !record.ScanType) {
-                        // Keep the first entry time
-                        if(studentRecords[phone].entryTime === "--") {
-                            studentRecords[phone].entryTime = record.Time;
-                        }
+                        if(studentRecords[phone].entryTime === "--") studentRecords[phone].entryTime = record.Time;
                     } else if (record.ScanType === "OUT") {
-                        // Update to latest exit time
                         studentRecords[phone].exitTime = record.Time;
                     }
                 }
             });
 
-            // Generate HTML
             const body = document.getElementById('attendanceBody');
-            body.innerHTML = '';
-            currentSmartAttendanceList = []; 
-            let count = 1;
+            body.innerHTML = ''; currentSmartAttendanceList = []; let count = 1;
 
             for (let phone in studentRecords) {
                 let student = studentRecords[phone];
-                currentSmartAttendanceList.push(student); // Save for Excel
+                currentSmartAttendanceList.push(student); 
 
-                let statusBadge = student.exitTime !== "--" 
-                    ? '<span class="badge bg-success">Left Class</span>' 
-                    : '<span class="badge bg-warning text-dark">Inside Class</span>';
+                let statusBadge = student.exitTime !== "--" ? '<span class="badge bg-success">Left Class</span>' : '<span class="badge bg-warning text-dark">Inside Class</span>';
 
-                body.innerHTML += `
-                    <tr>
-                        <td class="text-muted fw-bold">${count++}</td>
-                        <td class="text-start fw-bold">${student.name}</td>
-                        <td>${student.phone}</td>
-                        <td class="text-success fw-bold">${student.entryTime}</td>
-                        <td class="text-danger fw-bold">${student.exitTime}</td>
-                        <td>${statusBadge}</td>
-                    </tr>
-                `;
+                body.innerHTML += `<tr>
+                    <td class="text-muted fw-bold">${count++}</td>
+                    <td class="text-start fw-bold">${student.name}</td>
+                    <td>${student.phone}</td>
+                    <td class="text-success fw-bold">${student.entryTime}</td>
+                    <td class="text-danger fw-bold">${student.exitTime}</td>
+                    <td>${statusBadge}</td>
+                </tr>`;
             }
 
-            // Update Counts and Labels
             document.getElementById('countAttendance').innerText = currentSmartAttendanceList.length;
-            
-            const todayStr = formatInputDate(document.getElementById('dateFilter').defaultValue);
-            if(targetFormat1 === todayStr) {
-                document.getElementById('attendanceCardLabel').innerText = "Students Present Today";
-            } else {
-                document.getElementById('attendanceCardLabel').innerText = `Present on ${targetFormat1}`;
-            }
-
             if(currentSmartAttendanceList.length === 0) {
-                body.innerHTML = `<tr><td colspan="6" class="text-center text-danger fw-bold py-4">No attendance records found for this date.</td></tr>`;
+                body.innerHTML = `<tr><td colspan="6" class="text-center text-danger fw-bold py-4">No records found.</td></tr>`;
             }
         }
 
-        // --- EXCEL DOWNLOAD LOGIC ---
         function downloadCSV(type) {
-            let csv = "";
-            let dataLength = 0;
-
+            let csv = ""; let dataLength = 0;
             if(type === 'admissions') {
-                if(admissionsList.length === 0) { alert("No data!"); return; }
+                if(admissionsList.length === 0) return;
                 csv = "Date,Name,Phone,Course\n";
                 admissionsList.forEach(r => csv += `"${r.Date}","${r.Name}","${r.Phone}","${r.Course}"\n`);
                 dataLength = admissionsList.length;
-            } 
-            else if (type === 'attendance') {
-                if(currentSmartAttendanceList.length === 0) { alert("No data for selected date!"); return; }
-                // Smart Excel Format
+            } else if (type === 'attendance') {
+                if(currentSmartAttendanceList.length === 0) return;
                 csv = "Date,Student Name,Phone Number,Entry Time (IN),Exit Time (OUT),Status\n";
                 currentSmartAttendanceList.forEach(r => {
                     let statusText = r.exitTime !== "--" ? "Left Class" : "Inside Class";
@@ -302,11 +355,166 @@
                 const blob = new Blob([csv], { type: 'text/csv' });
                 const link = document.createElement("a");
                 link.href = URL.createObjectURL(blob);
-                
                 const dateSuf = type === 'attendance' ? document.getElementById('dateFilter').value : new Date().toLocaleDateString().replace(/\//g,'-');
                 link.download = `Sky_${type}_${dateSuf}.csv`;
                 link.click();
             }
+        }
+
+        // --- FEE RECEIPT LOGIC ---
+        function initFeeReceiptData() {
+            const datalist = document.getElementById('studentList');
+            const syncStatus = document.getElementById('syncStatus');
+            db.ref('Face_Data').once('value').then(snapshot => {
+                const data = snapshot.val();
+                if(data) {
+                    for (const phone in data) {
+                        const option = document.createElement('option');
+                        option.value = data[phone].Name + " (" + phone + ")"; 
+                        datalist.appendChild(option);
+                    }
+                    syncStatus.innerHTML = "<i class='fa-solid fa-check text-success'></i> Database Connected";
+                }
+            }).catch(err => syncStatus.innerHTML = "Sync Error");
+        }
+
+        function generateReceipt() {
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+            
+            let rawName = document.getElementById('feeName').value;
+            let cleanName = rawName.split(" (")[0]; 
+            const course = document.getElementById('feeCourse').value || 'General';
+            const amt = document.getElementById('feeAmount').value;
+            const mode = document.getElementById('feeMode').value;
+            
+            if(!cleanName || !amt) { alert("Please enter Student Name and Amount!"); return; }
+
+            doc.setFillColor(10, 37, 64); doc.rect(0, 0, 210, 45, 'F');
+            doc.setTextColor(255, 255, 255); doc.setFont("helvetica", "bold"); doc.setFontSize(30);
+            doc.text("SKY CLASSES", 105, 22, null, null, "center");
+            doc.setFontSize(12); doc.setFont("helvetica", "normal");
+            doc.text("Gorakhpur's Premium Educational Institute", 105, 32, null, null, "center");
+            
+            doc.setTextColor(217, 4, 41); doc.setFontSize(18); doc.setFont("helvetica", "bold");
+            doc.text("OFFICIAL FEE RECEIPT", 105, 65, null, null, "center");
+            
+            doc.setDrawColor(200, 200, 200); doc.setLineWidth(0.5); doc.rect(20, 80, 170, 80);
+            doc.setTextColor(0); doc.setFontSize(12);
+            
+            const today = new Date().toLocaleDateString('en-IN');
+            const receiptID = "SKY" + Math.floor(1000 + Math.random() * 9000);
+            
+            doc.setFont("helvetica", "normal"); doc.text(`Receipt No: `, 30, 95);
+            doc.setFont("helvetica", "bold"); doc.text(receiptID, 70, 95);
+            doc.setFont("helvetica", "normal"); doc.text(`Date: `, 130, 95);
+            doc.setFont("helvetica", "bold"); doc.text(today, 150, 95);
+            doc.line(20, 102, 190, 102); 
+            
+            doc.setFont("helvetica", "normal"); doc.text(`Received from : `, 30, 115);
+            doc.setFont("helvetica", "bold"); doc.text(cleanName.toUpperCase(), 75, 115);
+            doc.setFont("helvetica", "normal"); doc.text(`Course Name  : `, 30, 128);
+            doc.setFont("helvetica", "bold"); doc.text(course, 75, 128);
+            doc.setFont("helvetica", "normal"); doc.text(`Payment Mode : `, 30, 141);
+            doc.setFont("helvetica", "bold"); doc.text(mode, 75, 141);
+
+            doc.setFillColor(245, 245, 245); doc.rect(130, 130, 50, 15, 'FD');
+            doc.setFontSize(14); doc.setTextColor(217, 4, 41); doc.text(`Rs. ${amt} /-`, 140, 140);
+            
+            doc.setTextColor(0); doc.setFontSize(10); doc.setFont("helvetica", "normal");
+            doc.text("-----------------------------------", 155, 185, null, null, "center");
+            doc.text("Authorized Signatory", 155, 190, null, null, "center");
+            
+            doc.save(`SkyClasses_Receipt_${cleanName}.pdf`);
+            
+            document.getElementById('feeName').value = ''; document.getElementById('feeAmount').value = '';
+        }
+
+        // --- QUESTION PAPER MAKER LOGIC ---
+        let questionCount = 0;
+
+        function addQuestion(type) {
+            questionCount++;
+            const container = document.getElementById('questionsContainer');
+            const div = document.createElement('div');
+            div.className = 'question-box'; div.id = `qbox_${questionCount}`;
+            
+            let html = `
+                <div class="d-flex justify-content-between mb-2">
+                    <label class="fw-bold text-primary">Question ${questionCount}</label>
+                    <button class="btn btn-sm btn-outline-danger" onclick="removeQuestion(${questionCount})"><i class="fa-solid fa-trash"></i></button>
+                </div>
+                <textarea class="form-control mb-2 q-text" rows="2" placeholder="Type your question here..."></textarea>
+            `;
+
+            if(type === 'mcq') {
+                html += `
+                    <div class="row g-2 q-options">
+                        <div class="col-6"><input type="text" class="form-control form-control-sm opt-a" placeholder="Option A"></div>
+                        <div class="col-6"><input type="text" class="form-control form-control-sm opt-b" placeholder="Option B"></div>
+                        <div class="col-6"><input type="text" class="form-control form-control-sm opt-c" placeholder="Option C"></div>
+                        <div class="col-6"><input type="text" class="form-control form-control-sm opt-d" placeholder="Option D"></div>
+                    </div>
+                `;
+            }
+            div.innerHTML = html; div.setAttribute('data-type', type); container.appendChild(div);
+        }
+
+        function removeQuestion(id) { document.getElementById(`qbox_${id}`).remove(); }
+
+        function generatePaper() {
+            const examName = document.getElementById('examName').value || "MOCK TEST";
+            const subject = document.getElementById('subject').value || "Subject";
+            const marks = document.getElementById('marks').value || "100";
+            const time = document.getElementById('time').value || "3 Hours";
+
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+            
+            doc.setFont("helvetica", "bold"); doc.setFontSize(22);
+            doc.text("SKY CLASSES", 105, 20, null, null, "center");
+            doc.setFontSize(12); doc.setFont("helvetica", "normal");
+            doc.text("Gorakhpur's Premium Educational Institute", 105, 28, null, null, "center");
+            doc.setLineWidth(0.5); doc.line(15, 32, 195, 32);
+
+            doc.setFont("helvetica", "bold"); doc.setFontSize(14);
+            doc.text(examName.toUpperCase(), 105, 42, null, null, "center");
+            doc.setFontSize(11); doc.setFont("helvetica", "normal");
+            doc.text(`Subject: ${subject}`, 15, 52); doc.text(`Time: ${time}`, 15, 58);
+            doc.text(`Total Marks: ${marks}`, 150, 52); doc.line(15, 62, 195, 62);
+
+            let y = 72; doc.setFontSize(11);
+            const boxes = document.querySelectorAll('.question-box');
+            
+            if(boxes.length === 0) { alert("Please add at least one question!"); return; }
+
+            boxes.forEach((box, index) => {
+                const qText = box.querySelector('.q-text').value;
+                const type = box.getAttribute('data-type');
+                
+                doc.setFont("helvetica", "bold"); doc.text(`Q${index + 1}.`, 15, y);
+                doc.setFont("helvetica", "normal");
+                
+                const splitText = doc.splitTextToSize(qText, 165);
+                doc.text(splitText, 25, y);
+                y += (splitText.length * 6); 
+
+                if(type === 'mcq') {
+                    const optA = box.querySelector('.opt-a').value;
+                    const optB = box.querySelector('.opt-b').value;
+                    const optC = box.querySelector('.opt-c').value;
+                    const optD = box.querySelector('.opt-d').value;
+                    
+                    y += 2; doc.text(`(A) ${optA}`, 25, y); doc.text(`(B) ${optB}`, 105, y);
+                    y += 6; doc.text(`(C) ${optC}`, 25, y); doc.text(`(D) ${optD}`, 105, y);
+                    y += 6;
+                }
+                y += 4; 
+
+                if(y >= 280) { doc.addPage(); y = 20; }
+            });
+
+            doc.save(`Sky_Classes_${subject}_Paper.pdf`);
         }
     </script>
 </body>
