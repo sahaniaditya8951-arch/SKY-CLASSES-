@@ -43,16 +43,16 @@
 
         .scanner-wrapper { position: relative; display: flex; justify-content: center; align-items: center; margin-bottom: 20px; margin-top: 60px; }
         
-        /* ZOOM FIX: aspect-ratio aur contain property use ki hai */
         .scanner-container {
             position: relative; width: 85vw; max-width: 400px; aspect-ratio: 3/4; max-height: 60vh;
             border-radius: 24px; overflow: hidden; background: #000;
             box-shadow: 0 20px 50px rgba(0,0,0,0.5), 0 0 0 2px rgba(251, 191, 36, 0.2);
+            transition: box-shadow 0.3s ease;
         }
         
         video, canvas { 
             position: absolute; top: 0; left: 0; width: 100%; height: 100%; 
-            object-fit: contain; /* YE ZOOM ROKEGA */
+            object-fit: contain; 
             transform: scaleX(-1); border-radius: 24px;
         }
         
@@ -70,7 +70,7 @@
             padding: 20px; border-radius: 20px; text-align: center;
             border: 1px solid rgba(255, 255, 255, 0.08); box-shadow: 0 20px 40px rgba(0,0,0,0.4);
         }
-        #recognitionStatus { font-size: 20px; font-weight: 700; margin: 0; color: #fbbf24; }
+        #recognitionStatus { font-size: 20px; font-weight: 700; margin: 0; color: #fbbf24; transition: color 0.3s; }
         .hint-text { font-size: 13px; font-weight: 300; margin-top: 8px; color: #94a3b8; }
         
         .loading-overlay {
@@ -130,7 +130,7 @@
         const statusText = document.getElementById('recognitionStatus');
         
         let faceMatcher = null;
-        let studentHistory = {}; // Yeh bachho ka IN/OUT yaad rakhega
+        let studentHistory = {}; 
         let isProcessing = false; 
 
         function speakAttendance(studentName, mode) {
@@ -154,11 +154,9 @@
             faceapi.nets.faceRecognitionNet.loadFromUri(MODEL_URL)
         ]).then(fetchInitialData).catch(() => setTimeout(startVideo, 1000));
 
-        // Naya Function: Aaj ki attendance aur Face data dono nikalega
         function fetchInitialData() {
             const todayStr = new Date().toLocaleDateString('en-IN');
             
-            // Pehle dekhega aaj kaun kaun aa chuka hai (taaki unka seedha EXIT lage)
             db.ref('Daily_Attendance').once('value').then(snap => {
                 snap.forEach(child => {
                     let record = child.val();
@@ -224,6 +222,7 @@
                 resizedDetections.forEach((detection) => {
                     const result = faceMatcher.findBestMatch(detection.descriptor);
                     
+                    // AGAR CHEHRA MATCH HO JATA HAI (Registered)
                     if (result.label !== 'unknown') {
                         const splitData = result.label.split("||");
                         const name = splitData[0];
@@ -235,11 +234,9 @@
 
                         const nowTime = Date.now();
                         
-                        // AUTO MODE LOGIC
                         let lastRecord = studentHistory[phone] || { state: "OUT", Timestamp: 0 };
                         let upcomingMode = lastRecord.state === "IN" ? "EXIT" : "ENTRY";
 
-                        // 5 Minute Cooldown (300000 ms)
                         if (nowTime - lastRecord.Timestamp < 300000) {
                             statusText.innerHTML = `<i class='fa-solid fa-ban me-2'></i> ${name}, Wait 5 Mins!`;
                             statusText.style.color = "#f43f5e";
@@ -255,6 +252,12 @@
                             statusText.style.color = "#38bdf8"; 
                             document.querySelector('.scanner-container').style.boxShadow = "0 20px 50px rgba(56, 189, 248, 0.3), 0 0 0 2px #38bdf8";
                         }
+                    } 
+                    // AGAR CHEHRA UNKNOWN HAI (Unregistered)
+                    else {
+                        statusText.innerHTML = `<i class='fa-solid fa-user-secret me-2'></i> UNKNOWN PERSON!`;
+                        statusText.style.color = "#f43f5e"; // Red Color text
+                        document.querySelector('.scanner-container').style.boxShadow = "0 20px 50px rgba(244, 63, 94, 0.3), 0 0 0 4px #f43f5e"; // Red border glow
                     }
                 });
             }, 250); 
@@ -262,10 +265,9 @@
 
         function markAttendance(name, phone, mode) {
             const nowTime = Date.now();
-            // Local history update karo taaki turant ulta na lag jaye
             studentHistory[phone] = { state: mode === "ENTRY" ? "IN" : "OUT", Timestamp: nowTime };
             
-            let color = mode === "ENTRY" ? "#10b981" : "#f43f5e"; // Green for Entry, Red for Exit
+            let color = mode === "ENTRY" ? "#10b981" : "#f43f5e"; 
             statusText.innerHTML = `<i class='fa-solid fa-fingerprint me-2'></i> ${mode} Saved: ${name}`;
             statusText.style.color = color;
             document.querySelector('.scanner-container').style.boxShadow = `0 20px 50px ${color}66, 0 0 0 3px ${color}`;
