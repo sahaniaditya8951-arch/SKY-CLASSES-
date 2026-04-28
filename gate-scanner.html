@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sky Classes | AI Gate Scanner</title>
+    <title>Sky Classes | Gate Face Scanner v1.33</title>
     
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700;800&display=swap" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -11,237 +11,221 @@
     
     <script src="https://www.gstatic.com/firebasejs/10.11.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.11.0/firebase-database-compat.js"></script>
-    
-    <script src="https://cdn.jsdelivr.net/npm/@vladmandic/face-api/dist/face-api.js"></script>
 
     <style>
+        :root {
+            --status-red: #D90429;
+            --status-green: #28a745;
+            --sky-dark: #07192F;
+        }
+
         body { 
+            background-color: #000; 
+            color: white; 
             font-family: 'Poppins', sans-serif; 
-            background: #000; /* Dark sci-fi background */
-            height: 100vh; margin: 0; overflow: hidden;
-            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            height: 100vh;
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
         }
-        
-        /* Top Header */
-        .header {
-            position: absolute; top: 20px; left: 0; width: 100%; text-align: center; z-index: 10;
-        }
-        .header h1 { color: white; font-weight: 800; font-size: 35px; letter-spacing: 2px; text-shadow: 0 0 15px rgba(230, 179, 30, 0.5); }
-        .header h1 span { color: #E6B31E; }
-        .live-badge {
-            background: #D90429; color: white; padding: 5px 15px; border-radius: 50px; 
-            font-size: 14px; font-weight: bold; display: inline-block; animation: blink 2s infinite;
-        }
-        @keyframes blink { 0% { opacity: 1; } 50% { opacity: 0.5; } 100% { opacity: 1; } }
 
-        /* Camera Scanner Design */
-        .scanner-container {
-            position: relative; width: 90vw; max-width: 600px; height: 60vh; 
-            border: 4px solid #0A2540; border-radius: 20px; overflow: hidden;
-            box-shadow: 0 0 40px rgba(10, 37, 64, 0.8);
+        /* --- Top Bar Styling --- */
+        .scanner-top-bar {
+            width: 100%;
+            max-width: 450px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 25px;
+            position: absolute;
+            top: 10px;
         }
+        .status-text { font-weight: 700; transition: 0.3s; }
+        .status-red { color: var(--status-red); }
+        .status-green { color: var(--status-green); text-shadow: 0 0 10px var(--status-green); }
         
-        /* YAHAN FIX KIYA HAI: scaleX(-1) se camera bilkul mirror jaisa seedha dikhega */
-        video, canvas { 
-            position: absolute; top: 0; left: 0; 
-            width: 100%; height: 100%; 
-            object-fit: cover; 
-            transform: scaleX(-1); 
-        }
-        
-        /* Scanning overlay effect */
-        .scan-line {
-            position: absolute; top: 0; left: 0; width: 100%; height: 5px; background: #E6B31E;
-            box-shadow: 0 0 15px #E6B31E, 0 0 30px #E6B31E; opacity: 0.7; z-index: 5;
-            animation: scan 3s linear infinite;
-        }
-        @keyframes scan { 0% { top: 0%; } 100% { top: 100%; } }
+        .aadhaar-auth-title { text-align: right; font-size: 14px; opacity: 0.8; }
+        .version-small { display: block; font-size: 10px; font-weight: 400; }
 
-        /* Status & Logs */
-        .status-box {
-            position: absolute; bottom: 30px; width: 90vw; max-width: 600px;
-            background: rgba(10, 37, 64, 0.9); padding: 20px; border-radius: 15px;
-            text-align: center; color: white; border: 1px solid #1a365d;
+        /* --- IN/OUT Mode Switcher --- */
+        .mode-container {
+            position: absolute;
+            top: 80px;
+            z-index: 10;
         }
-        #recognitionStatus { font-size: 24px; font-weight: 700; margin: 0; color: #E6B31E; }
-        
-        .loading-overlay {
-            position: fixed; top:0; left:0; width:100%; height:100%; background: #07192F;
-            display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 1000; color: white;
+        .btn-check:checked + .btn-outline-success { background-color: var(--status-green); color: white; border-color: var(--status-green); }
+        .btn-check:checked + .btn-outline-danger { background-color: var(--status-red); color: white; border-color: var(--status-red); }
+
+        /* --- Main Circular Scanner (THE BAVAL PART) --- */
+        .camera-wrapper {
+            position: relative;
+            width: 320px;
+            height: 320px;
+            margin-top: 40px;
         }
+
+        .camera-circle-container {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            overflow: hidden;
+            position: relative;
+            border: 8px solid var(--status-red); /* Default Red */
+            transition: border-color 0.4s ease, box-shadow 0.4s ease;
+            box-shadow: 0 0 20px rgba(217, 4, 41, 0.3);
+        }
+
+        /* Success State for Ring */
+        .camera-circle-container.success-ring {
+            border-color: var(--status-green);
+            box-shadow: 0 0 40px rgba(40, 167, 69, 0.6);
+        }
+
+        #webcam {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transform: scaleX(-1); /* Mirror view */
+        }
+
+        /* --- Hindi Text Overlay (Exact as Image) --- */
+        .hindi-overlay-text {
+            position: absolute;
+            bottom: 15px;
+            left: 50%;
+            transform: translateX(-50%);
+            color: white;
+            font-size: 28px;
+            font-weight: 800;
+            white-space: nowrap;
+            z-index: 100;
+            /* White text with thick Red outline */
+            text-shadow: 
+                -3px -3px 0 var(--status-red), 3px -3px 0 var(--status-red),
+                -3px 3px 0 var(--status-red), 3px 3px 0 var(--status-red),
+                0px 0px 15px rgba(0,0,0,0.5);
+        }
+
+        /* --- Bottom Bar --- */
+        .scanner-bottom-bar {
+            position: absolute;
+            bottom: 30px;
+            width: 100%;
+            max-width: 450px;
+            display: flex;
+            justify-content: space-between;
+            padding: 0 30px;
+            opacity: 0.6;
+        }
+        .btn-refresh { background: none; border: none; color: white; font-size: 24px; cursor: pointer; }
     </style>
 </head>
 <body>
 
-    <div class="loading-overlay" id="loadingScreen">
-        <i class="fa-solid fa-satellite-dish fa-spin" style="font-size: 60px; color: #E6B31E; margin-bottom: 20px;"></i>
-        <h2 class="fw-bold">Initializing Gate Scanner...</h2>
-        <p class="text-muted" id="loadingText">Syncing Face Data from Server</p>
+    <div class="scanner-top-bar">
+        <div id="statusLabel" class="status-text status-red">Face Not Detected</div>
+        <div class="aadhaar-auth-title text-uppercase">
+            <img src="https://upload.wikimedia.org/wikipedia/en/thumb/c/cf/Aadhaar_Logo.svg/1200px-Aadhaar_Logo.svg.png" width="30" class="mb-1"><br>
+            Aadhaar Auth <span class="version-small">v1.33</span>
+        </div>
     </div>
 
-    <div class="header">
-        <h1>SKY <span>CLASSES</span></h1>
-        <div class="live-badge"><i class="fa-solid fa-record-vinyl me-2"></i> AI GATE SCANNER LIVE</div>
+    <div class="mode-container d-flex gap-2">
+        <input type="radio" class="btn-check" name="gateMode" id="modeIn" value="IN" checked>
+        <label class="btn btn-outline-success btn-sm px-3 fw-bold rounded-pill" for="modeIn">ENTRY (IN)</label>
+
+        <input type="radio" class="btn-check" name="gateMode" id="modeOut" value="OUT">
+        <label class="btn btn-outline-danger btn-sm px-3 fw-bold rounded-pill" for="modeOut">EXIT (OUT)</label>
     </div>
 
-    <div class="scanner-container">
-        <video id="video" autoplay muted playsinline></video>
-        <canvas id="canvas"></canvas>
-        <div class="scan-line"></div>
+    <div class="camera-wrapper">
+        <div class="camera-circle-container" id="ring">
+            <video id="webcam" autoplay muted></video>
+            <div class="hindi-overlay-text">उधास होके नही जाने देना है</div>
+        </div>
     </div>
 
-    <div class="status-box">
-        <p id="recognitionStatus"><i class="fa-solid fa-face-viewfinder me-2"></i> Looking for students...</p>
+    <div class="scanner-bottom-bar">
+        <button class="btn-refresh" onclick="location.reload()"><i class="fa-solid fa-rotate-right"></i></button>
+        <div id="clock" class="small fw-bold">00:00:00</div>
     </div>
+
+    <audio id="beepSuccess" src="https://www.soundjay.com/buttons/sounds/button-3.mp3"></audio>
+    <audio id="beepError" src="https://www.soundjay.com/buttons/sounds/button-10.mp3"></audio>
 
     <script>
-        // Firebase Setup
+        // --- 1. Firebase Configuration ---
         const firebaseConfig = {
-          apiKey: "AIzaSyC6bcqETEnTjLEQnISXjnWR2brPrVOAm-Y",
-          authDomain: "sky-classes-db-d6140.firebaseapp.com",
-          databaseURL: "https://sky-classes-db-d6140-default-rtdb.firebaseio.com",
-          projectId: "sky-classes-db-d6140",
-          storageBucket: "sky-classes-db-d6140.firebasestorage.app",
-          messagingSenderId: "915411828634",
-          appId: "1:915411828634:web:44aadc81aa911cdebcc423"
+            apiKey: "AIzaSyC6bcqETEnTjLEQnISXjnWR2brPrVOAm-Y",
+            authDomain: "sky-classes-db-d6140.firebaseapp.com",
+            databaseURL: "https://sky-classes-db-d6140-default-rtdb.firebaseio.com",
+            projectId: "sky-classes-db-d6140",
+            storageBucket: "sky-classes-db-d6140.firebasestorage.app",
+            messagingSenderId: "915411828634",
+            appId: "1:915411828634:web:44aadc81aa911cdebcc423"
         };
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
 
-        const video = document.getElementById('video');
-        const canvas = document.getElementById('canvas');
-        const statusText = document.getElementById('recognitionStatus');
-        const loadingText = document.getElementById('loadingText');
-        
-        let faceMatcher = null;
-        let recentlyScanned = {}; // Anti-spam system
+        // --- 2. Camera Setup ---
+        const video = document.getElementById('webcam');
+        async function startCamera() {
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+                video.srcObject = stream;
+            } catch (err) {
+                console.error("Camera Access Denied:", err);
+                alert("Bhai, camera chalu nahi ho raha!");
+            }
+        }
+        startCamera();
 
-        // Step 1: Load AI Models
-        const MODEL_URL = 'https://cdn.jsdelivr.net/npm/@vladmandic/face-api/model/';
-        
-        Promise.all([
-            faceapi.nets.ssdMobilenetv1.loadFromUri(MODEL_URL),
-            faceapi.nets.faceLandmark68Net.loadFromUri(MODEL_URL),
-            faceapi.nets.faceRecognitionNet.loadFromUri(MODEL_URL)
-        ]).then(fetchRegisteredFaces).catch(err => {
-            loadingText.innerHTML = "Error loading AI Models. Please refresh.";
-            loadingText.style.color = "red";
-        });
+        // --- 3. Live Clock ---
+        setInterval(() => {
+            document.getElementById('clock').innerText = new Date().toLocaleTimeString();
+        }, 1000);
 
-        // Step 2: Fetch Data from Firebase and Train the AI Matcher
-        function fetchRegisteredFaces() {
-            loadingText.innerHTML = "Training AI with Sky Classes Students...";
+        // --- 4. Core Attendance Logic (Baval Animation & Sound) ---
+        function markAttendance(phone, studentName) {
+            const today = new Date().toLocaleDateString('en-GB').replace(/\//g, "-");
+            const currentTime = new Date().toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' });
+            const selectedMode = document.querySelector('input[name="gateMode"]:checked').value;
             
-            db.ref('Face_Data').once('value').then(snapshot => {
-                const data = snapshot.val();
-                if (!data) {
-                    loadingText.innerHTML = "No students registered yet! Please use Registration Page.";
-                    loadingText.style.color = "red";
-                    return;
-                }
+            const ring = document.getElementById('ring');
+            const statusLabel = document.getElementById('statusLabel');
 
-                const labeledFaceDescriptors = [];
+            // Save to Firebase
+            db.ref(`Face_Data/${phone}/Attendance/${today}`).update({
+                [selectedMode]: currentTime
+            }).then(() => {
+                // UI Feedback (Baval Look)
+                ring.classList.add('success-ring');
+                statusLabel.innerText = `${selectedMode} SUCCESS: ${studentName}`;
+                statusLabel.classList.remove('status-red');
+                statusLabel.classList.add('status-green');
                 
-                for (const phone in data) {
-                    const student = data[phone];
-                    const floatArray = new Float32Array(student.FaceDescriptor);
-                    const label = student.Name + "||" + phone + "||" + (student.Parent_Phone || ""); 
-                    
-                    labeledFaceDescriptors.push(
-                        new faceapi.LabeledFaceDescriptors(label, [floatArray])
-                    );
-                }
+                document.getElementById('beepSuccess').play();
 
-                faceMatcher = new faceapi.FaceMatcher(labeledFaceDescriptors, 0.5);
-                startVideo();
+                // Reset back after 3 seconds
+                setTimeout(() => {
+                    ring.classList.remove('success-ring');
+                    statusLabel.innerText = "Face Not Detected";
+                    statusLabel.classList.remove('status-green');
+                    statusLabel.classList.add('status-red');
+                }, 3000);
+            }).catch((err) => {
+                document.getElementById('beepError').play();
+                alert("Database Error!");
             });
         }
 
-        // Step 3: Start Camera
-        function startVideo() {
-            navigator.mediaDevices.getUserMedia({ video: { facingMode: "user" } })
-                .then(stream => {
-                    video.srcObject = stream;
-                })
-                .catch(err => {
-                    loadingText.innerHTML = "Camera permission required for Gate Scanner!";
-                    loadingText.style.color = "red";
-                });
-        }
-
-        // Step 4: The Core Scanning Loop
-        video.addEventListener('play', () => {
-            document.getElementById('loadingScreen').style.display = 'none';
-            
-            const displaySize = { width: video.videoWidth || 600, height: video.videoHeight || 450 };
-            faceapi.matchDimensions(canvas, displaySize);
-
-            setInterval(async () => {
-                if (!faceMatcher) return;
-
-                const detections = await faceapi.detectAllFaces(video).withFaceLandmarks().withFaceDescriptors();
-                const resizedDetections = faceapi.resizeResults(detections, displaySize);
-                
-                canvas.getContext('2d').clearRect(0, 0, canvas.width, canvas.height);
-
-                const results = resizedDetections.map(d => faceMatcher.findBestMatch(d.descriptor));
-                
-                if(results.length === 0) {
-                    statusText.innerHTML = "<i class='fa-solid fa-face-viewfinder me-2'></i> Looking for students...";
-                    statusText.style.color = "#E6B31E";
-                }
-
-                results.forEach((result, i) => {
-                    if (result.label !== 'unknown') {
-                        const splitData = result.label.split("||");
-                        const name = splitData[0];
-                        const phone = splitData[1];
-                        const parentPhone = splitData[2];
-
-                        // Cooldown Check (5 Minutes)
-                        const nowTime = Date.now();
-                        if (recentlyScanned[phone] && (nowTime - recentlyScanned[phone] < 300000)) {
-                            statusText.innerHTML = `<i class='fa-solid fa-clock-rotate-left me-2'></i> ${name}, already marked today!`;
-                            statusText.style.color = "#ffc107";
-                            return;
-                        }
-
-                        markAttendance(name, phone, parentPhone);
-                    } else {
-                        statusText.innerHTML = "<i class='fa-solid fa-user-secret me-2'></i> Unknown Face Detected!";
-                        statusText.style.color = "#D90429";
-                    }
-                });
-            }, 1000); 
-        });
-
-        // Step 5: Save to Firebase
-        function markAttendance(name, phone, parentPhone) {
-            recentlyScanned[phone] = Date.now(); 
-            
-            statusText.innerHTML = `<i class='fa-solid fa-circle-check me-2'></i> Welcome, ${name}!`;
-            statusText.style.color = "#28a745";
-
-            const now = new Date();
-            const dateStr = now.toLocaleDateString('en-IN'); 
-            const timeStr = now.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' });
-
-            db.ref('Daily_Attendance').push({
-                Name: name,
-                Phone: phone,
-                Parent_Phone: parentPhone || "N/A",
-                Date: dateStr,
-                Time: timeStr,
-                Timestamp: Date.now(),
-                Method: "Face ID" 
-            }).then(() => {
-                const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-                const oscillator = audioCtx.createOscillator();
-                oscillator.type = 'sine'; oscillator.frequency.setValueAtTime(800, audioCtx.currentTime);
-                oscillator.connect(audioCtx.destination);
-                oscillator.start(); oscillator.stop(audioCtx.currentTime + 0.2);
-            }).catch(err => console.error("Firebase Error: ", err));
-        }
+        // --- NOTE FOR ADITYA ---
+        // Aapne jo bhi Face API library use ki hai, uske 'detection' wale 
+        // loop ke andar bas ye function call kar dena:
+        // Example: markAttendance("9876543210", "Rahul Kumar");
     </script>
 </body>
 </html>
