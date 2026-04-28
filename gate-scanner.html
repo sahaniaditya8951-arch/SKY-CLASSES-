@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sky Classes | Premium AI Scanner</title>
+    <title>Sky Classes | Auto AI Scanner</title>
     
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700;800&display=swap" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -14,7 +14,6 @@
     <script src="https://cdn.jsdelivr.net/npm/@vladmandic/face-api/dist/face-api.js"></script>
 
     <style>
-        /* PREMIUM DARK THEME */
         body { 
             font-family: 'Outfit', sans-serif; 
             background: radial-gradient(circle at 50% -20%, #1e293b, #020617 80%, #000);
@@ -23,65 +22,40 @@
             color: white;
         }
         
-        /* PREMIUM HEADER */
         .header {
             position: absolute; top: 0; left: 0; width: 100%; text-align: center; z-index: 10;
-            padding: 20px 0;
-            background: linear-gradient(180deg, rgba(2,6,23,0.9) 0%, transparent 100%);
+            padding: 20px 0; background: linear-gradient(180deg, rgba(2,6,23,0.9) 0%, transparent 100%);
         }
         .header h1 { 
             font-weight: 800; font-size: 38px; letter-spacing: 3px; margin: 0;
             background: linear-gradient(to right, #ffffff, #fbbf24);
             -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-            text-shadow: 0 10px 30px rgba(251, 191, 36, 0.3);
         }
         
         .live-badge {
             background: rgba(217, 4, 41, 0.15); color: #ff3366; padding: 6px 18px; 
             border-radius: 50px; border: 1px solid rgba(255, 51, 102, 0.3);
             font-size: 12px; font-weight: 700; display: inline-flex; align-items: center; gap: 8px;
-            margin-top: 10px; backdrop-filter: blur(5px); box-shadow: 0 0 15px rgba(217, 4, 41, 0.2);
+            margin-top: 10px; backdrop-filter: blur(5px);
         }
         .live-dot { width: 8px; height: 8px; background: #ff3366; border-radius: 50%; animation: pulse 1.5s infinite; }
         @keyframes pulse { 0% { box-shadow: 0 0 0 0 rgba(255, 51, 102, 0.7); } 70% { box-shadow: 0 0 0 10px rgba(255, 51, 102, 0); } 100% { box-shadow: 0 0 0 0 rgba(255, 51, 102, 0); } }
 
-        /* SLEEK TOGGLE BUTTONS */
-        .mode-toggle {
-            display: flex; gap: 15px; margin-bottom: 25px; z-index: 10; margin-top: 90px;
-            background: rgba(255, 255, 255, 0.03); padding: 8px; border-radius: 50px;
-            backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.05);
-        }
-        .mode-toggle input { display: none; }
-        .mode-label {
-            padding: 10px 35px; border-radius: 40px; font-weight: 600; cursor: pointer;
-            color: #94a3b8; transition: all 0.4s ease; font-size: 15px; margin: 0;
-        }
-        #modeIn:checked + .in-label { background: #10b981; color: #fff; box-shadow: 0 0 20px rgba(16, 185, 129, 0.4); }
-        #modeOut:checked + .out-label { background: #f43f5e; color: #fff; box-shadow: 0 0 20px rgba(244, 63, 94, 0.4); }
-
-        /* HIGH-TECH SCANNER HUD */
-        .scanner-wrapper { position: relative; display: flex; justify-content: center; align-items: center; margin-bottom: 20px; }
+        .scanner-wrapper { position: relative; display: flex; justify-content: center; align-items: center; margin-bottom: 20px; margin-top: 60px; }
+        
+        /* ZOOM FIX: aspect-ratio aur contain property use ki hai */
         .scanner-container {
-            position: relative; width: 85vw; max-width: 380px; height: 50vh; max-height: 480px;
-            border-radius: 24px; overflow: hidden;
+            position: relative; width: 85vw; max-width: 400px; aspect-ratio: 3/4; max-height: 60vh;
+            border-radius: 24px; overflow: hidden; background: #000;
             box-shadow: 0 20px 50px rgba(0,0,0,0.5), 0 0 0 2px rgba(251, 191, 36, 0.2);
-            background: #000;
         }
         
-        /* Corner Brackets for HUD Effect */
-        .hud-corners::before, .hud-corners::after, .scanner-container::before, .scanner-container::after {
-            content: ''; position: absolute; width: 40px; height: 40px; border-color: #fbbf24; border-style: solid; z-index: 20; pointer-events: none; transition: 0.3s;
-        }
-        .hud-corners::before { top: 15px; left: 15px; border-width: 3px 0 0 3px; border-radius: 10px 0 0 0; }
-        .hud-corners::after { top: 15px; right: 15px; border-width: 3px 3px 0 0; border-radius: 0 10px 0 0; }
-        .scanner-container::before { bottom: 15px; left: 15px; border-width: 0 0 3px 3px; border-radius: 0 0 0 10px; }
-        .scanner-container::after { bottom: 15px; right: 15px; border-width: 0 3px 3px 0; border-radius: 0 0 10px 0; }
-
         video, canvas { 
-            position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; transform: scaleX(-1); border-radius: 24px;
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%; 
+            object-fit: contain; /* YE ZOOM ROKEGA */
+            transform: scaleX(-1); border-radius: 24px;
         }
         
-        /* Laser Effect */
         .scan-line {
             position: absolute; top: 0; left: 0; width: 100%; height: 2px; 
             background: linear-gradient(to right, transparent, #fbbf24, transparent);
@@ -90,18 +64,15 @@
         }
         @keyframes scan { 0% { top: 5%; opacity: 0; } 10% { opacity: 1; } 90% { opacity: 1; } 100% { top: 95%; opacity: 0; } }
 
-        /* GLASSMORPHISM STATUS BOX */
         .status-box {
             position: absolute; bottom: 30px; width: 90vw; max-width: 500px;
             background: rgba(15, 23, 42, 0.6); backdrop-filter: blur(16px);
             padding: 20px; border-radius: 20px; text-align: center;
-            border: 1px solid rgba(255, 255, 255, 0.08);
-            box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+            border: 1px solid rgba(255, 255, 255, 0.08); box-shadow: 0 20px 40px rgba(0,0,0,0.4);
         }
         #recognitionStatus { font-size: 20px; font-weight: 700; margin: 0; color: #fbbf24; }
-        .hint-text { font-size: 13px; font-weight: 300; margin-top: 8px; color: #94a3b8; letter-spacing: 1px; }
+        .hint-text { font-size: 13px; font-weight: 300; margin-top: 8px; color: #94a3b8; }
         
-        /* PREMIUM LOADING SCREEN */
         .loading-overlay {
             position: fixed; top:0; left:0; width:100%; height:100%; 
             background: #020617; display: flex; flex-direction: column; 
@@ -119,25 +90,16 @@
 
     <div class="loading-overlay" id="loadingScreen">
         <div class="loader-ring"></div>
-        <h3 class="fw-bold text-white mb-2" style="font-family: 'Outfit';">Starting Engine...</h3>
-        <p class="text-muted" id="loadingText" style="font-size: 14px;">Initializing AI Models & Data</p>
+        <h3 class="fw-bold text-white mb-2">Starting Engine...</h3>
+        <p class="text-muted" id="loadingText">Fetching Today's Records...</p>
     </div>
 
     <div class="header">
         <h1>SKY CLASSES</h1>
-        <div class="live-badge"><div class="live-dot"></div> AI VISION LIVE</div>
-    </div>
-
-    <div class="mode-toggle">
-        <input type="radio" name="gateMode" id="modeIn" value="IN" checked onchange="updateMode(this)">
-        <label for="modeIn" class="mode-label in-label"><i class="fa-solid fa-sign-in-alt me-2"></i> ENTRY</label>
-
-        <input type="radio" name="gateMode" id="modeOut" value="OUT" onchange="updateMode(this)">
-        <label for="modeOut" class="mode-label out-label">EXIT <i class="fa-solid fa-sign-out-alt ms-2"></i></label>
+        <div class="live-badge"><div class="live-dot"></div> AUTO SMART GATE</div>
     </div>
 
     <div class="scanner-wrapper">
-        <div class="hud-corners"></div>
         <div class="scanner-container">
             <video id="video" autoplay muted playsinline></video>
             <canvas id="canvas"></canvas>
@@ -146,12 +108,11 @@
     </div>
 
     <div class="status-box">
-        <p id="recognitionStatus"><i class="fa-solid fa-crosshairs fa-spin me-2" style="color: #94a3b8;"></i> Scanning Area...</p>
-        <p class="hint-text"><i class="fa-regular fa-eye me-1"></i> Blink to confirm identity</p>
+        <p id="recognitionStatus"><i class="fa-solid fa-crosshairs fa-spin me-2" style="color: #94a3b8;"></i> Scanning Face...</p>
+        <p class="hint-text"><i class="fa-regular fa-eye me-1"></i> Blink to mark attendance automatically</p>
     </div>
 
     <script>
-        // FIREBASE AUR JAVASCRIPT LOGIC EKDUM SAME HAI (Pehle jaisa perfect chalega)
         const firebaseConfig = {
           apiKey: "AIzaSyC6bcqETEnTjLEQnISXjnWR2brPrVOAm-Y",
           authDomain: "sky-classes-db-d6140.firebaseapp.com",
@@ -169,19 +130,12 @@
         const statusText = document.getElementById('recognitionStatus');
         
         let faceMatcher = null;
-        let recentlyScanned = {}; 
-        let currentMode = "IN"; 
+        let studentHistory = {}; // Yeh bachho ka IN/OUT yaad rakhega
         let isProcessing = false; 
 
-        function updateMode(radio) {
-            currentMode = radio.value;
-            statusText.innerHTML = `<i class='fa-solid fa-shield-halved me-2'></i> Gate Mode: ${currentMode}`;
-            statusText.style.color = "#fbbf24";
-        }
-
-        function speakAttendance(studentName) {
+        function speakAttendance(studentName, mode) {
             if ('speechSynthesis' in window) {
-                const speech = new SpeechSynthesisUtterance(`${studentName}, Present. Thank you!`);
+                const speech = new SpeechSynthesisUtterance(`${studentName}, ${mode} Successful!`);
                 speech.lang = 'en-IN'; 
                 window.speechSynthesis.speak(speech);
             }
@@ -198,7 +152,26 @@
             faceapi.nets.ssdMobilenetv1.loadFromUri(MODEL_URL),
             faceapi.nets.faceLandmark68Net.loadFromUri(MODEL_URL),
             faceapi.nets.faceRecognitionNet.loadFromUri(MODEL_URL)
-        ]).then(fetchRegisteredFaces).catch(() => setTimeout(startVideo, 1000));
+        ]).then(fetchInitialData).catch(() => setTimeout(startVideo, 1000));
+
+        // Naya Function: Aaj ki attendance aur Face data dono nikalega
+        function fetchInitialData() {
+            const todayStr = new Date().toLocaleDateString('en-IN');
+            
+            // Pehle dekhega aaj kaun kaun aa chuka hai (taaki unka seedha EXIT lage)
+            db.ref('Daily_Attendance').once('value').then(snap => {
+                snap.forEach(child => {
+                    let record = child.val();
+                    if(record.Date === todayStr) {
+                        let phone = record.Phone;
+                        if(!studentHistory[phone] || studentHistory[phone].Timestamp < record.Timestamp) {
+                            studentHistory[phone] = { state: record.ScanType, Timestamp: record.Timestamp };
+                        }
+                    }
+                });
+                fetchRegisteredFaces();
+            });
+        }
 
         function fetchRegisteredFaces() {
             db.ref('Face_Data').once('value').then(snapshot => {
@@ -211,7 +184,7 @@
                     if (student && student.FaceDescriptor) {
                         try {
                             const floatArray = new Float32Array(Object.values(student.FaceDescriptor));
-                            const label = student.Name + "||" + phone + "||" + (student.Parent_Phone || ""); 
+                            const label = student.Name + "||" + phone; 
                             labeledFaceDescriptors.push(new faceapi.LabeledFaceDescriptors(label, [floatArray]));
                         } catch (e) {}
                     }
@@ -222,9 +195,7 @@
         }
 
         function startVideo() {
-            navigator.mediaDevices.getUserMedia({ 
-                video: { facingMode: "user", width: { ideal: 480 }, height: { ideal: 640 } } 
-            })
+            navigator.mediaDevices.getUserMedia({ video: { facingMode: "user" } })
             .then(stream => { 
                 video.srcObject = stream; 
                 document.getElementById('loadingScreen').style.display = 'none';
@@ -232,7 +203,6 @@
         }
 
         video.addEventListener('play', () => {
-            document.getElementById('loadingScreen').style.display = 'none';
             const displaySize = { width: video.clientWidth || 380, height: video.clientHeight || 480 }; 
             faceapi.matchDimensions(canvas, displaySize);
 
@@ -245,9 +215,8 @@
                 canvas.getContext('2d').clearRect(0, 0, canvas.width, canvas.height);
 
                 if(resizedDetections.length === 0) {
-                    statusText.innerHTML = "<i class='fa-solid fa-crosshairs fa-spin me-2' style='color: #94a3b8;'></i> Scanning Area...";
+                    statusText.innerHTML = "Scanning Area...";
                     statusText.style.color = "#fbbf24";
-                    // Reset HUD border
                     document.querySelector('.scanner-container').style.boxShadow = "0 20px 50px rgba(0,0,0,0.5), 0 0 0 2px rgba(251, 191, 36, 0.2)";
                     return;
                 }
@@ -264,10 +233,14 @@
                         const rightEye = detection.landmarks.getRightEye();
                         const ear = (calculateEAR(leftEye) + calculateEAR(rightEye)) / 2;
 
-                        const scanKey = phone + "_" + currentMode;
                         const nowTime = Date.now();
                         
-                        if (recentlyScanned[scanKey] && (nowTime - recentlyScanned[scanKey] < 300000)) {
+                        // AUTO MODE LOGIC
+                        let lastRecord = studentHistory[phone] || { state: "OUT", Timestamp: 0 };
+                        let upcomingMode = lastRecord.state === "IN" ? "EXIT" : "ENTRY";
+
+                        // 5 Minute Cooldown (300000 ms)
+                        if (nowTime - lastRecord.Timestamp < 300000) {
                             statusText.innerHTML = `<i class='fa-solid fa-ban me-2'></i> ${name}, Wait 5 Mins!`;
                             statusText.style.color = "#f43f5e";
                             return;
@@ -275,12 +248,11 @@
 
                         if (ear < 0.28) {
                             isProcessing = true; 
-                            markAttendance(name, phone, splitData[2], scanKey);
-                            setTimeout(() => { isProcessing = false; }, 3000); 
+                            markAttendance(name, phone, upcomingMode);
+                            setTimeout(() => { isProcessing = false; }, 3500); 
                         } else {
-                            statusText.innerHTML = `Identity Verified: ${name}`;
-                            statusText.style.color = "#38bdf8"; // Premium Cyan color
-                            // Glow up the scanner box when face matches
+                            statusText.innerHTML = `${name} Identified. Blink for ${upcomingMode}!`;
+                            statusText.style.color = "#38bdf8"; 
                             document.querySelector('.scanner-container').style.boxShadow = "0 20px 50px rgba(56, 189, 248, 0.3), 0 0 0 2px #38bdf8";
                         }
                     }
@@ -288,14 +260,17 @@
             }, 250); 
         });
 
-        function markAttendance(name, phone, parentPhone, scanKey) {
-            recentlyScanned[scanKey] = Date.now(); 
+        function markAttendance(name, phone, mode) {
+            const nowTime = Date.now();
+            // Local history update karo taaki turant ulta na lag jaye
+            studentHistory[phone] = { state: mode === "ENTRY" ? "IN" : "OUT", Timestamp: nowTime };
             
-            statusText.innerHTML = `<i class='fa-solid fa-fingerprint me-2'></i> ${currentMode} Granted: ${name}`;
-            statusText.style.color = "#10b981"; // Premium Green color
-            document.querySelector('.scanner-container').style.boxShadow = "0 20px 50px rgba(16, 185, 129, 0.4), 0 0 0 3px #10b981";
+            let color = mode === "ENTRY" ? "#10b981" : "#f43f5e"; // Green for Entry, Red for Exit
+            statusText.innerHTML = `<i class='fa-solid fa-fingerprint me-2'></i> ${mode} Saved: ${name}`;
+            statusText.style.color = color;
+            document.querySelector('.scanner-container').style.boxShadow = `0 20px 50px ${color}66, 0 0 0 3px ${color}`;
 
-            speakAttendance(name);
+            speakAttendance(name, mode);
 
             const now = new Date();
             const dateStr = now.toLocaleDateString('en-IN'); 
@@ -306,10 +281,9 @@
                 Phone: phone,
                 Date: dateStr,
                 Time: timeStr,
-                Timestamp: Date.now(),
-                ScanType: currentMode,           
-                Status: `${currentMode} at ${timeStr}` 
-            }).catch(err => console.error(err));
+                Timestamp: nowTime,
+                ScanType: mode === "ENTRY" ? "IN" : "OUT"
+            });
         }
     </script>
 </body>
