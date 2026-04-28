@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sky Classes | Master Admin Dashboard</title>
+    <title>Sky Classes | Ultimate Admin ERP</title>
     
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -17,44 +17,37 @@
         :root { --primary-dark: #07192F; --primary-blue: #0A2540; --accent-gold: #E6B31E; --accent-red: #D90429; }
         body { font-family: 'Poppins', sans-serif; background-color: #f4f7f6; margin: 0; overflow-x: hidden; }
         
-        /* Login Screen */
+        /* Layout */
         #loginScreen { position: fixed; top: 0; left: 0; width: 100%; height: 100vh; background: linear-gradient(135deg, var(--primary-dark), var(--primary-blue)); display: flex; justify-content: center; align-items: center; z-index: 9999; }
         .login-box { background: white; padding: 40px; border-radius: 15px; text-align: center; width: 100%; max-width: 400px; box-shadow: 0 20px 50px rgba(0,0,0,0.5); }
         .btn-login { background: var(--accent-red); color: white; width: 100%; padding: 12px; border: none; border-radius: 8px; font-weight: bold; }
         
-        /* Dashboard Sidebar */
         #dashboardScreen { display: none; }
         .sidebar { height: 100vh; background-color: var(--primary-dark); color: white; padding-top: 20px; position: fixed; width: 260px; z-index: 100; overflow-y: auto;}
         .sidebar h4 { text-align: center; font-weight: 800; color: var(--accent-gold); margin-bottom: 30px; }
-        .sidebar a { padding: 15px 25px; text-decoration: none; color: #a0aec0; display: block; border-left: 4px solid transparent; cursor: pointer; transition: 0.3s; }
+        .sidebar a { padding: 12px 25px; text-decoration: none; color: #a0aec0; display: block; border-left: 4px solid transparent; cursor: pointer; transition: 0.3s; font-size: 15px;}
         .sidebar a:hover, .sidebar a.active { background: rgba(255,255,255,0.05); color: white; border-left-color: var(--accent-gold); }
         
         .main-content { margin-left: 260px; padding: 30px; }
-        .stat-card { background: white; padding: 25px; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.04); text-align: center; border-bottom: 5px solid var(--primary-blue); }
+        .stat-card { background: white; padding: 20px; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.04); text-align: center; border-bottom: 5px solid var(--primary-blue); }
         .table-container { background: white; padding: 25px; border-radius: 15px; margin-top: 30px; box-shadow: 0 4px 15px rgba(0,0,0,0.04); display: none; }
         .active-section { display: block; }
         
-        .btn-excel { background: #28a745; color: white; border: none; padding: 8px 18px; border-radius: 8px; font-weight: 600; white-space: nowrap; transition: 0.3s; }
-        .btn-excel:hover { opacity: 0.8; }
-        .date-picker { border: 2px solid #e2e8f0; border-radius: 8px; padding: 6px 12px; outline: none; font-weight: 500; color: #0A2540;}
-        .date-picker:focus { border-color: var(--accent-gold); }
-
-        /* Tools CSS (Receipt & Paper) */
-        .tool-card { max-width: 700px; margin: auto; border: 1px solid #eee; padding: 30px; border-radius: 15px; }
+        .btn-excel { background: #28a745; color: white; border: none; padding: 8px 18px; border-radius: 8px; font-weight: 600; transition: 0.3s; }
+        .btn-action { padding: 5px 10px; border-radius: 5px; border: none; font-size: 13px; color: white; margin: 0 2px;}
+        
+        /* Tools UI */
+        .tool-card { max-width: 800px; margin: auto; border: 1px solid #eee; padding: 30px; border-radius: 15px; }
         .tool-header { text-align: center; border-bottom: 2px solid #eee; padding-bottom: 15px; margin-bottom: 25px; }
         .btn-print { background: #0A2540; color: white; padding: 12px; border-radius: 8px; width: 100%; font-weight: 700; border: none; transition: 0.3s; margin-top: 15px;}
         .btn-print:hover { background: #D90429; color: white; }
-        
-        .question-box { background: #fff; border: 1px solid #e2e8f0; border-left: 4px solid #0A2540; padding: 15px; border-radius: 8px; margin-bottom: 15px; }
-        .btn-add { background: #0A2540; color: white; font-weight: 600; }
-        .btn-add:hover { background: #07192F; color: white; }
     </style>
 </head>
 <body>
 
     <div id="loginScreen">
         <div class="login-box">
-            <h3 class="fw-bold"><span style="color: var(--accent-red);">SKY</span> ADMIN</h3>
+            <h3 class="fw-bold"><span style="color: var(--accent-red);">SKY</span> ERP</h3>
             <input type="password" id="adminPassword" class="form-control mb-3 text-center" placeholder="Master Password">
             <button class="btn-login" onclick="checkPassword()">LOGIN</button>
         </div>
@@ -64,154 +57,161 @@
         
         <div class="sidebar">
             <h4>SKY CLASSES</h4>
-            <a onclick="showSection('admissions')" id="link-admissions" class="active"><i class="fa-solid fa-user-plus me-2"></i> Admissions</a>
+            <p class="text-center text-muted small" style="margin-top:-20px;">Master Panel</p>
+            
+            <a onclick="showSection('crm')" id="link-crm" class="active"><i class="fa-solid fa-users-gear me-2"></i> Student CRM</a>
             <a onclick="showSection('attendance')" id="link-attendance"><i class="fa-solid fa-calendar-check me-2"></i> Smart Attendance</a>
+            <a onclick="showSection('finance')" id="link-finance"><i class="fa-solid fa-wallet me-2"></i> Finance Tracker</a>
+            
+            <hr style="border-color: #334155;">
+            
             <a onclick="showSection('fee')" id="link-fee"><i class="fa-solid fa-file-invoice-dollar me-2"></i> Fee Receipt</a>
+            <a onclick="showSection('idcard')" id="link-idcard"><i class="fa-solid fa-id-card me-2"></i> ID Card Maker</a>
+            <a onclick="showSection('result')" id="link-result"><i class="fa-solid fa-graduation-cap me-2"></i> Marksheet Maker</a>
             <a onclick="showSection('paper')" id="link-paper"><i class="fa-solid fa-file-pen me-2"></i> Paper Generator</a>
             
-            <a onclick="logout()" style="color: #ff4d4d; margin-top: 50px;"><i class="fa-solid fa-lock me-2"></i> Lock Dashboard</a>
+            <a onclick="logout()" style="color: #ff4d4d; margin-top: 40px;"><i class="fa-solid fa-power-off me-2"></i> Lock System</a>
         </div>
 
         <div class="main-content">
             
             <div class="row g-4 mb-4">
-                <div class="col-md-6">
-                    <div class="stat-card">
-                        <h2 id="countAdmissions">0</h2>
-                        <p class="text-muted fw-bold mb-0">Total Admissions</p>
+                <div class="col-md-4">
+                    <div class="stat-card" style="border-color: #0d6efd;">
+                        <h2 id="countTotalStudents">0</h2><p class="text-muted fw-bold mb-0">Total Students</p>
                     </div>
                 </div>
-                <div class="col-md-6">
+                <div class="col-md-4">
                     <div class="stat-card" style="border-color: #28a745;">
-                        <h2 id="countAttendance">0</h2>
-                        <p class="text-muted fw-bold mb-0" id="attendanceCardLabel">Students Present (Selected Date)</p>
+                        <h2 id="countAttendance">0</h2><p class="text-muted fw-bold mb-0">Present Today</p>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="stat-card" style="border-color: #E6B31E;">
+                        <h2 id="countRevenue">₹0</h2><p class="text-muted fw-bold mb-0">Monthly Revenue</p>
                     </div>
                 </div>
             </div>
 
-            <div id="section-admissions" class="table-container active-section">
+            <div id="section-crm" class="table-container active-section">
                 <div class="d-flex justify-content-between align-items-center mb-4">
-                    <h5 class="fw-bold m-0 text-primary"><i class="fa-solid fa-users me-2"></i> Admission Data</h5>
-                    <button class="btn-excel" onclick="downloadCSV('admissions')"><i class="fa-solid fa-download me-2"></i> Excel</button>
+                    <h5 class="fw-bold m-0 text-primary"><i class="fa-solid fa-address-book me-2"></i> Student Directory (CRM)</h5>
                 </div>
                 <div class="table-responsive">
-                    <table class="table table-hover align-middle">
-                        <thead class="table-light">
-                            <tr><th>Date</th><th>Name</th><th>Phone</th><th>Course</th></tr>
+                    <table class="table table-hover align-middle text-center">
+                        <thead class="table-dark">
+                            <tr><th>Name</th><th>Phone Number</th><th>Parent Phone</th><th>Action</th></tr>
                         </thead>
-                        <tbody id="admissionsBody"></tbody>
+                        <tbody id="crmBody"></tbody>
                     </table>
                 </div>
             </div>
 
             <div id="section-attendance" class="table-container">
                 <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-3">
-                    <h5 class="fw-bold m-0 text-success"><i class="fa-solid fa-clock-rotate-left me-2"></i> Daily Entry/Exit Log</h5>
+                    <h5 class="fw-bold m-0 text-success"><i class="fa-solid fa-clock-rotate-left me-2"></i> Entry/Exit Log</h5>
                     <div class="d-flex gap-2 align-items-center">
-                        <span class="text-muted fw-bold small">Filter Date:</span>
-                        <input type="date" id="dateFilter" class="date-picker" onchange="filterAttendanceData()">
-                        <button class="btn-excel" style="background: #17a2b8;" onclick="downloadCSV('attendance')">
-                            <i class="fa-solid fa-file-csv me-2"></i> Download Excel
-                        </button>
+                        <input type="date" id="dateFilter" class="form-control" onchange="filterAttendanceData()">
+                        <button class="btn-excel" onclick="downloadCSV('attendance')"><i class="fa-solid fa-file-csv"></i></button>
                     </div>
                 </div>
                 <div class="table-responsive">
                     <table class="table table-hover text-center align-middle">
-                        <thead class="table-dark">
-                            <tr>
-                                <th>S.No</th>
-                                <th class="text-start">Student Name</th>
-                                <th>Phone</th>
-                                <th class="text-success">ENTRY (IN)</th>
-                                <th class="text-danger">EXIT (OUT)</th>
-                                <th>Current Status</th>
-                            </tr>
+                        <thead class="table-light">
+                            <tr><th>Student Name</th><th>Phone</th><th class="text-success">ENTRY (IN)</th><th class="text-danger">EXIT (OUT)</th><th>Status</th></tr>
                         </thead>
                         <tbody id="attendanceBody"></tbody>
                     </table>
                 </div>
             </div>
 
-            <div id="section-fee" class="table-container">
-                <div class="tool-card">
-                    <div class="tool-header">
-                        <h4 class="fw-bold" style="color: var(--primary-blue);">Smart Fee Receipt</h4>
-                        <p class="text-muted small mb-0" id="syncStatus">Syncing Database...</p>
-                    </div>
-                    
-                    <div class="mb-3">
-                        <label class="form-label fw-bold small">Student Name (Auto-Search)</label>
-                        <input type="text" id="feeName" class="form-control" list="studentList" placeholder="Start typing name..." autocomplete="off">
-                        <datalist id="studentList"></datalist>
-                    </div>
-                    
-                    <div class="row mb-3">
-                        <div class="col-md-6 mb-3 mb-md-0">
-                            <label class="form-label fw-bold small">Course / Batch</label>
-                            <input type="text" id="feeCourse" class="form-control" placeholder="e.g. Physics Class 12">
-                        </div>
-                        <div class="col-md-6">
-                            <label class="form-label fw-bold small">Amount Paid (₹)</label>
-                            <input type="number" id="feeAmount" class="form-control" placeholder="Enter amount">
-                        </div>
-                    </div>
-                    <div class="mb-4">
-                        <label class="form-label fw-bold small">Payment Mode</label>
-                        <select id="feeMode" class="form-select">
-                            <option>Cash</option>
-                            <option>UPI / PhonePe / GPay</option>
-                            <option>Bank Transfer</option>
+            <div id="section-finance" class="table-container">
+                <div class="row mb-4">
+                    <div class="col-md-6"><h5 class="fw-bold text-primary"><i class="fa-solid fa-chart-pie me-2"></i> Income & Expense</h5></div>
+                </div>
+                <div class="row g-3 mb-4 p-3" style="background:#f8fafc; border-radius:10px; border:1px solid #e2e8f0;">
+                    <div class="col-md-3"><input type="text" id="finTitle" class="form-control" placeholder="Detail (e.g. Electricity, Fee)"></div>
+                    <div class="col-md-3"><input type="number" id="finAmount" class="form-control" placeholder="Amount (₹)"></div>
+                    <div class="col-md-3">
+                        <select id="finType" class="form-select">
+                            <option value="Income">Income (Kamai)</option>
+                            <option value="Expense">Expense (Kharcha)</option>
                         </select>
                     </div>
-                    
-                    <button class="btn-print" onclick="generateReceipt()"><i class="fa-solid fa-file-pdf me-2"></i> Generate & Download PDF</button>
+                    <div class="col-md-3"><button class="btn btn-primary w-100" onclick="addFinance()"><i class="fa-solid fa-plus me-1"></i> Add Entry</button></div>
+                </div>
+                <table class="table text-center">
+                    <thead class="table-dark"><tr><th>Date</th><th>Details</th><th>Income</th><th>Expense</th></tr></thead>
+                    <tbody id="financeBody"></tbody>
+                </table>
+            </div>
+
+            <div id="section-idcard" class="table-container">
+                <div class="tool-card">
+                    <div class="tool-header"><h4 class="fw-bold" style="color: var(--primary-blue);">Smart ID Card Maker</h4></div>
+                    <div class="mb-3">
+                        <label class="form-label fw-bold small">Select Student</label>
+                        <input type="text" id="idName" class="form-control" list="studentListAll" placeholder="Search student...">
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-md-6"><label class="form-label fw-bold small">Course/Class</label><input type="text" id="idCourse" class="form-control" placeholder="e.g. Class 12"></div>
+                        <div class="col-md-6"><label class="form-label fw-bold small">Valid Till</label><input type="text" id="idValid" class="form-control" value="March 2027"></div>
+                    </div>
+                    <button class="btn-print" onclick="generateIDCard()"><i class="fa-solid fa-id-badge me-2"></i> Print ID Card</button>
+                </div>
+            </div>
+
+            <div id="section-result" class="table-container">
+                <div class="tool-card">
+                    <div class="tool-header"><h4 class="fw-bold" style="color: var(--primary-blue);">Marksheet Maker</h4></div>
+                    <div class="row mb-3">
+                        <div class="col-md-6"><label class="form-label fw-bold small">Student Name</label><input type="text" id="resName" class="form-control"></div>
+                        <div class="col-md-6"><label class="form-label fw-bold small">Exam Name</label><input type="text" id="resExam" class="form-control" placeholder="e.g. Half Yearly"></div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-md-4"><input type="text" id="sub1" class="form-control" placeholder="Subject 1"></div>
+                        <div class="col-md-4"><input type="number" id="mark1" class="form-control" placeholder="Marks Obtained"></div>
+                        <div class="col-md-4"><input type="number" id="tot1" class="form-control" placeholder="Out of" value="100"></div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-md-4"><input type="text" id="sub2" class="form-control" placeholder="Subject 2"></div>
+                        <div class="col-md-4"><input type="number" id="mark2" class="form-control" placeholder="Marks Obtained"></div>
+                        <div class="col-md-4"><input type="number" id="tot2" class="form-control" placeholder="Out of" value="100"></div>
+                    </div>
+                    <button class="btn-print" style="background:#28a745;" onclick="generateResult()"><i class="fa-solid fa-trophy me-2"></i> Generate Result PDF</button>
+                </div>
+            </div>
+
+            <div id="section-fee" class="table-container">
+                <div class="tool-card">
+                    <div class="tool-header"><h4 class="fw-bold" style="color: var(--primary-blue);">Fee Receipt</h4></div>
+                    <div class="mb-3"><label class="form-label fw-bold small">Student Name</label><input type="text" id="feeName" class="form-control" list="studentListAll"></div>
+                    <div class="row mb-3">
+                        <div class="col-md-6"><label class="form-label fw-bold small">Course</label><input type="text" id="feeCourse" class="form-control"></div>
+                        <div class="col-md-6"><label class="form-label fw-bold small">Amount (₹)</label><input type="number" id="feeAmount" class="form-control"></div>
+                    </div>
+                    <button class="btn-print" onclick="generateReceipt()"><i class="fa-solid fa-file-invoice me-2"></i> Create Receipt</button>
                 </div>
             </div>
 
             <div id="section-paper" class="table-container">
-                <div class="tool-card" style="max-width: 800px;">
-                    <div class="tool-header">
-                        <h4 class="fw-bold" style="color: var(--primary-blue);">Question Paper Maker</h4>
+                <div class="tool-card">
+                    <div class="tool-header"><h4 class="fw-bold" style="color: var(--primary-blue);">Question Paper Maker</h4></div>
+                    <div class="row mb-3">
+                        <div class="col-md-6"><input type="text" id="pExam" class="form-control mb-2" placeholder="Exam Name"></div>
+                        <div class="col-md-6"><input type="text" id="pSub" class="form-control mb-2" placeholder="Subject"></div>
                     </div>
-                    
-                    <div class="row mb-4">
-                        <div class="col-md-6 mb-3">
-                            <label class="fw-bold small text-muted">Exam Name</label>
-                            <input type="text" id="examName" class="form-control" placeholder="e.g., Weekly Test 1">
-                        </div>
-                        <div class="col-md-6 mb-3">
-                            <label class="fw-bold small text-muted">Class & Subject</label>
-                            <input type="text" id="subject" class="form-control" placeholder="e.g., Class 12 - Physics">
-                        </div>
-                        <div class="col-md-6 mb-3">
-                            <label class="fw-bold small text-muted">Total Marks</label>
-                            <input type="text" id="marks" class="form-control" placeholder="e.g., 50">
-                        </div>
-                        <div class="col-md-6 mb-3">
-                            <label class="fw-bold small text-muted">Time Allowed</label>
-                            <input type="text" id="time" class="form-control" placeholder="e.g., 2 Hours">
-                        </div>
-                    </div>
-            
-                    <hr>
-                    <h6 class="fw-bold text-dark mb-3">Add Questions</h6>
-                    
-                    <div id="questionsContainer"></div>
-            
-                    <div class="d-flex gap-2 mb-3">
-                        <button class="btn btn-add w-100" onclick="addQuestion('subjective')"><i class="fa-solid fa-plus me-1"></i> Add Normal Question</button>
-                        <button class="btn btn-secondary w-100" onclick="addQuestion('mcq')"><i class="fa-solid fa-list me-1"></i> Add MCQ</button>
-                    </div>
-            
-                    <button class="btn-print" style="background: var(--accent-red);" onclick="generatePaper()"><i class="fa-solid fa-print me-2"></i> Create PDF Paper</button>
+                    <textarea id="pQuestions" class="form-control mb-3" rows="8" placeholder="Type questions here... (Write 1. 2. 3. format)"></textarea>
+                    <button class="btn-print" style="background:var(--accent-red);" onclick="generatePaper()"><i class="fa-solid fa-print me-2"></i> Generate PDF Paper</button>
                 </div>
             </div>
 
+            <datalist id="studentListAll"></datalist>
         </div>
     </div>
 
     <script>
-        // --- FIREBASE INITIALIZATION ---
+        // --- FIREBASE CONFIG ---
         const firebaseConfig = {
           apiKey: "AIzaSyC6bcqETEnTjLEQnISXjnWR2brPrVOAm-Y",
           authDomain: "sky-classes-db-d6140.firebaseapp.com",
@@ -222,14 +222,14 @@
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
 
-        // --- DASHBOARD UI LOGIC ---
+        // --- CORE UI LOGIC ---
         function checkPassword() {
             if(document.getElementById('adminPassword').value === "SkyAdmin123") {
                 document.getElementById('loginScreen').style.display = 'none';
                 document.getElementById('dashboardScreen').style.display = 'block';
-                setDefaultDate();
-                startRealtimeData();
-                initFeeReceiptData(); // Load student names for Fee Receipt
+                const td = new Date();
+                document.getElementById('dateFilter').value = `${td.getFullYear()}-${String(td.getMonth()+1).padStart(2,'0')}-${String(td.getDate()).padStart(2,'0')}`;
+                loadAllData();
             } else { alert("Wrong Password!"); }
         }
 
@@ -242,280 +242,146 @@
             document.getElementById('link-' + id).classList.add('active');
         }
 
-        // --- ATTENDANCE & ADMISSION LOGIC ---
-        let admissionsList = [];
-        let allAttendanceList = []; 
-        let currentSmartAttendanceList = []; 
-
-        function setDefaultDate() {
-            const today = new Date();
-            const yyyy = today.getFullYear();
-            const mm = String(today.getMonth() + 1).padStart(2, '0');
-            const dd = String(today.getDate()).padStart(2, '0');
-            document.getElementById('dateFilter').value = `${yyyy}-${mm}-${dd}`;
-        }
-
-        function formatInputDate(dateStr) {
-            if(!dateStr) return "";
-            const parts = dateStr.split('-');
-            return `${parts[2]}/${parts[1]}/${parts[0]}`; 
-        }
-
-        function startRealtimeData() {
-            // Fetch Admissions
-            db.ref('Student_Admissions').on('value', snap => {
+        // --- DATA FETCHING (CRM, ATTENDANCE, FINANCE) ---
+        let allAttendance = [];
+        function loadAllData() {
+            // 1. CRM Data (Face Data & Admissions)
+            db.ref('Face_Data').on('value', snap => {
                 const data = snap.val();
-                const body = document.getElementById('admissionsBody');
-                body.innerHTML = ''; admissionsList = [];
+                const crmBody = document.getElementById('crmBody');
+                const listAll = document.getElementById('studentListAll');
+                crmBody.innerHTML = ''; listAll.innerHTML = '';
+                let count = 0;
+                
                 if(data) {
-                    Object.values(data).reverse().forEach(st => {
-                        admissionsList.push(st);
-                        body.innerHTML += `<tr><td>${st.Date}</td><td class="fw-bold">${st.Name}</td><td>${st.Phone}</td><td><span class="badge bg-light text-dark border">${st.Course}</span></td></tr>`;
-                    });
+                    for(let phone in data) {
+                        let st = data[phone];
+                        count++;
+                        
+                        // Add to Datalist for Tools
+                        let opt = document.createElement('option');
+                        opt.value = st.Name; listAll.appendChild(opt);
+
+                        // Add to CRM Table
+                        let pPhone = st.Parent_Phone || "N/A";
+                        let waLink = `https://wa.me/91${pPhone}?text=Hello%20from%20Sky%20Classes!`;
+                        
+                        crmBody.innerHTML += `<tr>
+                            <td class="fw-bold">${st.Name}</td><td>${phone}</td><td>${pPhone}</td>
+                            <td>
+                                <a href="${waLink}" target="_blank" class="btn-action" style="background:#25D366;"><i class="fa-brands fa-whatsapp"></i> MSG</a>
+                                <button onclick="deleteStudent('${phone}')" class="btn-action" style="background:#D90429;"><i class="fa-solid fa-trash"></i></button>
+                            </td>
+                        </tr>`;
+                    }
                 }
-                document.getElementById('countAdmissions').innerText = admissionsList.length;
+                document.getElementById('countTotalStudents').innerText = count;
             });
 
-            // Fetch Attendance
+            // 2. Attendance Data
             db.ref('Daily_Attendance').on('value', snap => {
                 const data = snap.val();
-                allAttendanceList = [];
-                if(data) {
-                    Object.values(data).forEach(at => { allAttendanceList.push(at); });
-                }
+                allAttendance = [];
+                if(data) { Object.values(data).forEach(at => allAttendance.push(at)); }
                 filterAttendanceData(); 
             });
+
+            // 3. Finance Data
+            db.ref('Finance_Data').on('value', snap => {
+                const data = snap.val();
+                const fBody = document.getElementById('financeBody');
+                fBody.innerHTML = '';
+                let totalIncome = 0;
+                
+                if(data) {
+                    Object.values(data).reverse().forEach(f => {
+                        let inc = f.Type === "Income" ? `+ ₹${f.Amount}` : "-";
+                        let exp = f.Type === "Expense" ? `- ₹${f.Amount}` : "-";
+                        if(f.Type === "Income") totalIncome += Number(f.Amount);
+                        
+                        fBody.innerHTML += `<tr>
+                            <td>${f.Date}</td><td>${f.Title}</td>
+                            <td class="text-success fw-bold">${inc}</td><td class="text-danger fw-bold">${exp}</td>
+                        </tr>`;
+                    });
+                }
+                document.getElementById('countRevenue').innerText = `₹${totalIncome}`;
+            });
+        }
+
+        // --- HELPER FUNCTIONS ---
+        function deleteStudent(phone) {
+            if(confirm("Are you sure you want to delete this student from database?")) {
+                db.ref('Face_Data/' + phone).remove();
+            }
         }
 
         function filterAttendanceData() {
-            const selectedDateVal = document.getElementById('dateFilter').value;
-            const targetFormat1 = formatInputDate(selectedDateVal); 
-            const parts = selectedDateVal.split('-');
-            const targetFormat2 = `${parseInt(parts[2])}/${parseInt(parts[1])}/${parts[0]}`; 
-
-            let studentRecords = {};
-
-            allAttendanceList.forEach(record => {
-                if(record.Date === targetFormat1 || record.Date === targetFormat2) {
-                    let phone = record.Phone;
-                    if (!studentRecords[phone]) {
-                        studentRecords[phone] = { date: record.Date, name: record.Name, phone: phone, entryTime: "--", exitTime: "--" };
-                    }
-                    if (record.ScanType === "IN" || !record.ScanType) {
-                        if(studentRecords[phone].entryTime === "--") studentRecords[phone].entryTime = record.Time;
-                    } else if (record.ScanType === "OUT") {
-                        studentRecords[phone].exitTime = record.Time;
-                    }
+            let selectedDate = document.getElementById('dateFilter').value;
+            let parts = selectedDate.split('-');
+            let f1 = `${parts[2]}/${parts[1]}/${parts[0]}`; 
+            let f2 = `${parseInt(parts[2])}/${parseInt(parts[1])}/${parts[0]}`;
+            
+            let records = {};
+            allAttendance.forEach(r => {
+                if(r.Date === f1 || r.Date === f2) {
+                    let p = r.Phone;
+                    if(!records[p]) records[p] = {name: r.Name, phone: p, in: "--", out: "--"};
+                    if(r.ScanType === "IN" || !r.ScanType) records[p].in = r.Time;
+                    else if (r.ScanType === "OUT") records[p].out = r.Time;
                 }
             });
 
-            const body = document.getElementById('attendanceBody');
-            body.innerHTML = ''; currentSmartAttendanceList = []; let count = 1;
-
-            for (let phone in studentRecords) {
-                let student = studentRecords[phone];
-                currentSmartAttendanceList.push(student); 
-
-                let statusBadge = student.exitTime !== "--" ? '<span class="badge bg-success">Left Class</span>' : '<span class="badge bg-warning text-dark">Inside Class</span>';
-
-                body.innerHTML += `<tr>
-                    <td class="text-muted fw-bold">${count++}</td>
-                    <td class="text-start fw-bold">${student.name}</td>
-                    <td>${student.phone}</td>
-                    <td class="text-success fw-bold">${student.entryTime}</td>
-                    <td class="text-danger fw-bold">${student.exitTime}</td>
-                    <td>${statusBadge}</td>
-                </tr>`;
+            let body = document.getElementById('attendanceBody'); body.innerHTML = '';
+            let count = 0;
+            for(let p in records) {
+                let st = records[p]; count++;
+                let stat = st.out !== "--" ? '<span class="badge bg-success">Left</span>' : '<span class="badge bg-warning text-dark">Inside</span>';
+                body.innerHTML += `<tr><td class="fw-bold">${st.name}</td><td>${st.phone}</td><td class="text-success fw-bold">${st.in}</td><td class="text-danger fw-bold">${st.out}</td><td>${stat}</td></tr>`;
             }
-
-            document.getElementById('countAttendance').innerText = currentSmartAttendanceList.length;
-            if(currentSmartAttendanceList.length === 0) {
-                body.innerHTML = `<tr><td colspan="6" class="text-center text-danger fw-bold py-4">No records found.</td></tr>`;
-            }
+            document.getElementById('countAttendance').innerText = count;
         }
 
-        function downloadCSV(type) {
-            let csv = ""; let dataLength = 0;
-            if(type === 'admissions') {
-                if(admissionsList.length === 0) return;
-                csv = "Date,Name,Phone,Course\n";
-                admissionsList.forEach(r => csv += `"${r.Date}","${r.Name}","${r.Phone}","${r.Course}"\n`);
-                dataLength = admissionsList.length;
-            } else if (type === 'attendance') {
-                if(currentSmartAttendanceList.length === 0) return;
-                csv = "Date,Student Name,Phone Number,Entry Time (IN),Exit Time (OUT),Status\n";
-                currentSmartAttendanceList.forEach(r => {
-                    let statusText = r.exitTime !== "--" ? "Left Class" : "Inside Class";
-                    csv += `"${r.date}","${r.name}","${r.phone}","${r.entryTime}","${r.exitTime}","${statusText}"\n`;
-                });
-                dataLength = currentSmartAttendanceList.length;
-            }
-
-            if(dataLength > 0) {
-                const blob = new Blob([csv], { type: 'text/csv' });
-                const link = document.createElement("a");
-                link.href = URL.createObjectURL(blob);
-                const dateSuf = type === 'attendance' ? document.getElementById('dateFilter').value : new Date().toLocaleDateString().replace(/\//g,'-');
-                link.download = `Sky_${type}_${dateSuf}.csv`;
-                link.click();
-            }
-        }
-
-        // --- FEE RECEIPT LOGIC ---
-        function initFeeReceiptData() {
-            const datalist = document.getElementById('studentList');
-            const syncStatus = document.getElementById('syncStatus');
-            db.ref('Face_Data').once('value').then(snapshot => {
-                const data = snapshot.val();
-                if(data) {
-                    for (const phone in data) {
-                        const option = document.createElement('option');
-                        option.value = data[phone].Name + " (" + phone + ")"; 
-                        datalist.appendChild(option);
-                    }
-                    syncStatus.innerHTML = "<i class='fa-solid fa-check text-success'></i> Database Connected";
-                }
-            }).catch(err => syncStatus.innerHTML = "Sync Error");
-        }
-
-        function generateReceipt() {
-            const { jsPDF } = window.jspdf;
-            const doc = new jsPDF();
+        function addFinance() {
+            let title = document.getElementById('finTitle').value;
+            let amt = document.getElementById('finAmount').value;
+            let type = document.getElementById('finType').value;
+            if(!title || !amt) return alert("Fill details!");
             
-            let rawName = document.getElementById('feeName').value;
-            let cleanName = rawName.split(" (")[0]; 
-            const course = document.getElementById('feeCourse').value || 'General';
-            const amt = document.getElementById('feeAmount').value;
-            const mode = document.getElementById('feeMode').value;
-            
-            if(!cleanName || !amt) { alert("Please enter Student Name and Amount!"); return; }
-
-            doc.setFillColor(10, 37, 64); doc.rect(0, 0, 210, 45, 'F');
-            doc.setTextColor(255, 255, 255); doc.setFont("helvetica", "bold"); doc.setFontSize(30);
-            doc.text("SKY CLASSES", 105, 22, null, null, "center");
-            doc.setFontSize(12); doc.setFont("helvetica", "normal");
-            doc.text("Gorakhpur's Premium Educational Institute", 105, 32, null, null, "center");
-            
-            doc.setTextColor(217, 4, 41); doc.setFontSize(18); doc.setFont("helvetica", "bold");
-            doc.text("OFFICIAL FEE RECEIPT", 105, 65, null, null, "center");
-            
-            doc.setDrawColor(200, 200, 200); doc.setLineWidth(0.5); doc.rect(20, 80, 170, 80);
-            doc.setTextColor(0); doc.setFontSize(12);
-            
-            const today = new Date().toLocaleDateString('en-IN');
-            const receiptID = "SKY" + Math.floor(1000 + Math.random() * 9000);
-            
-            doc.setFont("helvetica", "normal"); doc.text(`Receipt No: `, 30, 95);
-            doc.setFont("helvetica", "bold"); doc.text(receiptID, 70, 95);
-            doc.setFont("helvetica", "normal"); doc.text(`Date: `, 130, 95);
-            doc.setFont("helvetica", "bold"); doc.text(today, 150, 95);
-            doc.line(20, 102, 190, 102); 
-            
-            doc.setFont("helvetica", "normal"); doc.text(`Received from : `, 30, 115);
-            doc.setFont("helvetica", "bold"); doc.text(cleanName.toUpperCase(), 75, 115);
-            doc.setFont("helvetica", "normal"); doc.text(`Course Name  : `, 30, 128);
-            doc.setFont("helvetica", "bold"); doc.text(course, 75, 128);
-            doc.setFont("helvetica", "normal"); doc.text(`Payment Mode : `, 30, 141);
-            doc.setFont("helvetica", "bold"); doc.text(mode, 75, 141);
-
-            doc.setFillColor(245, 245, 245); doc.rect(130, 130, 50, 15, 'FD');
-            doc.setFontSize(14); doc.setTextColor(217, 4, 41); doc.text(`Rs. ${amt} /-`, 140, 140);
-            
-            doc.setTextColor(0); doc.setFontSize(10); doc.setFont("helvetica", "normal");
-            doc.text("-----------------------------------", 155, 185, null, null, "center");
-            doc.text("Authorized Signatory", 155, 190, null, null, "center");
-            
-            doc.save(`SkyClasses_Receipt_${cleanName}.pdf`);
-            
-            document.getElementById('feeName').value = ''; document.getElementById('feeAmount').value = '';
-        }
-
-        // --- QUESTION PAPER MAKER LOGIC ---
-        let questionCount = 0;
-
-        function addQuestion(type) {
-            questionCount++;
-            const container = document.getElementById('questionsContainer');
-            const div = document.createElement('div');
-            div.className = 'question-box'; div.id = `qbox_${questionCount}`;
-            
-            let html = `
-                <div class="d-flex justify-content-between mb-2">
-                    <label class="fw-bold text-primary">Question ${questionCount}</label>
-                    <button class="btn btn-sm btn-outline-danger" onclick="removeQuestion(${questionCount})"><i class="fa-solid fa-trash"></i></button>
-                </div>
-                <textarea class="form-control mb-2 q-text" rows="2" placeholder="Type your question here..."></textarea>
-            `;
-
-            if(type === 'mcq') {
-                html += `
-                    <div class="row g-2 q-options">
-                        <div class="col-6"><input type="text" class="form-control form-control-sm opt-a" placeholder="Option A"></div>
-                        <div class="col-6"><input type="text" class="form-control form-control-sm opt-b" placeholder="Option B"></div>
-                        <div class="col-6"><input type="text" class="form-control form-control-sm opt-c" placeholder="Option C"></div>
-                        <div class="col-6"><input type="text" class="form-control form-control-sm opt-d" placeholder="Option D"></div>
-                    </div>
-                `;
-            }
-            div.innerHTML = html; div.setAttribute('data-type', type); container.appendChild(div);
-        }
-
-        function removeQuestion(id) { document.getElementById(`qbox_${id}`).remove(); }
-
-        function generatePaper() {
-            const examName = document.getElementById('examName').value || "MOCK TEST";
-            const subject = document.getElementById('subject').value || "Subject";
-            const marks = document.getElementById('marks').value || "100";
-            const time = document.getElementById('time').value || "3 Hours";
-
-            const { jsPDF } = window.jspdf;
-            const doc = new jsPDF();
-            
-            doc.setFont("helvetica", "bold"); doc.setFontSize(22);
-            doc.text("SKY CLASSES", 105, 20, null, null, "center");
-            doc.setFontSize(12); doc.setFont("helvetica", "normal");
-            doc.text("Gorakhpur's Premium Educational Institute", 105, 28, null, null, "center");
-            doc.setLineWidth(0.5); doc.line(15, 32, 195, 32);
-
-            doc.setFont("helvetica", "bold"); doc.setFontSize(14);
-            doc.text(examName.toUpperCase(), 105, 42, null, null, "center");
-            doc.setFontSize(11); doc.setFont("helvetica", "normal");
-            doc.text(`Subject: ${subject}`, 15, 52); doc.text(`Time: ${time}`, 15, 58);
-            doc.text(`Total Marks: ${marks}`, 150, 52); doc.line(15, 62, 195, 62);
-
-            let y = 72; doc.setFontSize(11);
-            const boxes = document.querySelectorAll('.question-box');
-            
-            if(boxes.length === 0) { alert("Please add at least one question!"); return; }
-
-            boxes.forEach((box, index) => {
-                const qText = box.querySelector('.q-text').value;
-                const type = box.getAttribute('data-type');
-                
-                doc.setFont("helvetica", "bold"); doc.text(`Q${index + 1}.`, 15, y);
-                doc.setFont("helvetica", "normal");
-                
-                const splitText = doc.splitTextToSize(qText, 165);
-                doc.text(splitText, 25, y);
-                y += (splitText.length * 6); 
-
-                if(type === 'mcq') {
-                    const optA = box.querySelector('.opt-a').value;
-                    const optB = box.querySelector('.opt-b').value;
-                    const optC = box.querySelector('.opt-c').value;
-                    const optD = box.querySelector('.opt-d').value;
-                    
-                    y += 2; doc.text(`(A) ${optA}`, 25, y); doc.text(`(B) ${optB}`, 105, y);
-                    y += 6; doc.text(`(C) ${optC}`, 25, y); doc.text(`(D) ${optD}`, 105, y);
-                    y += 6;
-                }
-                y += 4; 
-
-                if(y >= 280) { doc.addPage(); y = 20; }
+            db.ref('Finance_Data').push({
+                Date: new Date().toLocaleDateString('en-IN'),
+                Title: title, Amount: amt, Type: type
             });
-
-            doc.save(`Sky_Classes_${subject}_Paper.pdf`);
+            document.getElementById('finTitle').value = ''; document.getElementById('finAmount').value = '';
         }
-    </script>
-</body>
-</html>
+
+        // --- PDF GENERATORS (jsPDF) ---
+        function generateIDCard() {
+            const { jsPDF } = window.jspdf; const doc = new jsPDF({orientation: "portrait", unit: "mm", format: [54, 86]});
+            let name = document.getElementById('idName').value || "Student Name";
+            let course = document.getElementById('idCourse').value || "Class";
+            let valid = document.getElementById('idValid').value;
+            
+            doc.setFillColor(10, 37, 64); doc.rect(0, 0, 54, 15, 'F');
+            doc.setTextColor(255); doc.setFontSize(12); doc.setFont("helvetica", "bold"); doc.text("SKY CLASSES", 27, 10, null, null, "center");
+            
+            doc.setDrawColor(10, 37, 64); doc.setLineWidth(0.5); doc.rect(2, 2, 50, 82); // Border
+            
+            doc.setTextColor(0); doc.setFontSize(10); doc.text("STUDENT ID CARD", 27, 22, null, null, "center");
+            
+            // Photo Box
+            doc.setFillColor(230); doc.rect(17, 28, 20, 25, 'F'); doc.setFontSize(8); doc.text("PHOTO", 27, 42, null, null, "center");
+            
+            doc.setFontSize(11); doc.setFont("helvetica", "bold"); doc.text(name.toUpperCase(), 27, 60, null, null, "center");
+            doc.setFontSize(9); doc.setFont("helvetica", "normal"); doc.text(course, 27, 65, null, null, "center");
+            
+            doc.setFillColor(217, 4, 41); doc.rect(0, 75, 54, 11, 'F');
+            doc.setTextColor(255); doc.setFontSize(7); doc.text(`Valid Till: ${valid}`, 27, 82, null, null, "center");
+            
+            doc.save(`ID_${name}.pdf`);
+        }
+
+        function generateResult() {
+            const { jsPDF } = window.jspdf; const doc = new jsPDF();
+            let name = document.getElementById('resName').value; let exam = document.getElementById('resExam').value;
+            let s1=document.getElementById('sub1').value, m1=
