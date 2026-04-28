@@ -44,7 +44,6 @@
         #modeIn:checked + .in-label { border-color: #28a745; background: rgba(40,167,69,0.2); color: #28a745; box-shadow: 0 0 15px #28a745; }
         #modeOut:checked + .out-label { border-color: #D90429; background: rgba(217,4,41,0.2); color: #D90429; box-shadow: 0 0 15px #D90429; }
 
-        /* Bada Circular Scanner */
         .scanner-container {
             position: relative; width: 350px; height: 350px; 
             border: 5px solid #E6B31E; border-radius: 50%; overflow: hidden;
@@ -84,7 +83,7 @@
     <div class="loading-overlay" id="loadingScreen">
         <i class="fa-solid fa-satellite-dish fa-spin" style="font-size: 60px; color: #E6B31E; margin-bottom: 20px;"></i>
         <h2 class="fw-bold">Initializing Gate Scanner...</h2>
-        <p class="text-muted" id="loadingText">Syncing Face Data from Server</p>
+        <p class="text-muted" id="loadingText">Please wait, loading AI Models...</p>
     </div>
 
     <div class="header">
@@ -108,11 +107,10 @@
 
     <div class="status-box">
         <p id="recognitionStatus"><i class="fa-solid fa-face-viewfinder me-2"></i> Looking for students...</p>
-        <p style="font-size: 14px; margin-top: 10px; color: #ccc;">Blink (Aankh jhapakna) zaroori hai</p>
+        <p style="font-size: 14px; margin-top: 10px; color: #ccc;">Aankh jhapakna (Blink) zaroori hai</p>
     </div>
 
     <script>
-        // Firebase Setup
         const firebaseConfig = {
           apiKey: "AIzaSyC6bcqETEnTjLEQnISXjnWR2brPrVOAm-Y",
           authDomain: "sky-classes-db-d6140.firebaseapp.com",
@@ -140,7 +138,6 @@
             statusText.style.color = "#E6B31E";
         }
 
-        // Voice Message Function
         function speakAttendance(studentName) {
             if ('speechSynthesis' in window) {
                 const speech = new SpeechSynthesisUtterance(`${studentName}, Present. Thank you!`);
@@ -150,7 +147,6 @@
             }
         }
 
-        // Blink Calculation Logic
         function calculateEAR(eye) {
             const dist = (p1, p2) => Math.sqrt(Math.pow(p1.x - p2.x, 2) + Math.pow(p1.y - p2.y, 2));
             const v1 = dist(eye[1], eye[5]);
@@ -166,19 +162,19 @@
             faceapi.nets.faceLandmark68Net.loadFromUri(MODEL_URL),
             faceapi.nets.faceRecognitionNet.loadFromUri(MODEL_URL)
         ]).then(fetchRegisteredFaces).catch(err => {
-            loadingText.innerHTML = "Error loading AI Models. Please refresh.";
+            loadingText.innerHTML = "Error loading AI Models! " + err.message;
             loadingText.style.color = "red";
-            console.error(err);
+            setTimeout(startVideo, 2000); // Fail hone par bhi camera start karega
         });
 
         function fetchRegisteredFaces() {
-            loadingText.innerHTML = "Training AI with Sky Classes Students...";
+            loadingText.innerHTML = "Fetching Sky Classes Students...";
             
             db.ref('Face_Data').once('value').then(snapshot => {
                 const data = snapshot.val();
                 if (!data) {
-                    loadingText.innerHTML = "No students registered yet!";
-                    loadingText.style.color = "red";
+                    loadingText.innerHTML = "No students found in Database!";
+                    setTimeout(startVideo, 1000);
                     return;
                 }
 
@@ -186,24 +182,36 @@
                 
                 for (const phone in data) {
                     const student = data[phone];
-                    
-                    // ✨ YAHI THA WO ERROR KA FIX ✨ (Object.values use kiya hai)
-                    const floatArray = new Float32Array(Object.values(student.FaceDescriptor));
-                    const label = student.Name + "||" + phone + "||" + (student.Parent_Phone || ""); 
-                    
-                    labeledFaceDescriptors.push(
-                        new faceapi.LabeledFaceDescriptors(label, [floatArray])
-                    );
+                    // SAFETY SHIELD: Sirf wahi data uthayega jo sahi format me hai
+                    if (student && student.FaceDescriptor) {
+                        try {
+                            const floatArray = new Float32Array(Object.values(student.FaceDescriptor));
+                            const label = student.Name + "||" + phone + "||" + (student.Parent_Phone || ""); 
+                            labeledFaceDescriptors.push(new faceapi.LabeledFaceDescriptors(label, [floatArray]));
+                        } catch (e) {
+                            console.log("Kharab data chhod diya gaya: ", student.Name);
+                        }
+                    }
                 }
 
-                faceMatcher = new faceapi.FaceMatcher(labeledFaceDescriptors, 0.5);
+                if(labeledFaceDescriptors.length > 0){
+                    faceMatcher = new faceapi.FaceMatcher(labeledFaceDescriptors, 0.5);
+                }
                 startVideo();
+            }).catch(err => {
+                loadingText.innerHTML = "Database Error!";
+                setTimeout(startVideo, 1000);
             });
         }
 
         function startVideo() {
+            loadingText.innerHTML = "Opening Camera...";
             navigator.mediaDevices.getUserMedia({ video: { facingMode: "user" } })
-                .then(stream => { video.srcObject = stream; })
+                .then(stream => { 
+                    video.srcObject = stream; 
+                    // Camera khulte hi loading screen hatayega
+                    document.getElementById('loadingScreen').style.display = 'none';
+                })
                 .catch(err => {
                     loadingText.innerHTML = "Camera permission required!";
                     loadingText.style.color = "red";
@@ -211,12 +219,12 @@
         }
 
         video.addEventListener('play', () => {
+            // Backup hide
             document.getElementById('loadingScreen').style.display = 'none';
             
-            const displaySize = { width: 350, height: 350 }; // Bada Circle Size
+            const displaySize = { width: 350, height: 350 }; 
             faceapi.matchDimensions(canvas, displaySize);
 
-            // Blink catch karne ke liye speed 1000ms se 200ms kar di hai
             setInterval(async () => {
                 if (!faceMatcher) return;
 
@@ -240,7 +248,6 @@
                         const phone = splitData[1];
                         const parentPhone = splitData[2];
 
-                        // Blink Check System
                         const leftEye = detection.landmarks.getLeftEye();
                         const rightEye = detection.landmarks.getRightEye();
                         const ear = (calculateEAR(leftEye) + calculateEAR(rightEye)) / 2;
@@ -248,14 +255,12 @@
                         const scanKey = phone + "_" + currentMode;
                         const nowTime = Date.now();
                         
-                        // Pehle se lag chuki hai attendance
                         if (recentlyScanned[scanKey] && (nowTime - recentlyScanned[scanKey] < 300000)) {
                             statusText.innerHTML = `<i class='fa-solid fa-clock-rotate-left me-2'></i> ${name}, already marked!`;
                             statusText.style.color = "#ffc107";
                             return;
                         }
 
-                        // Agar aankh jhapki (EAR 0.28 se kam hua)
                         if (ear < 0.28) {
                             markAttendance(name, phone, parentPhone, scanKey);
                         } else {
@@ -277,7 +282,6 @@
             statusText.innerHTML = `<i class='fa-solid fa-circle-check me-2'></i> ${currentMode} SUCCESS: ${name}!`;
             statusText.style.color = "#28a745";
 
-            // Aawaz aayegi
             speakAttendance(name);
 
             const now = new Date();
