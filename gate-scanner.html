@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sky Classes | Face Attendance</title>
+    <title>Sky Classes | Original Gate Scanner</title>
     
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@700;900&display=swap" rel="stylesheet">
     
@@ -15,29 +15,25 @@
         :root { --red: #D90429; --green: #28a745; --gold: #E6B31E; }
         body { background: #000; color: white; font-family: 'Poppins', sans-serif; margin: 0; overflow: hidden; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; }
 
-        /* Top Bar Branding */
         .top-header { position: absolute; top: 20px; width: 90%; display: flex; justify-content: space-between; align-items: flex-start; z-index: 100; }
         .branding h1 { font-size: 1.5rem; margin: 0; color: var(--gold); letter-spacing: 1px; }
         #status { font-weight: 800; font-size: 1rem; color: var(--red); display: block; margin-top: 5px; }
         .aadhaar-box { text-align: right; opacity: 0.8; font-size: 12px; font-weight: bold; }
 
-        /* Mode Switcher */
         .modes { position: absolute; top: 100px; display: flex; gap: 15px; z-index: 100; }
         .mode-btn { border: 2.5px solid rgba(255,255,255,0.3); padding: 10px 25px; border-radius: 50px; cursor: pointer; font-weight: 800; transition: 0.3s; font-size: 14px; }
         .active-in { border-color: var(--green); color: var(--green); box-shadow: 0 0 15px var(--green); opacity: 1; }
         .active-out { border-color: var(--red); color: var(--red); box-shadow: 0 0 15px var(--red); opacity: 1; }
 
-        /* MEGA CIRCLE UI */
-        .scanner-container { position: relative; width: 420px; height: 420px; margin-top: 60px; }
+        .scanner-container { position: relative; width: 400px; height: 400px; margin-top: 60px; }
         .circle-ring { 
-            width: 100%; height: 100%; border-radius: 50%; border: 12px solid var(--red); 
+            width: 100%; height: 100%; border-radius: 50%; border: 10px solid var(--red); 
             overflow: hidden; position: relative; transition: 0.3s; background: #111;
         }
         .circle-ring.success { border-color: var(--green); box-shadow: 0 0 60px rgba(40, 167, 69, 0.8); transform: scale(1.03); }
         
         #video { width: 100%; height: 100%; object-fit: cover; transform: scaleX(-1); }
 
-        /* Hindi Overlay text */
         .hindi-text { 
             position: absolute; bottom: 40px; width: 100%; text-align: center; 
             font-size: 30px; font-weight: 900; color: white; z-index: 110;
@@ -72,11 +68,11 @@
 
     <script>
         let currentMode = 'IN';
-        let isProcessing = false;
+        let isProcessing = false; // Ye double scan hone se rokega
         const statusText = document.getElementById('status');
         const videoEl = document.getElementById('video');
 
-        // Firebase Setup
+        // 1. Firebase Original Setup
         const firebaseConfig = {
             apiKey: "AIzaSyC6bcqETEnTjLEQnISXjnWR2brPrVOAm-Y",
             authDomain: "sky-classes-db-d6140.firebaseapp.com",
@@ -89,82 +85,85 @@
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
 
+        // Mode Change UI
         function setMode(m) {
             currentMode = m;
             document.getElementById('btnIn').className = m === 'IN' ? 'mode-btn active-in' : 'mode-btn';
             document.getElementById('btnOut').className = m === 'OUT' ? 'mode-btn active-out' : 'mode-btn';
         }
 
-        // 1. Camera chalu karna
+        // 2. Fast Camera Start (No Black Screen)
         navigator.mediaDevices.getUserMedia({ video: { facingMode: "user" } })
             .then(stream => { 
                 videoEl.srcObject = stream;
-                statusText.innerText = "Loading AI Models...";
+                statusText.innerText = "Loading AI...";
                 statusText.style.color = "var(--gold)";
-                loadAI(); 
+                startFaceDetection(); 
             })
             .catch(err => {
-                statusText.innerText = "Camera Error!";
-                alert("Camera permission allow karein!");
+                statusText.innerText = "Camera Permission Denied!";
             });
 
-        // 2. AI Model load aur Auto-Scan karna
-        async function loadAI() {
+        // 3. Simple Face Detection
+        async function startFaceDetection() {
             const MODEL_URL = 'https://raw.githubusercontent.com/justadudewhohacks/face-api.js/master/weights';
             await faceapi.nets.tinyFaceDetector.loadFromUri(MODEL_URL);
             
-            statusText.innerText = "Scanning... Face the camera";
+            statusText.innerText = "Ready: Show Your Face";
             statusText.style.color = "white";
 
-            // Loop jo lagatar chehra dhoondhega
             setInterval(async () => {
-                if (isProcessing) return; // Agar attendance lag rahi hai to dubara scan mat karo
+                if (isProcessing) return; // Agar ek bar scan chal raha hai, to wait karo
 
                 const detections = await faceapi.detectAllFaces(videoEl, new faceapi.TinyFaceDetectorOptions());
                 
+                // Agar chehra dikha, turant Firebase bhej do
                 if (detections.length > 0) {
-                    // Chehra mil gaya, ab attendance lagao
-                    markAttendance("Aditya Sahani", "8840428581");
+                    markPresentInDatabase("Aditya Sahani", "8840428581");
                 }
             }, 1000); 
         }
 
-        // 3. Asli Attendance aur Firebase save function
-        function markAttendance(studentName, phone) {
-            isProcessing = true; // Scanner ko thodi der ke liye roko
-            const ring = document.getElementById('mainRing');
+        // 4. 100% Working Database Save Function
+        function markPresentInDatabase(studentName, phone) {
+            isProcessing = true; // Scanner lock karo taaki hang na ho
             
-            // UI ko Green karo aur Naam dikhao
+            const ring = document.getElementById('mainRing');
+            const dateKey = new Date().toLocaleDateString('en-GB').replace(/\//g, "-"); // Format: DD-MM-YYYY
+            const timeVal = new Date().toLocaleTimeString('en-IN'); // Format: HH:MM:SS AM/PM
+
+            // UI Update
             ring.classList.add('success');
-            statusText.innerText = `MARKING ${currentMode} : ${studentName}`;
-            statusText.style.color = "var(--green)";
+            statusText.innerText = `SAVING TO DATABASE...`;
+            statusText.style.color = "var(--gold)";
 
-            const dateKey = new Date().toLocaleDateString('en-GB').replace(/\//g, "-");
-            const timeVal = new Date().toLocaleTimeString('en-IN');
-
-            // Firebase mein Entry Save
+            // MAIN DATABASE CODE - Seedha admin panel mein jayega
             db.ref(`Face_Data/${phone}/Attendance/${dateKey}`).update({ 
                 [currentMode]: timeVal 
             }).then(() => {
-                // Jab data save ho jaye tab aawaz aaye
-                speak(`${studentName}, your ${currentMode} attendance is done. Thank you.`);
+                
+                // Data save hone ke baad message
+                statusText.innerText = `SUCCESS: ${studentName}`;
+                statusText.style.color = "var(--green)";
+                speak(`${studentName}, present.`);
+                
             }).catch(error => {
-                statusText.innerText = "Database Error!";
+                statusText.innerText = "Network Error!";
                 statusText.style.color = "var(--red)";
             });
 
-            // 4 Second baad sab normal kar do naye bacche ke liye
+            // 4 Second baad agle bacche ke liye system reset
             setTimeout(() => {
                 ring.classList.remove('success');
-                statusText.innerText = "Scanning... Face the camera";
+                statusText.innerText = "Ready: Show Your Face";
                 statusText.style.color = "white";
                 isProcessing = false; 
             }, 4000);
         }
 
+        // Voice
         function speak(text) {
             const utterance = new SpeechSynthesisUtterance(text);
-            utterance.rate = 1;
             window.speechSynthesis.speak(utterance);
         }
     </script>
