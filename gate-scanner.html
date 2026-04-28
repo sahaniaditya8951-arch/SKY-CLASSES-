@@ -3,109 +3,155 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sky Classes | AI Gate Scanner</title>
+    <title>Sky Classes | Premium AI Scanner</title>
     
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700;800&display=swap" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <script src="https://www.gstatic.com/firebasejs/10.11.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.11.0/firebase-database-compat.js"></script>
-    
     <script src="https://cdn.jsdelivr.net/npm/@vladmandic/face-api/dist/face-api.js"></script>
 
     <style>
+        /* PREMIUM DARK THEME */
         body { 
-            font-family: 'Poppins', sans-serif; 
-            background: #000; 
+            font-family: 'Outfit', sans-serif; 
+            background: radial-gradient(circle at 50% -20%, #1e293b, #020617 80%, #000);
             height: 100vh; margin: 0; overflow: hidden;
             display: flex; flex-direction: column; align-items: center; justify-content: center;
+            color: white;
         }
         
+        /* PREMIUM HEADER */
         .header {
-            position: absolute; top: 20px; left: 0; width: 100%; text-align: center; z-index: 10;
+            position: absolute; top: 0; left: 0; width: 100%; text-align: center; z-index: 10;
+            padding: 20px 0;
+            background: linear-gradient(180deg, rgba(2,6,23,0.9) 0%, transparent 100%);
         }
-        .header h1 { color: white; font-weight: 800; font-size: 35px; letter-spacing: 2px; text-shadow: 0 0 15px rgba(230, 179, 30, 0.5); }
-        .header h1 span { color: #E6B31E; }
+        .header h1 { 
+            font-weight: 800; font-size: 38px; letter-spacing: 3px; margin: 0;
+            background: linear-gradient(to right, #ffffff, #fbbf24);
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            text-shadow: 0 10px 30px rgba(251, 191, 36, 0.3);
+        }
+        
+        .live-badge {
+            background: rgba(217, 4, 41, 0.15); color: #ff3366; padding: 6px 18px; 
+            border-radius: 50px; border: 1px solid rgba(255, 51, 102, 0.3);
+            font-size: 12px; font-weight: 700; display: inline-flex; align-items: center; gap: 8px;
+            margin-top: 10px; backdrop-filter: blur(5px); box-shadow: 0 0 15px rgba(217, 4, 41, 0.2);
+        }
+        .live-dot { width: 8px; height: 8px; background: #ff3366; border-radius: 50%; animation: pulse 1.5s infinite; }
+        @keyframes pulse { 0% { box-shadow: 0 0 0 0 rgba(255, 51, 102, 0.7); } 70% { box-shadow: 0 0 0 10px rgba(255, 51, 102, 0); } 100% { box-shadow: 0 0 0 0 rgba(255, 51, 102, 0); } }
 
+        /* SLEEK TOGGLE BUTTONS */
         .mode-toggle {
-            display: flex; gap: 20px; margin-bottom: 20px; z-index: 10; margin-top: 80px;
+            display: flex; gap: 15px; margin-bottom: 25px; z-index: 10; margin-top: 90px;
+            background: rgba(255, 255, 255, 0.03); padding: 8px; border-radius: 50px;
+            backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.05);
         }
         .mode-toggle input { display: none; }
         .mode-label {
-            padding: 10px 30px; border-radius: 50px; font-weight: bold; cursor: pointer;
-            border: 2px solid rgba(255,255,255,0.3); color: white; transition: 0.3s; font-size: 16px;
+            padding: 10px 35px; border-radius: 40px; font-weight: 600; cursor: pointer;
+            color: #94a3b8; transition: all 0.4s ease; font-size: 15px; margin: 0;
         }
-        #modeIn:checked + .in-label { border-color: #28a745; background: rgba(40,167,69,0.2); color: #28a745; box-shadow: 0 0 15px #28a745; }
-        #modeOut:checked + .out-label { border-color: #D90429; background: rgba(217,4,41,0.2); color: #D90429; box-shadow: 0 0 15px #D90429; }
+        #modeIn:checked + .in-label { background: #10b981; color: #fff; box-shadow: 0 0 20px rgba(16, 185, 129, 0.4); }
+        #modeOut:checked + .out-label { background: #f43f5e; color: #fff; box-shadow: 0 0 20px rgba(244, 63, 94, 0.4); }
 
-        /* Zoom Fix: Ab yeh mobile screen ke hisaab se rectangle hoga, circle nahi */
+        /* HIGH-TECH SCANNER HUD */
+        .scanner-wrapper { position: relative; display: flex; justify-content: center; align-items: center; margin-bottom: 20px; }
         .scanner-container {
-            position: relative; width: 90vw; max-width: 400px; height: 50vh; max-height: 500px;
-            border: 4px solid #E6B31E; border-radius: 20px; overflow: hidden;
-            box-shadow: 0 0 30px rgba(230, 179, 30, 0.3);
-            margin-bottom: 20px;
+            position: relative; width: 85vw; max-width: 380px; height: 50vh; max-height: 480px;
+            border-radius: 24px; overflow: hidden;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.5), 0 0 0 2px rgba(251, 191, 36, 0.2);
+            background: #000;
         }
         
-        video, canvas { 
-            position: absolute; top: 0; left: 0; 
-            width: 100%; height: 100%; 
-            object-fit: cover; 
-            transform: scaleX(-1); 
+        /* Corner Brackets for HUD Effect */
+        .hud-corners::before, .hud-corners::after, .scanner-container::before, .scanner-container::after {
+            content: ''; position: absolute; width: 40px; height: 40px; border-color: #fbbf24; border-style: solid; z-index: 20; pointer-events: none; transition: 0.3s;
         }
-        
-        .scan-line {
-            position: absolute; top: 0; left: 0; width: 100%; height: 5px; background: #E6B31E;
-            box-shadow: 0 0 15px #E6B31E; opacity: 0.7; z-index: 5;
-            animation: scan 2.5s linear infinite;
-        }
-        @keyframes scan { 0% { top: 0%; } 100% { top: 100%; } }
+        .hud-corners::before { top: 15px; left: 15px; border-width: 3px 0 0 3px; border-radius: 10px 0 0 0; }
+        .hud-corners::after { top: 15px; right: 15px; border-width: 3px 3px 0 0; border-radius: 0 10px 0 0; }
+        .scanner-container::before { bottom: 15px; left: 15px; border-width: 0 0 3px 3px; border-radius: 0 0 0 10px; }
+        .scanner-container::after { bottom: 15px; right: 15px; border-width: 0 3px 3px 0; border-radius: 0 0 10px 0; }
 
-        .status-box {
-            position: absolute; bottom: 30px; width: 90vw; max-width: 600px;
-            background: rgba(10, 37, 64, 0.9); padding: 20px; border-radius: 15px;
-            text-align: center; color: white; border: 1px solid #1a365d;
+        video, canvas { 
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; transform: scaleX(-1); border-radius: 24px;
         }
-        #recognitionStatus { font-size: 20px; font-weight: 700; margin: 0; color: #E6B31E; }
         
-        .loading-overlay {
-            position: fixed; top:0; left:0; width:100%; height:100%; background: #07192F;
-            display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 1000; color: white;
+        /* Laser Effect */
+        .scan-line {
+            position: absolute; top: 0; left: 0; width: 100%; height: 2px; 
+            background: linear-gradient(to right, transparent, #fbbf24, transparent);
+            box-shadow: 0 0 20px 2px #fbbf24; z-index: 5;
+            animation: scan 2.5s ease-in-out infinite;
         }
+        @keyframes scan { 0% { top: 5%; opacity: 0; } 10% { opacity: 1; } 90% { opacity: 1; } 100% { top: 95%; opacity: 0; } }
+
+        /* GLASSMORPHISM STATUS BOX */
+        .status-box {
+            position: absolute; bottom: 30px; width: 90vw; max-width: 500px;
+            background: rgba(15, 23, 42, 0.6); backdrop-filter: blur(16px);
+            padding: 20px; border-radius: 20px; text-align: center;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+        }
+        #recognitionStatus { font-size: 20px; font-weight: 700; margin: 0; color: #fbbf24; }
+        .hint-text { font-size: 13px; font-weight: 300; margin-top: 8px; color: #94a3b8; letter-spacing: 1px; }
+        
+        /* PREMIUM LOADING SCREEN */
+        .loading-overlay {
+            position: fixed; top:0; left:0; width:100%; height:100%; 
+            background: #020617; display: flex; flex-direction: column; 
+            justify-content: center; align-items: center; z-index: 1000;
+        }
+        .loader-ring {
+            width: 80px; height: 80px; border: 4px solid rgba(251, 191, 36, 0.1);
+            border-top: 4px solid #fbbf24; border-radius: 50%;
+            animation: spin 1s linear infinite; margin-bottom: 20px;
+        }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
     </style>
 </head>
 <body>
 
     <div class="loading-overlay" id="loadingScreen">
-        <i class="fa-solid fa-satellite-dish fa-spin" style="font-size: 60px; color: #E6B31E; margin-bottom: 20px;"></i>
-        <h2 class="fw-bold">Starting Gate Scanner...</h2>
-        <p class="text-muted" id="loadingText">Loading Data...</p>
+        <div class="loader-ring"></div>
+        <h3 class="fw-bold text-white mb-2" style="font-family: 'Outfit';">Starting Engine...</h3>
+        <p class="text-muted" id="loadingText" style="font-size: 14px;">Initializing AI Models & Data</p>
     </div>
 
     <div class="header">
-        <h1>SKY <span>CLASSES</span></h1>
+        <h1>SKY CLASSES</h1>
+        <div class="live-badge"><div class="live-dot"></div> AI VISION LIVE</div>
     </div>
 
     <div class="mode-toggle">
         <input type="radio" name="gateMode" id="modeIn" value="IN" checked onchange="updateMode(this)">
-        <label for="modeIn" class="mode-label in-label"><i class="fa-solid fa-arrow-right-to-bracket me-1"></i> ENTRY (IN)</label>
+        <label for="modeIn" class="mode-label in-label"><i class="fa-solid fa-sign-in-alt me-2"></i> ENTRY</label>
 
         <input type="radio" name="gateMode" id="modeOut" value="OUT" onchange="updateMode(this)">
-        <label for="modeOut" class="mode-label out-label"><i class="fa-solid fa-arrow-right-from-bracket me-1"></i> EXIT (OUT)</label>
+        <label for="modeOut" class="mode-label out-label">EXIT <i class="fa-solid fa-sign-out-alt ms-2"></i></label>
     </div>
 
-    <div class="scanner-container">
-        <video id="video" autoplay muted playsinline></video>
-        <canvas id="canvas"></canvas>
-        <div class="scan-line"></div>
+    <div class="scanner-wrapper">
+        <div class="hud-corners"></div>
+        <div class="scanner-container">
+            <video id="video" autoplay muted playsinline></video>
+            <canvas id="canvas"></canvas>
+            <div class="scan-line"></div>
+        </div>
     </div>
 
     <div class="status-box">
-        <p id="recognitionStatus"><i class="fa-solid fa-face-viewfinder me-2"></i> Looking for students...</p>
-        <p style="font-size: 14px; margin-top: 5px; color: #ccc;">Aankh jhapakna (Blink) zaroori hai</p>
+        <p id="recognitionStatus"><i class="fa-solid fa-crosshairs fa-spin me-2" style="color: #94a3b8;"></i> Scanning Area...</p>
+        <p class="hint-text"><i class="fa-regular fa-eye me-1"></i> Blink to confirm identity</p>
     </div>
 
     <script>
+        // FIREBASE AUR JAVASCRIPT LOGIC EKDUM SAME HAI (Pehle jaisa perfect chalega)
         const firebaseConfig = {
           apiKey: "AIzaSyC6bcqETEnTjLEQnISXjnWR2brPrVOAm-Y",
           authDomain: "sky-classes-db-d6140.firebaseapp.com",
@@ -125,12 +171,12 @@
         let faceMatcher = null;
         let recentlyScanned = {}; 
         let currentMode = "IN"; 
-        let isProcessing = false; // Multiple scan rokiya jayega isse
+        let isProcessing = false; 
 
         function updateMode(radio) {
             currentMode = radio.value;
-            statusText.innerHTML = `<i class='fa-solid fa-exchange-alt me-2'></i> Gate Mode: ${currentMode}`;
-            statusText.style.color = "#E6B31E";
+            statusText.innerHTML = `<i class='fa-solid fa-shield-halved me-2'></i> Gate Mode: ${currentMode}`;
+            statusText.style.color = "#fbbf24";
         }
 
         function speakAttendance(studentName) {
@@ -176,7 +222,6 @@
         }
 
         function startVideo() {
-            // Zoom issue theek karne ke liye mobile ki proper resolution set ki hai
             navigator.mediaDevices.getUserMedia({ 
                 video: { facingMode: "user", width: { ideal: 480 }, height: { ideal: 640 } } 
             })
@@ -188,7 +233,7 @@
 
         video.addEventListener('play', () => {
             document.getElementById('loadingScreen').style.display = 'none';
-            const displaySize = { width: video.clientWidth || 400, height: video.clientHeight || 500 }; 
+            const displaySize = { width: video.clientWidth || 380, height: video.clientHeight || 480 }; 
             faceapi.matchDimensions(canvas, displaySize);
 
             setInterval(async () => {
@@ -200,8 +245,10 @@
                 canvas.getContext('2d').clearRect(0, 0, canvas.width, canvas.height);
 
                 if(resizedDetections.length === 0) {
-                    statusText.innerHTML = "Looking for students...";
-                    statusText.style.color = "#E6B31E";
+                    statusText.innerHTML = "<i class='fa-solid fa-crosshairs fa-spin me-2' style='color: #94a3b8;'></i> Scanning Area...";
+                    statusText.style.color = "#fbbf24";
+                    // Reset HUD border
+                    document.querySelector('.scanner-container').style.boxShadow = "0 20px 50px rgba(0,0,0,0.5), 0 0 0 2px rgba(251, 191, 36, 0.2)";
                     return;
                 }
 
@@ -220,23 +267,21 @@
                         const scanKey = phone + "_" + currentMode;
                         const nowTime = Date.now();
                         
-                        // 5 MINUTE COOLDOWN LOGIC (300,000 ms)
                         if (recentlyScanned[scanKey] && (nowTime - recentlyScanned[scanKey] < 300000)) {
-                            statusText.innerHTML = `${name}, already marked ${currentMode}! (Wait 5 mins)`;
-                            statusText.style.color = "#ffc107";
+                            statusText.innerHTML = `<i class='fa-solid fa-ban me-2'></i> ${name}, Wait 5 Mins!`;
+                            statusText.style.color = "#f43f5e";
                             return;
                         }
 
-                        // Blink Detected
                         if (ear < 0.28) {
-                            isProcessing = true; // Scanner lock taaki double na lage
+                            isProcessing = true; 
                             markAttendance(name, phone, splitData[2], scanKey);
-                            
-                            // 3 second baad doosre bachhe ke liye scanner phir on ho jayega
                             setTimeout(() => { isProcessing = false; }, 3000); 
                         } else {
-                            statusText.innerHTML = `Face matched: ${name}. Please Blink!`;
-                            statusText.style.color = "#00d2ff";
+                            statusText.innerHTML = `Identity Verified: ${name}`;
+                            statusText.style.color = "#38bdf8"; // Premium Cyan color
+                            // Glow up the scanner box when face matches
+                            document.querySelector('.scanner-container').style.boxShadow = "0 20px 50px rgba(56, 189, 248, 0.3), 0 0 0 2px #38bdf8";
                         }
                     }
                 });
@@ -244,10 +289,11 @@
         });
 
         function markAttendance(name, phone, parentPhone, scanKey) {
-            recentlyScanned[scanKey] = Date.now(); // Record current time for 5 min block
+            recentlyScanned[scanKey] = Date.now(); 
             
-            statusText.innerHTML = `✅ ${currentMode} Marked: ${name}!`;
-            statusText.style.color = "#28a745";
+            statusText.innerHTML = `<i class='fa-solid fa-fingerprint me-2'></i> ${currentMode} Granted: ${name}`;
+            statusText.style.color = "#10b981"; // Premium Green color
+            document.querySelector('.scanner-container').style.boxShadow = "0 20px 50px rgba(16, 185, 129, 0.4), 0 0 0 3px #10b981";
 
             speakAttendance(name);
 
@@ -255,15 +301,14 @@
             const dateStr = now.toLocaleDateString('en-IN'); 
             const timeStr = now.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' });
 
-            // Admin Panel ke hisaab se proper IN aur OUT time bheja ja raha hai
             db.ref('Daily_Attendance').push({
                 Name: name,
                 Phone: phone,
                 Date: dateStr,
                 Time: timeStr,
                 Timestamp: Date.now(),
-                ScanType: currentMode,           // Admin panel ke liye: IN ya OUT
-                Status: `${currentMode} at ${timeStr}` // Admin panel ke liye: "IN at 08:30 AM"
+                ScanType: currentMode,           
+                Status: `${currentMode} at ${timeStr}` 
             }).catch(err => console.error(err));
         }
     </script>
