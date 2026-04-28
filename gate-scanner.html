@@ -17,12 +17,11 @@
     <style>
         body { 
             font-family: 'Poppins', sans-serif; 
-            background: #000; /* Dark sci-fi background */
+            background: #000; 
             height: 100vh; margin: 0; overflow: hidden;
             display: flex; flex-direction: column; align-items: center; justify-content: center;
         }
         
-        /* Top Header */
         .header {
             position: absolute; top: 20px; left: 0; width: 100%; text-align: center; z-index: 10;
         }
@@ -34,7 +33,6 @@
         }
         @keyframes blink { 0% { opacity: 1; } 50% { opacity: 0.5; } 100% { opacity: 1; } }
 
-        /* IN/OUT Toggle CSS (NEW ADDITION) */
         .mode-toggle {
             display: flex; gap: 20px; margin-bottom: 20px; z-index: 10; margin-top: 80px;
         }
@@ -46,11 +44,12 @@
         #modeIn:checked + .in-label { border-color: #28a745; background: rgba(40,167,69,0.2); color: #28a745; box-shadow: 0 0 15px #28a745; }
         #modeOut:checked + .out-label { border-color: #D90429; background: rgba(217,4,41,0.2); color: #D90429; box-shadow: 0 0 15px #D90429; }
 
-        /* Camera Scanner Design */
+        /* Bada Circular Scanner */
         .scanner-container {
-            position: relative; width: 90vw; max-width: 600px; height: 50vh; 
-            border: 4px solid #0A2540; border-radius: 20px; overflow: hidden;
-            box-shadow: 0 0 40px rgba(10, 37, 64, 0.8);
+            position: relative; width: 350px; height: 350px; 
+            border: 5px solid #E6B31E; border-radius: 50%; overflow: hidden;
+            box-shadow: 0 0 40px rgba(230, 179, 30, 0.4);
+            margin-bottom: 20px;
         }
         
         video, canvas { 
@@ -60,15 +59,13 @@
             transform: scaleX(-1); 
         }
         
-        /* Scanning overlay effect */
         .scan-line {
             position: absolute; top: 0; left: 0; width: 100%; height: 5px; background: #E6B31E;
             box-shadow: 0 0 15px #E6B31E, 0 0 30px #E6B31E; opacity: 0.7; z-index: 5;
-            animation: scan 3s linear infinite;
+            animation: scan 2s linear infinite;
         }
         @keyframes scan { 0% { top: 0%; } 100% { top: 100%; } }
 
-        /* Status & Logs */
         .status-box {
             position: absolute; bottom: 30px; width: 90vw; max-width: 600px;
             background: rgba(10, 37, 64, 0.9); padding: 20px; border-radius: 15px;
@@ -111,6 +108,7 @@
 
     <div class="status-box">
         <p id="recognitionStatus"><i class="fa-solid fa-face-viewfinder me-2"></i> Looking for students...</p>
+        <p style="font-size: 14px; margin-top: 10px; color: #ccc;">Blink (Aankh jhapakna) zaroori hai</p>
     </div>
 
     <script>
@@ -134,16 +132,33 @@
         
         let faceMatcher = null;
         let recentlyScanned = {}; 
-        let currentMode = "IN"; // Default mode
+        let currentMode = "IN"; 
 
-        // Update Mode Function
         function updateMode(radio) {
             currentMode = radio.value;
             statusText.innerHTML = `<i class='fa-solid fa-exchange-alt me-2'></i> Mode changed to: ${currentMode}`;
             statusText.style.color = "#E6B31E";
         }
 
-        // Step 1: Load AI Models (FIXED URL)
+        // Voice Message Function
+        function speakAttendance(studentName) {
+            if ('speechSynthesis' in window) {
+                const speech = new SpeechSynthesisUtterance(`${studentName}, Present. Thank you!`);
+                speech.lang = 'en-IN'; 
+                speech.rate = 1.1;
+                window.speechSynthesis.speak(speech);
+            }
+        }
+
+        // Blink Calculation Logic
+        function calculateEAR(eye) {
+            const dist = (p1, p2) => Math.sqrt(Math.pow(p1.x - p2.x, 2) + Math.pow(p1.y - p2.y, 2));
+            const v1 = dist(eye[1], eye[5]);
+            const v2 = dist(eye[2], eye[4]);
+            const h = dist(eye[0], eye[3]);
+            return (v1 + v2) / (2.0 * h);
+        }
+
         const MODEL_URL = 'https://raw.githubusercontent.com/justadudewhohacks/face-api.js/master/weights';
         
         Promise.all([
@@ -156,14 +171,13 @@
             console.error(err);
         });
 
-        // Step 2: Fetch Data from Firebase and Train the AI Matcher
         function fetchRegisteredFaces() {
             loadingText.innerHTML = "Training AI with Sky Classes Students...";
             
             db.ref('Face_Data').once('value').then(snapshot => {
                 const data = snapshot.val();
                 if (!data) {
-                    loadingText.innerHTML = "No students registered yet! Please use Registration Page.";
+                    loadingText.innerHTML = "No students registered yet!";
                     loadingText.style.color = "red";
                     return;
                 }
@@ -172,7 +186,9 @@
                 
                 for (const phone in data) {
                     const student = data[phone];
-                    const floatArray = new Float32Array(student.FaceDescriptor);
+                    
+                    // ✨ YAHI THA WO ERROR KA FIX ✨ (Object.values use kiya hai)
+                    const floatArray = new Float32Array(Object.values(student.FaceDescriptor));
                     const label = student.Name + "||" + phone + "||" + (student.Parent_Phone || ""); 
                     
                     labeledFaceDescriptors.push(
@@ -185,25 +201,22 @@
             });
         }
 
-        // Step 3: Start Camera
         function startVideo() {
             navigator.mediaDevices.getUserMedia({ video: { facingMode: "user" } })
-                .then(stream => {
-                    video.srcObject = stream;
-                })
+                .then(stream => { video.srcObject = stream; })
                 .catch(err => {
-                    loadingText.innerHTML = "Camera permission required for Gate Scanner!";
+                    loadingText.innerHTML = "Camera permission required!";
                     loadingText.style.color = "red";
                 });
         }
 
-        // Step 4: The Core Scanning Loop
         video.addEventListener('play', () => {
             document.getElementById('loadingScreen').style.display = 'none';
             
-            const displaySize = { width: video.videoWidth || 600, height: video.videoHeight || 450 };
+            const displaySize = { width: 350, height: 350 }; // Bada Circle Size
             faceapi.matchDimensions(canvas, displaySize);
 
+            // Blink catch karne ke liye speed 1000ms se 200ms kar di hai
             setInterval(async () => {
                 if (!faceMatcher) return;
 
@@ -212,50 +225,65 @@
                 
                 canvas.getContext('2d').clearRect(0, 0, canvas.width, canvas.height);
 
-                const results = resizedDetections.map(d => faceMatcher.findBestMatch(d.descriptor));
-                
-                if(results.length === 0) {
+                if(resizedDetections.length === 0) {
                     statusText.innerHTML = "<i class='fa-solid fa-face-viewfinder me-2'></i> Looking for students...";
                     statusText.style.color = "#E6B31E";
+                    return;
                 }
 
-                results.forEach((result, i) => {
+                resizedDetections.forEach((detection, i) => {
+                    const result = faceMatcher.findBestMatch(detection.descriptor);
+                    
                     if (result.label !== 'unknown') {
                         const splitData = result.label.split("||");
                         const name = splitData[0];
                         const phone = splitData[1];
                         const parentPhone = splitData[2];
 
-                        // Cooldown Check (Mode-specific: IN aur OUT ke liye alag lock)
+                        // Blink Check System
+                        const leftEye = detection.landmarks.getLeftEye();
+                        const rightEye = detection.landmarks.getRightEye();
+                        const ear = (calculateEAR(leftEye) + calculateEAR(rightEye)) / 2;
+
                         const scanKey = phone + "_" + currentMode;
                         const nowTime = Date.now();
+                        
+                        // Pehle se lag chuki hai attendance
                         if (recentlyScanned[scanKey] && (nowTime - recentlyScanned[scanKey] < 300000)) {
-                            statusText.innerHTML = `<i class='fa-solid fa-clock-rotate-left me-2'></i> ${name}, ${currentMode} already marked today!`;
+                            statusText.innerHTML = `<i class='fa-solid fa-clock-rotate-left me-2'></i> ${name}, already marked!`;
                             statusText.style.color = "#ffc107";
                             return;
                         }
 
-                        markAttendance(name, phone, parentPhone, scanKey);
+                        // Agar aankh jhapki (EAR 0.28 se kam hua)
+                        if (ear < 0.28) {
+                            markAttendance(name, phone, parentPhone, scanKey);
+                        } else {
+                            statusText.innerHTML = `Face matched: ${name}. Please Blink!`;
+                            statusText.style.color = "#00d2ff";
+                        }
+
                     } else {
-                        statusText.innerHTML = "<i class='fa-solid fa-user-secret me-2'></i> Unknown Face Detected!";
+                        statusText.innerHTML = "<i class='fa-solid fa-user-secret me-2'></i> Unknown Face!";
                         statusText.style.color = "#D90429";
                     }
                 });
-            }, 1000); 
+            }, 200); 
         });
 
-        // Step 5: Save to Firebase
         function markAttendance(name, phone, parentPhone, scanKey) {
             recentlyScanned[scanKey] = Date.now(); 
             
             statusText.innerHTML = `<i class='fa-solid fa-circle-check me-2'></i> ${currentMode} SUCCESS: ${name}!`;
             statusText.style.color = "#28a745";
 
+            // Aawaz aayegi
+            speakAttendance(name);
+
             const now = new Date();
             const dateStr = now.toLocaleDateString('en-IN'); 
             const timeStr = now.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' });
 
-            // Database Save
             db.ref('Daily_Attendance').push({
                 Name: name,
                 Phone: phone,
@@ -264,13 +292,7 @@
                 Time: timeStr,
                 Timestamp: Date.now(),
                 Method: "Face ID",
-                GateMode: currentMode // Yahan IN ya OUT admin panel ke liye save ho jayega
-            }).then(() => {
-                const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-                const oscillator = audioCtx.createOscillator();
-                oscillator.type = 'sine'; oscillator.frequency.setValueAtTime(800, audioCtx.currentTime);
-                oscillator.connect(audioCtx.destination);
-                oscillator.start(); oscillator.stop(audioCtx.currentTime + 0.2);
+                GateMode: currentMode
             }).catch(err => console.error("Firebase Error: ", err));
         }
     </script>
