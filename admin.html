@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sky Classes | Central Admin Dashboard</title>
+    <title>Sky Classes | Master Admin Dashboard</title>
     
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -25,7 +25,7 @@
         #dashboardScreen { display: none; }
         .sidebar { height: 100vh; background-color: var(--primary-dark); color: white; padding-top: 20px; position: fixed; width: 260px; z-index: 100; }
         .sidebar h4 { text-align: center; font-weight: 800; color: var(--accent-gold); margin-bottom: 30px; }
-        .sidebar a { padding: 15px 25px; text-decoration: none; color: #a0aec0; display: block; border-left: 4px solid transparent; cursor: pointer; }
+        .sidebar a { padding: 15px 25px; text-decoration: none; color: #a0aec0; display: block; border-left: 4px solid transparent; cursor: pointer; transition: 0.3s; }
         .sidebar a:hover, .sidebar a.active { background: rgba(255,255,255,0.05); color: white; border-left-color: var(--accent-gold); }
         
         .main-content { margin-left: 260px; padding: 30px; }
@@ -33,8 +33,8 @@
         .table-container { background: white; padding: 25px; border-radius: 15px; margin-top: 30px; box-shadow: 0 4px 15px rgba(0,0,0,0.04); display: none; }
         .active-section { display: block; }
         
-        .btn-excel { background: #28a745; color: white; border: none; padding: 8px 18px; border-radius: 8px; font-weight: 600; white-space: nowrap; }
-        .badge-time { background: #fff3cd; color: #856404; padding: 4px 10px; border-radius: 5px; font-size: 12px; font-weight: 600; }
+        .btn-excel { background: #28a745; color: white; border: none; padding: 8px 18px; border-radius: 8px; font-weight: 600; white-space: nowrap; transition: 0.3s; }
+        .btn-excel:hover { opacity: 0.8; }
         .date-picker { border: 2px solid #e2e8f0; border-radius: 8px; padding: 6px 12px; outline: none; font-weight: 500; color: #0A2540;}
         .date-picker:focus { border-color: var(--accent-gold); }
     </style>
@@ -50,14 +50,16 @@
     </div>
 
     <div id="dashboardScreen">
+        
         <div class="sidebar">
             <h4>SKY CLASSES</h4>
             <a onclick="showSection('admissions')" id="link-admissions" class="active"><i class="fa-solid fa-user-plus me-2"></i> Admissions</a>
-            <a onclick="showSection('attendance')" id="link-attendance"><i class="fa-solid fa-calendar-check me-2"></i> Attendance Log</a>
+            <a onclick="showSection('attendance')" id="link-attendance"><i class="fa-solid fa-calendar-check me-2"></i> Smart Attendance</a>
             <a onclick="logout()" style="color: #ff4d4d; margin-top: 50px;"><i class="fa-solid fa-lock me-2"></i> Lock Dashboard</a>
         </div>
 
         <div class="main-content">
+            
             <div class="row g-4 mb-4">
                 <div class="col-md-6">
                     <div class="stat-card">
@@ -68,18 +70,18 @@
                 <div class="col-md-6">
                     <div class="stat-card" style="border-color: #28a745;">
                         <h2 id="countAttendance">0</h2>
-                        <p class="text-muted fw-bold mb-0" id="attendanceCardLabel">Selected Date Attendance</p>
+                        <p class="text-muted fw-bold mb-0" id="attendanceCardLabel">Students Present (Selected Date)</p>
                     </div>
                 </div>
             </div>
 
             <div id="section-admissions" class="table-container active-section">
                 <div class="d-flex justify-content-between align-items-center mb-4">
-                    <h5 class="fw-bold m-0 text-primary">Admission Inquiries</h5>
+                    <h5 class="fw-bold m-0 text-primary"><i class="fa-solid fa-users me-2"></i> Admission Data</h5>
                     <button class="btn-excel" onclick="downloadCSV('admissions')"><i class="fa-solid fa-download me-2"></i> Excel</button>
                 </div>
                 <div class="table-responsive">
-                    <table class="table table-hover">
+                    <table class="table table-hover align-middle">
                         <thead class="table-light">
                             <tr><th>Date</th><th>Name</th><th>Phone</th><th>Course</th></tr>
                         </thead>
@@ -90,7 +92,7 @@
 
             <div id="section-attendance" class="table-container">
                 <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-3">
-                    <h5 class="fw-bold m-0 text-success">Daily Attendance Log</h5>
+                    <h5 class="fw-bold m-0 text-success"><i class="fa-solid fa-clock-rotate-left me-2"></i> Daily Entry/Exit Log</h5>
                     <div class="d-flex gap-2 align-items-center">
                         <span class="text-muted fw-bold small">Filter Date:</span>
                         <input type="date" id="dateFilter" class="date-picker" onchange="filterAttendanceData()">
@@ -100,19 +102,27 @@
                     </div>
                 </div>
                 <div class="table-responsive">
-                    <table class="table table-hover">
-                        <thead class="table-light">
-                            <tr><th>Date</th><th>Time</th><th>Method</th><th>Student Name</th><th>Phone</th></tr>
+                    <table class="table table-hover text-center align-middle">
+                        <thead class="table-dark">
+                            <tr>
+                                <th>S.No</th>
+                                <th class="text-start">Student Name</th>
+                                <th>Phone</th>
+                                <th class="text-success">ENTRY (IN)</th>
+                                <th class="text-danger">EXIT (OUT)</th>
+                                <th>Current Status</th>
+                            </tr>
                         </thead>
                         <tbody id="attendanceBody"></tbody>
                     </table>
                 </div>
             </div>
+
         </div>
     </div>
 
     <script>
-        // Password logic
+        // --- UI Logic ---
         function checkPassword() {
             if(document.getElementById('adminPassword').value === "SkyAdmin123") {
                 document.getElementById('loginScreen').style.display = 'none';
@@ -124,7 +134,6 @@
 
         function logout() { location.reload(); }
 
-        // Section Toggler
         function showSection(id) {
             document.querySelectorAll('.table-container').forEach(el => el.classList.remove('active-section'));
             document.querySelectorAll('.sidebar a').forEach(el => el.classList.remove('active'));
@@ -132,7 +141,6 @@
             document.getElementById('link-' + id).classList.add('active');
         }
 
-        // Set Today's date automatically in the filter
         function setDefaultDate() {
             const today = new Date();
             const yyyy = today.getFullYear();
@@ -141,14 +149,13 @@
             document.getElementById('dateFilter').value = `${yyyy}-${mm}-${dd}`;
         }
 
-        // Convert YYYY-MM-DD to DD/MM/YYYY (Indian format used in Firebase)
         function formatInputDate(dateStr) {
             if(!dateStr) return "";
             const parts = dateStr.split('-');
-            return `${parts[2]}/${parts[1]}/${parts[0]}`; // DD/MM/YYYY
+            return `${parts[2]}/${parts[1]}/${parts[0]}`; 
         }
 
-        // Firebase Config
+        // --- Firebase Config ---
         const firebaseConfig = {
           apiKey: "AIzaSyC6bcqETEnTjLEQnISXjnWR2brPrVOAm-Y",
           authDomain: "sky-classes-db-d6140.firebaseapp.com",
@@ -161,12 +168,13 @@
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
 
+        // --- Data Variables ---
         let admissionsList = [];
-        let allAttendanceList = []; // Firebase se aaya saara data
-        let filteredAttendanceList = []; // Sirf select ki hui date ka data
+        let allAttendanceList = []; 
+        let currentSmartAttendanceList = []; // For CSV Download
 
         function startRealtimeData() {
-            // Fetch Admissions
+            // Admissions Fetch
             db.ref('Student_Admissions').on('value', snap => {
                 const data = snap.val();
                 const body = document.getElementById('admissionsBody');
@@ -174,97 +182,131 @@
                 if(data) {
                     Object.values(data).reverse().forEach(st => {
                         admissionsList.push(st);
-                        body.innerHTML += `<tr><td>${st.Date}</td><td class="fw-bold">${st.Name}</td><td>${st.Phone}</td><td><span class="badge bg-light text-dark">${st.Course}</span></td></tr>`;
+                        body.innerHTML += `<tr><td>${st.Date}</td><td class="fw-bold">${st.Name}</td><td>${st.Phone}</td><td><span class="badge bg-light text-dark border">${st.Course}</span></td></tr>`;
                     });
                 }
                 document.getElementById('countAdmissions').innerText = admissionsList.length;
             });
 
-            // Fetch Daily Attendance
+            // Attendance Fetch
             db.ref('Daily_Attendance').on('value', snap => {
                 const data = snap.val();
                 allAttendanceList = [];
                 if(data) {
-                    Object.values(data).reverse().forEach(at => {
+                    Object.values(data).forEach(at => {
                         allAttendanceList.push(at);
                     });
                 }
-                filterAttendanceData(); // Data aane par turant filter apply karo
+                filterAttendanceData(); 
             });
         }
 
-        // Smart Filter Function
+        // --- MERGED SMART FILTER LOGIC ---
         function filterAttendanceData() {
             const selectedDateVal = document.getElementById('dateFilter').value;
             const targetFormat1 = formatInputDate(selectedDateVal); // "DD/MM/YYYY"
             
-            // Single digit dates ko handle karne ke liye (e.g. 05/04 vs 5/4)
             const parts = selectedDateVal.split('-');
             const targetFormat2 = `${parseInt(parts[2])}/${parseInt(parts[1])}/${parts[0]}`; 
 
-            const body = document.getElementById('attendanceBody');
-            body.innerHTML = '';
-            filteredAttendanceList = [];
+            let studentRecords = {};
 
-            allAttendanceList.forEach(at => {
-                // Check if attendance date matches selected date
-                if(at.Date === targetFormat1 || at.Date === targetFormat2) {
-                    filteredAttendanceList.push(at);
-                    const method = at.Method ? at.Method : 'Manual'; // Face ID or Manual
-                    const methodBadge = method === 'Face ID' ? `<span class="badge bg-success"><i class="fa-solid fa-face-smile me-1"></i> Face ID</span>` : `<span class="badge bg-secondary"><i class="fa-solid fa-keyboard me-1"></i> Form</span>`;
+            // Group data by student for the selected date
+            allAttendanceList.forEach(record => {
+                if(record.Date === targetFormat1 || record.Date === targetFormat2) {
+                    let phone = record.Phone;
                     
-                    body.innerHTML += `
-                        <tr>
-                            <td>${at.Date}</td>
-                            <td><span class="badge-time">${at.Time}</span></td>
-                            <td>${methodBadge}</td>
-                            <td class="fw-bold text-dark">${at.Name}</td>
-                            <td>${at.Phone}</td>
-                        </tr>
-                    `;
+                    if (!studentRecords[phone]) {
+                        studentRecords[phone] = {
+                            date: record.Date, name: record.Name, phone: phone, entryTime: "--", exitTime: "--"
+                        };
+                    }
+
+                    // Assign Entry/Exit based on ScanType
+                    if (record.ScanType === "IN" || !record.ScanType) {
+                        // Keep the first entry time
+                        if(studentRecords[phone].entryTime === "--") {
+                            studentRecords[phone].entryTime = record.Time;
+                        }
+                    } else if (record.ScanType === "OUT") {
+                        // Update to latest exit time
+                        studentRecords[phone].exitTime = record.Time;
+                    }
                 }
             });
 
-            // Update Header Count
-            document.getElementById('countAttendance').innerText = filteredAttendanceList.length;
-            
-            // Update Label Text (Today vs Selected)
-            const todayStr = formatInputDate(document.getElementById('dateFilter').defaultValue);
-            if(targetFormat1 === todayStr) {
-                document.getElementById('attendanceCardLabel').innerText = "Today's Attendance";
-            } else {
-                document.getElementById('attendanceCardLabel').innerText = `Attendance for ${targetFormat1}`;
+            // Generate HTML
+            const body = document.getElementById('attendanceBody');
+            body.innerHTML = '';
+            currentSmartAttendanceList = []; 
+            let count = 1;
+
+            for (let phone in studentRecords) {
+                let student = studentRecords[phone];
+                currentSmartAttendanceList.push(student); // Save for Excel
+
+                let statusBadge = student.exitTime !== "--" 
+                    ? '<span class="badge bg-success">Left Class</span>' 
+                    : '<span class="badge bg-warning text-dark">Inside Class</span>';
+
+                body.innerHTML += `
+                    <tr>
+                        <td class="text-muted fw-bold">${count++}</td>
+                        <td class="text-start fw-bold">${student.name}</td>
+                        <td>${student.phone}</td>
+                        <td class="text-success fw-bold">${student.entryTime}</td>
+                        <td class="text-danger fw-bold">${student.exitTime}</td>
+                        <td>${statusBadge}</td>
+                    </tr>
+                `;
             }
 
-            if(filteredAttendanceList.length === 0) {
-                body.innerHTML = `<tr><td colspan="5" class="text-center text-danger fw-bold py-4">No attendance found for selected date.</td></tr>`;
+            // Update Counts and Labels
+            document.getElementById('countAttendance').innerText = currentSmartAttendanceList.length;
+            
+            const todayStr = formatInputDate(document.getElementById('dateFilter').defaultValue);
+            if(targetFormat1 === todayStr) {
+                document.getElementById('attendanceCardLabel').innerText = "Students Present Today";
+            } else {
+                document.getElementById('attendanceCardLabel').innerText = `Present on ${targetFormat1}`;
+            }
+
+            if(currentSmartAttendanceList.length === 0) {
+                body.innerHTML = `<tr><td colspan="6" class="text-center text-danger fw-bold py-4">No attendance records found for this date.</td></tr>`;
             }
         }
 
+        // --- EXCEL DOWNLOAD LOGIC ---
         function downloadCSV(type) {
-            // Agar attendance select hai, toh sirf filtered wali list download hogi
-            let data = type === 'admissions' ? admissionsList : filteredAttendanceList;
-            if(data.length === 0) { alert("No data to download for this selection!"); return; }
-            
-            let csv = type === 'admissions' ? "Date,Name,Phone,Course\n" : "Date,Time,Method,Name,Phone\n";
-            data.forEach(row => {
-                if(type === 'admissions') {
-                    csv += `"${row.Date}","${row.Name}","${row.Phone}","${row.Course}"\n`;
-                } else {
-                    const method = row.Method ? row.Method : 'Manual';
-                    csv += `"${row.Date}","${row.Time}","${method}","${row.Name}","${row.Phone}"\n`;
-                }
-            });
+            let csv = "";
+            let dataLength = 0;
 
-            const blob = new Blob([csv], { type: 'text/csv' });
-            const link = document.createElement("a");
-            link.href = URL.createObjectURL(blob);
-            
-            // Excel file ke naam mein Date jodna
-            const dateSuf = type === 'attendance' ? document.getElementById('dateFilter').value : new Date().toLocaleDateString();
-            link.download = `Sky_${type}_${dateSuf}.csv`;
-            
-            link.click();
+            if(type === 'admissions') {
+                if(admissionsList.length === 0) { alert("No data!"); return; }
+                csv = "Date,Name,Phone,Course\n";
+                admissionsList.forEach(r => csv += `"${r.Date}","${r.Name}","${r.Phone}","${r.Course}"\n`);
+                dataLength = admissionsList.length;
+            } 
+            else if (type === 'attendance') {
+                if(currentSmartAttendanceList.length === 0) { alert("No data for selected date!"); return; }
+                // Smart Excel Format
+                csv = "Date,Student Name,Phone Number,Entry Time (IN),Exit Time (OUT),Status\n";
+                currentSmartAttendanceList.forEach(r => {
+                    let statusText = r.exitTime !== "--" ? "Left Class" : "Inside Class";
+                    csv += `"${r.date}","${r.name}","${r.phone}","${r.entryTime}","${r.exitTime}","${statusText}"\n`;
+                });
+                dataLength = currentSmartAttendanceList.length;
+            }
+
+            if(dataLength > 0) {
+                const blob = new Blob([csv], { type: 'text/csv' });
+                const link = document.createElement("a");
+                link.href = URL.createObjectURL(blob);
+                
+                const dateSuf = type === 'attendance' ? document.getElementById('dateFilter').value : new Date().toLocaleDateString().replace(/\//g,'-');
+                link.download = `Sky_${type}_${dateSuf}.csv`;
+                link.click();
+            }
         }
     </script>
 </body>
