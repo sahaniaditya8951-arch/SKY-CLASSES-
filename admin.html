@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sky Classes | Director ERP - Sandesh Sir</title>
     
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Outfit:wght@700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Outfit:wght@800&display=swap" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
@@ -17,11 +17,11 @@
 
     <style>
         :root { --dark: #0b1120; --blue: #3b82f6; --gold: #f59e0b; --slate: #0f172a; }
-        body { font-family: 'Poppins', sans-serif; background: #f1f5f9; margin: 0; overflow-x: hidden; }
+        body { font-family: 'Poppins', sans-serif; background: #f1f5f9; margin: 0; }
         
         #loginScreen { position: fixed; width:100%; height:100vh; background: linear-gradient(rgba(11,17,32,0.95), rgba(11,17,32,0.85)), url('https://images.unsplash.com/photo-1523240795612-9a054b0db644?q=80&w=2070&auto=format&fit=crop') center/cover; z-index:9999; display:flex; align-items:center; justify-content:center; }
         .login-card { background: rgba(255,255,255,0.05); backdrop-filter: blur(20px); padding: 50px; border-radius: 30px; text-align: center; color: white; width: 450px; border: 1px solid rgba(255,255,255,0.1); }
-        .login-card h1 { font-family: 'Outfit', sans-serif; font-size: 3.2rem; font-weight: 800; }
+        .login-card h1 { font-family: 'Outfit', sans-serif; font-size: 3rem; font-weight: 800; }
 
         .sidebar { height: 100vh; background: var(--slate); color: white; width: 280px; position: fixed; box-shadow: 10px 0 30px rgba(0,0,0,0.1); z-index: 100; }
         .sidebar a { padding: 18px 30px; color: #94a3b8; display: block; text-decoration: none; font-weight: 500; border-left: 4px solid transparent; transition: 0.3s; cursor: pointer; }
@@ -51,9 +51,9 @@
 <div id="loginScreen">
     <div class="login-card">
         <h1>SKY <span style="color:var(--blue)">CLASSES</span></h1>
-        <p class="text-uppercase fw-bold mb-5" style="letter-spacing:2px; color:#94a3b8;">Director Login Portal</p>
-        <input type="password" id="adminPass" class="form-control mb-4 text-center p-3 rounded-pill" style="background:rgba(255,255,255,0.1); color:white; border:1px solid rgba(255,255,255,0.2);" placeholder="Enter Master Password">
-        <button class="btn btn-primary w-100 p-3 rounded-pill fw-bold" onclick="doLogin()">SECURE LOGIN <i class="fa-solid fa-shield-halved ms-2"></i></button>
+        <p class="text-uppercase fw-bold mb-5" style="letter-spacing:2px; color:#94a3b8;">Director ERP Login</p>
+        <input type="password" id="adminPass" class="form-control mb-4 text-center p-3 rounded-pill" style="background:rgba(255,255,255,0.1); color:white;" placeholder="Master Password">
+        <button class="btn btn-primary w-100 p-3 rounded-pill fw-bold" onclick="doLogin()">SECURE LOGIN</button>
     </div>
 </div>
 
@@ -81,14 +81,12 @@
             <div class="glass-card">
                 <div class="d-flex justify-content-between mb-4">
                     <h4 class="fw-bold">Student Directory</h4>
-                    <button class="btn btn-primary rounded-pill px-4" data-bs-toggle="modal" data-bs-target="#admitModal">+ New Admission</button>
+                    <button class="btn btn-primary rounded-pill px-4" onclick="openModal()">+ New Admission</button>
                 </div>
-                <div class="table-responsive">
-                    <table class="table align-middle">
-                        <thead><tr><th>Roll No</th><th>Name</th><th>Class</th><th>Contact</th><th>Status</th><th>Actions</th></tr></thead>
-                        <tbody id="admitBody"></tbody>
-                    </table>
-                </div>
+                <table class="table">
+                    <thead><tr><th>Roll No</th><th>Name</th><th>Class</th><th>Fees</th><th>Status</th><th>Actions</th></tr></thead>
+                    <tbody id="admitBody"></tbody>
+                </table>
             </div>
         </div>
 
@@ -105,50 +103,45 @@
 
         <div id="sec-gate" class="hidden-section text-center">
             <div class="glass-card mx-auto" style="max-width:600px;">
-                <h4 class="fw-bold mb-4">AI Smart Gate Scanner</h4>
+                <h4 class="fw-bold mb-4">AI Gate Scanner</h4>
                 <div class="scanner-frame mb-4">
                     <video id="vGate" autoplay muted playsinline></video>
                     <canvas id="cGate"></canvas>
                     <div class="laser"></div>
                 </div>
-                <div id="gateStatus" class="p-3 bg-light rounded-pill fw-bold text-primary">Initializing AI...</div>
+                <div id="gateStatus" class="p-3 bg-light rounded-pill fw-bold text-primary">Ready to Scan</div>
             </div>
         </div>
 
         <div id="sec-logs" class="hidden-section">
             <div class="glass-card">
                 <div class="d-flex justify-content-between mb-4">
-                    <h4 class="fw-bold">Daily Attendance Logs</h4>
-                    <div class="d-flex gap-2">
-                        <input type="date" id="logDate" class="form-control" onchange="loadLogs()">
-                        <button class="btn btn-danger fw-bold" onclick="exportLogs()">PDF Report</button>
-                    </div>
+                    <h4 class="fw-bold">Attendance Logs</h4>
+                    <input type="date" id="logDate" class="form-control" style="width:200px" onchange="loadLogs()">
                 </div>
                 <table class="table" id="logTable">
-                    <thead><tr><th>Roll No</th><th>Name</th><th>Entry Time</th><th>Exit Time</th><th>Status</th></tr></thead>
+                    <thead><tr><th>Roll No</th><th>Name</th><th>IN</th><th>OUT</th><th>Status</th></tr></thead>
                     <tbody id="logBody"></tbody>
                 </table>
             </div>
         </div>
 
         <div id="sec-fees" class="hidden-section">
-            <div class="row g-4">
-                <div class="col-md-8"><div class="glass-card"><h4 class="fw-bold mb-4">Fee Collection</h4><table class="table"><tbody id="fTableBody"></tbody></table></div></div>
-                <div class="col-md-4"><div class="glass-card"><h4 class="fw-bold mb-4">Expenses</h4><input type="text" id="exN" class="form-control mb-2" placeholder="Item Name"><input type="number" id="exA" class="form-control mb-3" placeholder="Amount (₹)"><button class="btn btn-danger w-100 fw-bold rounded-pill" onclick="addEx()">Save Expense</button><hr><div id="exList"></div></div></div>
+            <div class="glass-card">
+                <h4 class="fw-bold mb-4">Fee Collection</h4>
+                <table class="table"><tbody id="fTableBody"></tbody></table>
             </div>
         </div>
 
         <div id="sec-enroll" class="hidden-section text-center">
             <div class="glass-card mx-auto" style="max-width:500px;">
-                <h4 class="fw-bold mb-4">Register Face ID</h4>
-                <input type="text" id="regRoll" class="form-control mb-3 text-center" placeholder="Enter SKY-XXXX">
-                <button class="btn btn-primary w-100 mb-4 rounded-pill" onclick="searchForReg()">Link Student</button>
-                <div class="scanner-frame mx-auto mb-4" style="width:250px; height:250px; border-radius:50%; border:5px solid var(--gold);">
+                <h4 class="fw-bold mb-4">Face Enrollment</h4>
+                <input type="text" id="regRoll" class="form-control mb-3 text-center" placeholder="SKY-XXXX">
+                <button class="btn btn-primary w-100 mb-4 rounded-pill" onclick="searchForReg()">Search</button>
+                <div class="scanner-frame mb-4" style="width:250px; height:250px; border-radius:50%">
                     <video id="vReg" autoplay muted playsinline></video>
-                    <canvas id="cReg"></canvas>
                 </div>
-                <p id="regStatus" class="fw-bold text-danger">Search first...</p>
-                <button id="regBtn" class="btn btn-dark w-100 p-3 rounded-pill fw-bold" onclick="saveFace()" disabled>LOCK FACE ID</button>
+                <button id="regBtn" class="btn btn-dark w-100 rounded-pill p-3 fw-bold" onclick="saveFace()" disabled>LOCK FACE ID</button>
             </div>
         </div>
     </div>
@@ -156,21 +149,19 @@
 
 <div class="modal fade" id="admitModal" tabindex="-1">
     <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content rounded-4 border-0">
-            <div class="modal-header bg-primary text-white"><h5 class="modal-title fw-bold">New Student Enrollment</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
-            <div class="modal-body p-4">
-                <input type="text" id="nName" class="form-control mb-3" placeholder="Full Name">
-                <input type="text" id="nClass" class="form-control mb-3" placeholder="Class/Course">
-                <input type="text" id="nAddr" class="form-control mb-3" placeholder="Address">
-                <div class="row g-3 mb-3"><div class="col-6"><input type="tel" id="nSPh" class="form-control" placeholder="Student Phone"></div><div class="col-6"><input type="tel" id="nPPh" class="form-control" placeholder="Parent Phone"></div></div>
-                <input type="number" id="nFees" class="form-control mb-4" placeholder="Total Fees (₹)">
-                <button class="btn btn-primary w-100 p-3 fw-bold rounded-pill" onclick="submitAdmit()">CONFIRM ADMISSION</button>
-            </div>
+        <div class="modal-content p-4 rounded-4">
+            <h5 class="fw-bold mb-4">New Admission</h5>
+            <input type="text" id="nName" class="form-control mb-3" placeholder="Student Name">
+            <input type="text" id="nClass" class="form-control mb-3" placeholder="Class">
+            <input type="tel" id="nPPh" class="form-control mb-3" placeholder="Parent Phone">
+            <input type="number" id="nFees" class="form-control mb-4" placeholder="Total Fees">
+            <button class="btn btn-primary w-100 rounded-pill p-3 fw-bold" onclick="submitAdmit()">CONFIRM</button>
         </div>
     </div>
 </div>
 
 <script>
+// Firebase Init
 const firebaseConfig = {
     apiKey: "AIzaSyC6bcqETEnTjLEQnISXjnWR2brPrVOAm-Y",
     authDomain: "sky-classes-db-d6140.firebaseapp.com",
@@ -180,9 +171,8 @@ const firebaseConfig = {
 };
 firebase.initializeApp(firebaseConfig);
 const db = firebase.database();
-const DIR = "Sandesh Sir";
 
-let students = {}; let attList = []; let expenses = []; let matcher = null; let processing = false; let history = {};
+let students = {}; let attList = []; let matcher = null; let processing = false;
 
 function doLogin() {
     if(document.getElementById('adminPass').value === "SkyAdmin123") {
@@ -190,13 +180,12 @@ function doLogin() {
         document.getElementById('dashboard').style.display='block';
         document.getElementById('logDate').valueAsDate = new Date();
         initDB();
-    } else alert("Galat Password!");
+    } else alert("Galat!");
 }
 
 function initDB() {
     db.ref('Student_Admissions').on('value', s => { students = s.val() || {}; renderAll(); });
     db.ref('Daily_Attendance').on('value', s => { attList = Object.values(s.val() || {}); loadLogs(); });
-    db.ref('Expenses').on('value', s => { expenses = Object.values(s.val() || {}); updateFin(); });
 }
 
 function openSec(id) {
@@ -212,47 +201,44 @@ function openSec(id) {
 function stopCam() {
     if(window.gS) window.gS.getTracks().forEach(t => t.stop());
     if(window.rS) window.rS.getTracks().forEach(t => t.stop());
-    clearInterval(window.gI); clearInterval(window.rI);
 }
+
+function openModal() { new bootstrap.Modal(document.getElementById('admitModal')).show(); }
 
 function submitAdmit() {
     const n = document.getElementById('nName').value;
-    const c = document.getElementById('nClass').value;
     const f = document.getElementById('nFees').value;
-    if(!n || !f) return alert("Details bharo!");
+    if(!n || !f) return alert("Fill Name/Fees!");
     const roll = 'SKY-' + Math.floor(1000 + Math.random()*9000);
     db.ref('Student_Admissions/'+roll).set({
-        RollNo: roll, Name: n, Class: c, Address: document.getElementById('nAddr').value,
-        Phone: document.getElementById('nSPh').value, ParentPhone: document.getElementById('nPPh').value,
-        TotalFees: parseFloat(f), PaidFees: 0, Date: new Date().toLocaleDateString('en-IN')
-    }).then(() => {
-        bootstrap.Modal.getInstance(document.getElementById('admitModal')).hide();
-        alert("Success: " + roll);
-    });
+        RollNo: roll, Name: n, Class: document.getElementById('nClass').value,
+        ParentPhone: document.getElementById('nPPh').value, TotalFees: parseFloat(f), PaidFees: 0
+    }).then(() => { alert("Saved!"); location.reload(); });
 }
 
 function renderAll() {
     const b = document.getElementById('admitBody'); b.innerHTML = '';
     const fb = document.getElementById('fTableBody'); fb.innerHTML = '';
-    Object.values(students).reverse().forEach(s => {
+    let col = 0;
+    Object.values(students).forEach(s => {
+        col += (s.PaidFees || 0);
         const due = s.TotalFees - s.PaidFees;
-        b.innerHTML += `<tr><td>${s.RollNo}</td><td class="fw-bold">${s.Name}</td><td>${s.Class}</td><td>${s.ParentPhone || s.Phone}</td><td>${due==0?'<span class="badge bg-success">PAID</span>':'<span class="badge bg-danger">DUE</span>'}</td><td><button class="btn btn-sm btn-outline-primary me-2" onclick="genBill('${s.RollNo}')">PDF</button><button class="btn btn-sm btn-danger" onclick="delSt('${s.RollNo}')">X</button></td></tr>`;
-        fb.innerHTML += `<tr><td class="fw-bold">${s.Name}</td><td>₹${s.TotalFees}</td><td class="text-success">₹${s.PaidFees}</td><td class="text-danger">₹${due}</td><td><button class="btn btn-sm btn-success" onclick="pay('${s.RollNo}')">Pay</button></td></tr>`;
+        b.innerHTML += `<tr><td>${s.RollNo}</td><td>${s.Name}</td><td>${s.Class}</td><td>₹${s.TotalFees}</td><td>${due==0?'Paid':'Due'}</td><td><button class="btn btn-sm btn-danger" onclick="del('${s.RollNo}')">X</button></td></tr>`;
+        fb.innerHTML += `<tr><td>${s.Name}</td><td>Due: ₹${due}</td><td><button class="btn btn-sm btn-success" onclick="pay('${s.RollNo}')">Pay</button></td></tr>`;
     });
     document.getElementById('sCount').innerText = Object.keys(students).length;
-    updateFin();
+    document.getElementById('fSum').innerText = "₹"+col;
 }
 
-function delSt(r) { if(confirm("Delete?")) db.ref('Student_Admissions/'+r).remove(); }
-function pay(r) { const a = prompt("Amount:"); if(a && !isNaN(a)) db.ref(`Student_Admissions/${r}/PaidFees`).set(parseFloat(students[r].PaidFees) + parseFloat(a)); }
-function addEx() { const n = document.getElementById('exN').value; const a = document.getElementById('exA').value; if(n && a) db.ref('Expenses').push({ Name: n, Amount: parseFloat(a), Date: new Date().toLocaleDateString() }); }
+function del(r) { if(confirm("Delete?")) db.ref('Student_Admissions/'+r).remove(); }
+function pay(r) { const a = prompt("Amount:"); if(a) db.ref(`Student_Admissions/${r}/PaidFees`).set(parseFloat(students[r].PaidFees) + parseFloat(a)); }
 
-function updateFin() {
-    let col = 0; Object.values(students).forEach(s => col += (s.PaidFees || 0));
-    let ex = 0; expenses.forEach(e => ex += e.Amount);
-    document.getElementById('fSum').innerText = "₹" + col;
-    document.getElementById('eSum').innerText = "₹" + ex;
-    document.getElementById('nProfit').innerText = "₹" + (col - ex);
+function manualMark(m) {
+    const r = document.getElementById('mRoll').value.toUpperCase();
+    if(!students[r]) return alert("No Roll No!");
+    const now = new Date(); const t = now.toLocaleTimeString('en-IN', {hour:'2-digit', minute:'2-digit'});
+    db.ref('Daily_Attendance').push({ RollNo:r, Name:students[r].Name, Date:now.toLocaleDateString('en-IN'), Time:t, ScanType:m });
+    alert("Marked "+m);
 }
 
 function loadLogs() {
@@ -261,66 +247,43 @@ function loadLogs() {
     attList.forEach(r => {
         if(r.Date === target) {
             if(!map[r.RollNo]) map[r.RollNo] = { name:r.Name, roll:r.RollNo, in:"--", out:"--" };
-            if(r.ScanType === "IN" && map[r.RollNo].in === "--") map[r.RollNo].in = r.Time;
-            else if(r.ScanType === "OUT") map[r.RollNo].out = r.Time;
+            if(r.ScanType === "IN") map[r.RollNo].in = r.Time; else map[r.RollNo].out = r.Time;
         }
     });
     const b = document.getElementById('logBody'); b.innerHTML = '';
-    Object.values(map).forEach(s => b.innerHTML += `<tr><td>${s.roll}</td><td>${s.name}</td><td class="text-success">${s.in}</td><td class="text-danger">${s.out}</td><td>${s.out!=='--'?'LEFT':'INSIDE'}</td></tr>`);
-}
-
-function manualMark(m) {
-    const r = document.getElementById('mRoll').value.toUpperCase();
-    if(!students[r]) return alert("Galat Roll No!");
-    markDB(students[r].Name, r, students[r].Phone, m);
-    alert("Saved: " + m);
-}
-
-function markDB(n, r, p, m) {
-    const now = new Date(); const t = now.toLocaleTimeString('en-IN', { hour:'2-digit', minute:'2-digit' });
-    db.ref('Daily_Attendance').push({ RollNo:r, Name:n, Phone:p, Date:now.toLocaleDateString('en-IN'), Time:t, Timestamp:Date.now(), ScanType:m });
-    const pPh = students[r]?.ParentPhone || p;
-    const proxy = "https://corsproxy.io/?https://www.fast2sms.com/dev/bulkV2";
-    const msg = m === "IN" ? `Sky Classes: ${n} coaching pahunch gaya hai.` : `Sky Classes: ${n} coaching se nikal gaya hai.`;
-    fetch(proxy, { method:"POST", headers:{"authorization":"5kO3otv1Ra9gTwlQDUze6IWVhBmKNnb80c2AJMP4CLXiFrpYdSrHbiDTSLOZM65YR4QeqBFKd3sN0gpv","Content-Type":"application/json"}, body:JSON.stringify({"route":"q","message":msg,"language":"english","flash":0,"numbers":pPh}) });
-}
-
-async function loadAI() {
-    const URL = 'https://cdn.jsdelivr.net/npm/@vladmandic/face-api/model/';
-    await Promise.all([faceapi.nets.tinyFaceDetector.loadFromUri(URL), faceapi.nets.ssdMobilenetv1.loadFromUri(URL), faceapi.nets.faceLandmark68Net.loadFromUri(URL), faceapi.nets.faceRecognitionNet.loadFromUri(URL)]);
+    Object.values(map).forEach(s => b.innerHTML += `<tr><td>${s.roll}</td><td>${s.name}</td><td>${s.in}</td><td>${s.out}</td><td>${s.out!=='--'?'LEFT':'IN'}</td></tr>`);
 }
 
 async function startGate() {
-    await loadAI();
-    const snap = await db.ref('Face_Data').once('value'); const data = snap.val(); if(!data) return;
-    const descs = [];
-    for(const k in data) descs.push(new faceapi.LabeledFaceDescriptors(data[k].Name+"||"+data[k].RollNo+"||"+data[k].Phone, [new Float32Array(Object.values(data[k].Descriptor))]));
-    matcher = new faceapi.FaceMatcher(descs, 0.5);
-    const v = document.getElementById('vGate'); const c = document.getElementById('cGate');
+    const MODEL_URL = 'https://cdn.jsdelivr.net/npm/@vladmandic/face-api/model/';
+    await faceapi.nets.ssdMobilenetv1.loadFromUri(MODEL_URL);
+    await faceapi.nets.faceRecognitionNet.loadFromUri(MODEL_URL);
+    const snap = await db.ref('Face_Data').once('value'); const data = snap.val();
+    if(data) {
+        const descs = [];
+        for(const k in data) descs.push(new faceapi.LabeledFaceDescriptors(data[k].Name+"||"+data[k].RollNo, [new Float32Array(Object.values(data[k].Descriptor))]));
+        matcher = new faceapi.FaceMatcher(descs, 0.5);
+    }
+    const v = document.getElementById('vGate');
     navigator.mediaDevices.getUserMedia({ video: true }).then(s => { window.gS = s; v.srcObject = s; });
-    v.onplay = () => {
-        faceapi.matchDimensions(c, v);
-        window.gI = setInterval(async () => {
-            const dets = await faceapi.detectAllFaces(v, new faceapi.SsdMobilenetv1Options()).withFaceDescriptors();
-            if(dets.length > 0 && matcher && !processing) {
-                const res = matcher.findBestMatch(dets[0].descriptor);
-                if(res.label !== 'unknown') {
-                    const [name, roll, phone] = res.label.split("||");
-                    processing = true; 
-                    let last = history[roll] || { state:"OUT", Timestamp:0 };
-                    let mode = last.state === "IN" ? "OUT" : "IN";
-                    history[roll] = { state:mode, Timestamp:Date.now() };
-                    markDB(name, roll, phone, mode);
-                    const ut = new SpeechSynthesisUtterance(mode==="IN"?`Hello ${name}`:`Bye ${name}`); ut.lang='hi-IN'; window.speechSynthesis.speak(ut);
-                    setTimeout(() => processing = false, 5000);
-                }
+    window.gI = setInterval(async () => {
+        if(!matcher || processing) return;
+        const det = await faceapi.detectSingleFace(v).withFaceDescriptor();
+        if(det) {
+            const res = matcher.findBestMatch(det.descriptor);
+            if(res.label !== 'unknown') {
+                processing = true; const [name, roll] = res.label.split("||");
+                manualMark("IN"); // Simple auto mark
+                setTimeout(() => processing = false, 5000);
             }
-        }, 500);
-    };
+        }
+    }, 1000);
 }
 
 async function startReg() {
-    await loadAI(); const v = document.getElementById('vReg');
+    const MODEL_URL = 'https://cdn.jsdelivr.net/npm/@vladmandic/face-api/model/';
+    await faceapi.nets.tinyFaceDetector.loadFromUri(MODEL_URL);
+    const v = document.getElementById('vReg');
     navigator.mediaDevices.getUserMedia({ video: true }).then(s => { window.rS = s; v.srcObject = s; });
     window.rI = setInterval(async () => {
         const det = await faceapi.detectSingleFace(v, new faceapi.TinyFaceDetectorOptions());
@@ -331,15 +294,11 @@ async function startReg() {
 function searchForReg() { const r = document.getElementById('regRoll').value.toUpperCase(); if(students[r]) document.getElementById('regStatus').innerText = "Found: "+students[r].Name; }
 async function saveFace() {
     const r = document.getElementById('regRoll').value.toUpperCase();
-    const det = await faceapi.detectSingleFace(document.getElementById('vReg'), new faceapi.TinyFaceDetectorOptions()).withFaceDescriptor();
+    const v = document.getElementById('vReg');
+    const det = await faceapi.detectSingleFace(v, new faceapi.TinyFaceDetectorOptions()).withFaceDescriptor();
     if(det) db.ref('Face_Data/'+r).set({ RollNo:r, Name:students[r].Name, Descriptor:Array.from(det.descriptor) }).then(() => alert("Saved!"));
 }
-
-function genBill(r) {
-    const s = students[r]; const { jsPDF } = window.jspdf; const doc = new jsPDF();
-    doc.text(`SKY CLASSES - Receipt\nName: ${s.Name}\nPaid: ${s.PaidFees}\nDue: ${s.TotalFees - s.PaidFees}\nDirector: Sandesh Sir`, 20, 20);
-    doc.save(`Bill_${s.Name}.pdf`);
-}
 </script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
