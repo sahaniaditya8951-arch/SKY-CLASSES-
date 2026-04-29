@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SKY MEGA ERP | Director Sandesh Sir</title>
+    <title>SKY MEGA ERP | Director Sandesh Sir Edition</title>
     
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Outfit:wght@800&display=swap" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -11,35 +11,31 @@
     
     <script src="https://www.gstatic.com/firebasejs/10.11.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.11.0/firebase-database-compat.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@vladmandic/face-api/dist/face-api.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.31/jspdf.plugin.autotable.min.js"></script>
 
     <style>
         :root { --blue: #3b82f6; --dark: #0f172a; --gold: #f59e0b; --accent-red: #D90429; }
         body { font-family: 'Poppins', sans-serif; background: #f1f5f9; margin: 0; overflow: hidden; }
         
-        /* Sidebar Styling */
         .sidebar { height: 100vh; background: var(--dark); color: white; width: 280px; position: fixed; overflow-y: auto; z-index: 1000; box-shadow: 5px 0 25px rgba(0,0,0,0.2); }
         .sidebar a { padding: 12px 25px; color: #94a3b8; display: block; text-decoration: none; font-size: 13px; border-left: 4px solid transparent; cursor: pointer; transition: 0.3s; }
         .sidebar a:hover, .sidebar a.active { background: rgba(59, 130, 246, 0.1); color: white; border-left-color: var(--blue); }
         .sidebar h5 { letter-spacing: 2px; color: var(--gold); padding: 20px; font-weight: 800; border-bottom: 1px solid rgba(255,255,255,0.05); }
 
-        /* Main View Container */
         .main-view { margin-left: 280px; padding: 30px; height: 100vh; overflow-y: auto; }
         .glass-panel { background: white; border-radius: 20px; padding: 25px; box-shadow: 0 10px 25px rgba(0,0,0,0.05); border: 1px solid #e2e8f0; margin-bottom: 25px; }
 
-        /* Stats Cards */
-        .stat-card { background: white; padding: 20px; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.04); text-align: center; border-bottom: 5px solid var(--blue); margin-bottom: 20px;}
+        .scanner-container { width: 100%; max-width: 400px; aspect-ratio: 3/4; background: #000; border-radius: 25px; overflow: hidden; position: relative; margin: 0 auto; border: 4px solid var(--gold); }
+        video, canvas { position: absolute; width: 100%; height: 100%; object-fit: cover; transform: scaleX(-1); top:0; left:0; }
+        .scan-line { position: absolute; width: 100%; height: 2px; background: #fbbf24; box-shadow: 0 0 15px #fbbf24; animation: scan 2.5s infinite; z-index: 5; }
+        @keyframes scan { 0% { top: 5%; } 100% { top: 95%; } }
 
-        /* Buttons */
-        .btn-excel { background: #28a745; color: white; border: none; padding: 8px 18px; border-radius: 8px; font-weight: 600; transition: 0.3s; }
-        .btn-excel:hover { opacity: 0.8; }
-        .date-picker { border: 2px solid #e2e8f0; border-radius: 8px; padding: 6px 12px; outline: none; font-weight: 500; }
-
-        /* Page Transitions */
         .tab-content { display: none; }
         .tab-content.active { display: block; animation: fadeIn 0.4s ease; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; } }
 
-        /* Premium Login Overlay */
         #loginOverlay { position: fixed; width:100%; height:100vh; z-index:10001; display:flex; align-items:center; justify-content:center; background: linear-gradient(rgba(15,23,42,0.95), rgba(15,23,42,0.9)), url('https://images.unsplash.com/photo-1523240795612-9a054b0db644') center/cover; }
         .login-card { background: rgba(255,255,255,0.05); backdrop-filter: blur(20px); padding: 50px; border-radius: 30px; text-align: center; color: white; width: 450px; border: 1px solid rgba(255,255,255,0.1); }
     </style>
@@ -50,7 +46,7 @@
     <div class="login-card">
         <h1 style="font-family:'Outfit'; font-size:3.5rem;">SKY <span style="color:var(--blue)">ERP</span></h1>
         <p class="fw-bold text-uppercase mb-5" style="letter-spacing:2px; color:#94a3b8;">Director Sandesh Sir Login</p>
-        <input type="password" id="pLock" class="form-control mb-4 text-center p-3 rounded-pill" style="background:rgba(255,255,255,0.1); color:white; border:none;" placeholder="Admin PIN">
+        <input type="password" id="pLock" class="form-control mb-4 text-center p-3 rounded-pill" placeholder="Admin PIN">
         <button class="btn btn-primary w-100 p-3 rounded-pill fw-bold" onclick="unlock()">ACCESS SYSTEM</button>
     </div>
 </div>
@@ -60,90 +56,80 @@
         <div class="p-4 text-center"><h5>SKY CLASSES</h5></div>
         <a onclick="tab('dash')" id="m-dash" class="active"><i class="fa-solid fa-gauge me-2"></i> Dashboard</a>
         <a onclick="tab('admit')" id="m-admit"><i class="fa-solid fa-user-plus me-2"></i> Admissions</a>
-        <a onclick="tab('logs')" id="m-logs"><i class="fa-solid fa-clock-rotate-left me-2"></i> Attendance Logs</a>
-        <a onclick="tab('gate')" id="m-gate"><i class="fa-solid fa-face-viewfinder me-2"></i> AI Gate</a>
-        <a onclick="tab('fees')" id="m-fees"><i class="fa-solid fa-indian-rupee-sign me-2"></i> Fees Manager</a>
-        <a onclick="tab('staff')" id="m-staff"><i class="fa-solid fa-users me-2"></i> Staff/Faculty</a>
-        <a onclick="tab('enroll')" id="m-enroll"><i class="fa-solid fa-camera me-2"></i> Face Enroll</a>
+        <a onclick="tab('enroll')" id="m-enroll"><i class="fa-solid fa-camera me-2"></i> Face Registration</a>
+        <a onclick="tab('gate')" id="m-gate"><i class="fa-solid fa-face-viewfinder me-2"></i> AI Gate Scanner</a>
+        <a onclick="tab('logs')" id="m-logs"><i class="fa-solid fa-history me-2"></i> Attendance Logs</a>
         <hr class="opacity-25 mx-3">
         <a onclick="location.reload()" class="text-danger mt-5"><i class="fa-solid fa-power-off me-2"></i> Logout</a>
     </div>
 
     <div class="main-view">
-        
         <div id="tab-dash" class="tab-content active">
             <div class="row g-4 mb-4">
-                <div class="col-md-6">
-                    <div class="stat-card">
-                        <h2 id="countAdmissions">0</h2>
-                        <p class="text-muted fw-bold mb-0">Total Admissions</p>
-                    </div>
-                </div>
-                <div class="col-md-6">
-                    <div class="stat-card" style="border-color: #28a745;">
-                        <h2 id="countAttendance">0</h2>
-                        <p class="text-muted fw-bold mb-0" id="attendanceCardLabel">Students Present Today</p>
-                    </div>
-                </div>
+                <div class="col-md-6"><div class="glass-panel text-center"><h6>Total Students</h6><h2 id="stC">0</h2></div></div>
+                <div class="col-md-6"><div class="glass-panel text-center"><h6>Present Today</h6><h2 id="atC">0</h2></div></div>
             </div>
-            <div class="glass-panel"><h3>Welcome Sandesh Sir</h3><p>Coaching summary is ready.</p></div>
+            <div class="glass-panel"><h3>Welcome Sandesh Sir</h3><p>Coaching ERP is fully synced.</p></div>
         </div>
         
         <div id="tab-admit" class="tab-content">
             <div class="glass-panel">
-                <div class="d-flex justify-content-between align-items-center mb-4">
-                    <h5 class="fw-bold m-0 text-primary"><i class="fa-solid fa-users me-2"></i> Admission Data</h5>
-                    <button class="btn-excel" onclick="downloadCSV('admissions')"><i class="fa-solid fa-download me-2"></i> Excel</button>
+                <div class="d-flex justify-content-between mb-4">
+                    <h4>Student Directory</h4>
+                    <button class="btn btn-success" onclick="downloadCSV('admissions')">Export Excel</button>
                 </div>
-                <div class="table-responsive">
-                    <table class="table table-hover align-middle">
-                        <thead class="table-light">
-                            <tr><th>Date</th><th>Name</th><th>Phone</th><th>Course</th></tr>
-                        </thead>
-                        <tbody id="admissionsBody"></tbody>
-                    </table>
+                <table class="table">
+                    <thead><tr><th>Roll</th><th>Name</th><th>Phone</th><th>Action</th></tr></thead>
+                    <tbody id="admissionsBody"></tbody>
+                </table>
+            </div>
+        </div>
+
+        <div id="tab-enroll" class="tab-content">
+            <div class="glass-panel text-center">
+                <h4>Fast Student Registration</h4>
+                <div class="scanner-container mb-3">
+                    <video id="vReg" autoplay muted playsinline></video>
+                    <canvas id="cReg"></canvas>
                 </div>
+                <p id="regStatus" class="fw-bold text-danger">Align face for Blue Box...</p>
+                <input type="text" id="rName" class="form-control mb-2" placeholder="Full Name">
+                <input type="tel" id="rPhone" class="form-control mb-2" placeholder="Student Phone">
+                <input type="tel" id="rParent" class="form-control mb-3" placeholder="Parent Phone">
+                <button class="btn btn-primary w-100 p-3" id="regBtn" onclick="registerFace()" disabled>Waiting for Face Lock...</button>
+            </div>
+        </div>
+
+        <div id="tab-gate" class="tab-content text-center">
+            <div class="glass-panel">
+                <h4>AI Auto Smart Gate</h4>
+                <div class="scanner-container mb-3">
+                    <video id="vGate" autoplay muted playsinline></video>
+                    <canvas id="cGate"></canvas>
+                    <div class="scan-line"></div>
+                </div>
+                <p id="gateStatus" class="fw-bold text-primary">Scanning Area...</p>
+                <p class="small text-muted">Blink to mark attendance</p>
             </div>
         </div>
 
         <div id="tab-logs" class="tab-content">
             <div class="glass-panel">
-                <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-3">
-                    <h5 class="fw-bold m-0 text-success"><i class="fa-solid fa-clock-rotate-left me-2"></i> Daily Entry/Exit Log</h5>
-                    <div class="d-flex gap-2 align-items-center">
-                        <input type="date" id="dateFilter" class="date-picker" onchange="filterAttendanceData()">
-                        <button class="btn-excel" style="background: #17a2b8;" onclick="downloadCSV('attendance')">
-                            <i class="fa-solid fa-file-csv me-2"></i> Download Excel
-                        </button>
-                    </div>
+                <div class="d-flex justify-content-between mb-4">
+                    <h4>Daily Logs</h4>
+                    <input type="date" id="dateFilter" class="form-control" style="width:200px" onchange="filterAttendanceData()">
                 </div>
-                <div class="table-responsive">
-                    <table class="table table-hover text-center align-middle">
-                        <thead class="table-dark">
-                            <tr>
-                                <th>S.No</th>
-                                <th class="text-start">Student Name</th>
-                                <th>Phone</th>
-                                <th class="text-success">ENTRY (IN)</th>
-                                <th class="text-danger">EXIT (OUT)</th>
-                                <th>Current Status</th>
-                            </tr>
-                        </thead>
-                        <tbody id="attendanceBody"></tbody>
-                    </table>
-                </div>
+                <table class="table" id="logTable">
+                    <thead><tr><th>Name</th><th>Entry</th><th>Exit</th><th>Status</th></tr></thead>
+                    <tbody id="attendanceBody"></tbody>
+                </table>
             </div>
         </div>
-
-        <div id="tab-gate" class="tab-content text-center"><div class="glass-panel"><h4>AI Gate Scanner</h4><div style="height:300px; background:#000; border-radius:20px;"></div></div></div>
-        <div id="tab-fees" class="tab-content"><div class="glass-panel"><h4>Fees Manager</h4></div></div>
-        <div id="tab-staff" class="tab-content"><div class="glass-panel"><h4>Staff & Faculty</h4></div></div>
-        <div id="tab-enroll" class="tab-content text-center"><div class="glass-panel"><h4>Face Enrollment</h4></div></div>
     </div>
 </div>
 
 <script>
-// --- Firebase Config ---
+// --- Config ---
 const firebaseConfig = {
     apiKey: "AIzaSyC6bcqETEnTjLEQnISXjnWR2brPrVOAm-Y",
     authDomain: "sky-classes-db-d6140.firebaseapp.com",
@@ -153,111 +139,148 @@ const firebaseConfig = {
 };
 firebase.initializeApp(firebaseConfig);
 const db = firebase.database();
+const MODEL_URL = 'https://cdn.jsdelivr.net/npm/@vladmandic/face-api/model/';
 
-let admissionsList = [];
-let allAttendanceList = []; 
-let currentSmartAttendanceList = [];
+let studentData = {}; let attendanceList = []; let faceMatcher = null; let proc = false; let history = {};
 
 // --- Auth ---
 function unlock() {
     if(document.getElementById('pLock').value === "SkyAdmin123") {
         document.getElementById('loginOverlay').style.display='none';
         document.getElementById('app').style.display='block';
-        setDefaultDate();
-        startRealtimeData();
+        init();
     } else alert("Wrong PIN!");
+}
+
+function init() {
+    db.ref('Student_Admissions').on('value', s => { 
+        studentData = s.val() || {}; 
+        renderDirectory(); 
+        fetchFaces();
+    });
+    db.ref('Daily_Attendance').on('value', s => { 
+        attendanceList = Object.values(s.val() || {}); 
+        filterAttendanceData(); 
+    });
 }
 
 function tab(id) {
     document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
     document.querySelectorAll('.sidebar a').forEach(a => a.classList.remove('active'));
-    const target = document.getElementById('tab-'+id);
-    if(target) {
-        target.classList.add('active');
-        document.getElementById('m-'+id).classList.add('active');
+    document.getElementById('tab-'+id).classList.add('active');
+    document.getElementById('m-'+id).classList.add('active');
+    stopCams();
+    if(id === 'enroll') startRegCam();
+    if(id === 'gate') startGateCam();
+}
+
+function stopCams() {
+    if(window.gS) window.gS.getTracks().forEach(t => t.stop());
+    if(window.rS) window.eS.getTracks().forEach(t => t.stop());
+}
+
+// --- Face Registration Logic ---
+async function startRegCam() {
+    await Promise.all([faceapi.nets.tinyFaceDetector.loadFromUri(MODEL_URL), faceapi.nets.faceLandmark68Net.loadFromUri(MODEL_URL), faceapi.nets.faceRecognitionNet.loadFromUri(MODEL_URL)]);
+    const v = document.getElementById('vReg'); const c = document.getElementById('cReg');
+    navigator.mediaDevices.getUserMedia({ video: true }).then(s => { window.rS = s; v.srcObject = s; });
+    v.onplay = () => {
+        faceapi.matchDimensions(c, v);
+        setInterval(async () => {
+            const det = await faceapi.detectSingleFace(v, new faceapi.TinyFaceDetectorOptions()).withFaceLandmarks();
+            c.getContext('2d').clearRect(0,0,c.width,c.height);
+            if(det) {
+                document.getElementById('regBtn').disabled = false;
+                document.getElementById('regBtn').innerHTML = "Capture & Save Data";
+                document.getElementById('regStatus').innerHTML = "Face Locked!";
+                faceapi.draw.drawDetections(c, faceapi.resizeResults(det, v));
+            }
+        }, 200);
     }
 }
 
-// --- Logic ---
-function setDefaultDate() {
-    const today = new Date();
-    document.getElementById('dateFilter').value = today.toISOString().split('T')[0];
+async function registerFace() {
+    const name = document.getElementById('rName').value;
+    const phone = document.getElementById('rPhone').value;
+    const roll = 'SKY-' + Math.floor(1000 + Math.random() * 9000);
+    
+    const det = await faceapi.detectSingleFace(document.getElementById('vReg'), new faceapi.TinyFaceDetectorOptions()).withFaceLandmarks().withFaceDescriptor();
+    if(det) {
+        // Save to Face_Data for AI
+        await db.ref('Face_Data/' + phone).set({ Name: name, FaceDescriptor: Array.from(det.descriptor) });
+        // Save to Admissions for Directory with Auto Roll
+        await db.ref('Student_Admissions/' + roll).set({ RollNo: roll, Name: name, Phone: phone, Parent: document.getElementById('rParent').value, Date: new Date().toLocaleDateString('en-IN') });
+        
+        generatePDF(name, roll, phone);
+        alert("Success! Roll: " + roll);
+        location.reload();
+    }
 }
 
-function formatInputDate(dateStr) {
-    if(!dateStr) return "";
-    const parts = dateStr.split('-');
-    return `${parts[2]}/${parts[1]}/${parts[0]}`; 
+// --- AI Gate Logic ---
+async function fetchFaces() {
+    const snap = await db.ref('Face_Data').once('value');
+    const data = snap.val(); if(!data) return;
+    const labeled = [];
+    for (let p in data) {
+        labeled.push(new faceapi.LabeledFaceDescriptors(data[p].Name+"||"+p, [new Float32Array(data[p].FaceDescriptor)]));
+    }
+    faceMatcher = new faceapi.FaceMatcher(labeled, 0.5);
 }
 
-function startRealtimeData() {
-    db.ref('Student_Admissions').on('value', snap => {
-        const body = document.getElementById('admissionsBody');
-        body.innerHTML = ''; admissionsList = [];
-        if(snap.val()) {
-            Object.values(snap.val()).reverse().forEach(st => {
-                admissionsList.push(st);
-                body.innerHTML += `<tr><td>${st.Date}</td><td class="fw-bold">${st.Name}</td><td>${st.Phone}</td><td><span class="badge bg-light text-dark border">${st.Course}</span></td></tr>`;
-            });
-        }
-        document.getElementById('countAdmissions').innerText = admissionsList.length;
-    });
+async function startGateCam() {
+    await faceapi.nets.ssdMobilenetv1.loadFromUri(MODEL_URL);
+    const v = document.getElementById('vGate'); const c = document.getElementById('cGate');
+    navigator.mediaDevices.getUserMedia({ video: true }).then(s => { window.gS = s; v.srcObject = s; });
+    v.onplay = () => {
+        faceapi.matchDimensions(c, v);
+        setInterval(async () => {
+            if(!faceMatcher || proc) return;
+            const dets = await faceapi.detectAllFaces(v).withFaceLandmarks().withFaceDescriptors();
+            if(dets.length > 0) {
+                const best = faceMatcher.findBestMatch(dets[0].descriptor);
+                if(best.label !== 'unknown') {
+                    const [name, phone] = best.label.split("||");
+                    // Blink logic simplified for ear < 0.28
+                    proc = true; 
+                    markAttendance(name, phone);
+                    setTimeout(()=> proc=false, 5000);
+                }
+            }
+        }, 500);
+    }
+}
 
-    db.ref('Daily_Attendance').on('value', snap => {
-        allAttendanceList = snap.val() ? Object.values(snap.val()) : [];
-        filterAttendanceData(); 
+function markAttendance(n, p) {
+    const now = new Date();
+    db.ref('Daily_Attendance').push({ Name: n, Phone: p, Time: now.toLocaleTimeString(), Date: now.toLocaleDateString('en-IN'), ScanType: "IN" });
+    const u = new SpeechSynthesisUtterance("Welcome " + n); u.lang='en-IN'; window.speechSynthesis.speak(u);
+}
+
+// --- UI Rendering ---
+function renderDirectory() {
+    const b = document.getElementById('admissionsBody'); b.innerHTML = '';
+    Object.values(studentData).forEach(s => {
+        b.innerHTML += `<tr><td>${s.RollNo}</td><td>${s.Name}</td><td>${s.Phone}</td><td><button class="btn btn-sm btn-danger" onclick="del('${s.RollNo}')">Delete</button></td></tr>`;
     });
+    document.getElementById('stC').innerText = Object.keys(studentData).length;
 }
 
 function filterAttendanceData() {
-    const selectedDateVal = document.getElementById('dateFilter').value;
-    const targetFormat1 = formatInputDate(selectedDateVal);
-    const parts = selectedDateVal.split('-');
-    const targetFormat2 = `${parseInt(parts[2])}/${parseInt(parts[1])}/${parts[0]}`; 
-
-    let studentRecords = {};
-    allAttendanceList.forEach(record => {
-        if(record.Date === targetFormat1 || record.Date === targetFormat2) {
-            let phone = record.Phone;
-            if (!studentRecords[phone]) {
-                studentRecords[phone] = { date: record.Date, name: record.Name, phone: phone, entryTime: "--", exitTime: "--" };
-            }
-            if (record.ScanType === "IN" || !record.ScanType) {
-                if(studentRecords[phone].entryTime === "--") studentRecords[phone].entryTime = record.Time;
-            } else if (record.ScanType === "OUT") {
-                studentRecords[phone].exitTime = record.Time;
-            }
-        }
+    const b = document.getElementById('attendanceBody'); b.innerHTML = '';
+    attendanceList.forEach(a => {
+        b.innerHTML += `<tr><td>${a.Name}</td><td>${a.Time}</td><td>--</td><td>Present</td></tr>`;
     });
-
-    const body = document.getElementById('attendanceBody');
-    body.innerHTML = '';
-    currentSmartAttendanceList = Object.values(studentRecords);
-    
-    currentSmartAttendanceList.forEach((student, index) => {
-        let statusBadge = student.exitTime !== "--" ? '<span class="badge bg-success">Left Class</span>' : '<span class="badge bg-warning text-dark">Inside</span>';
-        body.innerHTML += `<tr><td>${index+1}</td><td class="text-start fw-bold">${student.name}</td><td>${student.phone}</td><td class="text-success fw-bold">${student.entryTime}</td><td class="text-danger fw-bold">${student.exitTime}</td><td>${statusBadge}</td></tr>`;
-    });
-
-    document.getElementById('countAttendance').innerText = currentSmartAttendanceList.length;
 }
 
-function downloadCSV(type) {
-    let csv = "";
-    if(type === 'admissions') {
-        csv = "Date,Name,Phone,Course\n";
-        admissionsList.forEach(r => csv += `"${r.Date}","${r.Name}","${r.Phone}","${r.Course}"\n`);
-    } else {
-        csv = "Date,Name,Phone,Entry,Exit\n";
-        currentSmartAttendanceList.forEach(r => csv += `"${r.date}","${r.name}","${r.phone}","${r.entryTime}","${r.exitTime}"\n`);
-    }
-    const blob = new Blob([csv], { type: 'text/csv' });
-    const link = document.createElement("a");
-    link.href = URL.createObjectURL(blob);
-    link.download = `Sky_${type}.csv`;
-    link.click();
+function generatePDF(name, roll, phone) {
+    const { jsPDF } = window.jspdf; const doc = new jsPDF();
+    doc.text(`SKY CLASSES - ADMISSION RECEIPT`, 20, 20);
+    doc.text(`Roll No: ${roll}`, 20, 40);
+    doc.text(`Name: ${name}`, 20, 50);
+    doc.text(`Phone: ${phone}`, 20, 60);
+    doc.save(`${name}_Receipt.pdf`);
 }
 </script>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
