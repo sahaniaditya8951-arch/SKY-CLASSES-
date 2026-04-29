@@ -23,7 +23,6 @@
         }
         body { font-family: 'Poppins', sans-serif; background-color: var(--bg-color); margin: 0; overflow-x: hidden; color: var(--text-main); }
         
-        /* Login Screen */
         #loginScreen { position: fixed; top: 0; left: 0; width: 100%; height: 100vh; display: flex; z-index: 9999; background: white; }
         .login-banner { flex: 1.2; background: url('https://images.unsplash.com/photo-1523240795612-9a054b0db644?q=80&w=2070&auto=format&fit=crop') center/cover; position: relative; display: flex; align-items: flex-end; padding: 40px; }
         .login-banner::before { content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(to top, rgba(15, 23, 42, 0.9), rgba(15, 23, 42, 0.2)); }
@@ -36,7 +35,6 @@
         .custom-input { background: #f1f5f9; border: 1px solid #e2e8f0; padding: 15px; border-radius: 10px; transition: 0.3s; }
         .btn-login { background: var(--accent-blue); color: white; width: 100%; padding: 14px; border: none; border-radius: 10px; font-weight: 600; transition: 0.3s; }
         
-        /* Dashboard Sidebar */
         #dashboardScreen { display: none; }
         .sidebar { height: 100vh; background-color: var(--primary-dark); color: white; padding-top: 30px; position: fixed; width: 280px; z-index: 100; overflow-y: auto; }
         .sidebar-brand { text-align: center; margin-bottom: 30px; }
@@ -60,7 +58,6 @@
         .btn-pdf { background: #ef4444; color: white; border: none; padding: 8px 16px; border-radius: 8px; font-weight: 600; display: flex; align-items: center; gap: 8px; }
         .btn-add { background: var(--accent-blue); color: white; border: none; padding: 8px 16px; border-radius: 8px; font-weight: 600; }
         
-        /* FACE REGISTER & SCANNER */
         .register-wrapper { background: linear-gradient(135deg, #07192F, #0A2540); padding: 40px 20px; border-radius: 20px; display: flex; justify-content: center; align-items: center; }
         .scanner-box { background: white; padding: 30px; border-radius: 20px; width: 100%; max-width: 500px; text-align: center; }
         .reg-camera-container { position: relative; width: 100%; max-width: 320px; height: 320px; margin: 0 auto 20px; border-radius: 15px; overflow: hidden; border: 4px solid #E6B31E; background: #000; }
@@ -296,7 +293,7 @@
             document.getElementById('countAdmissions').innerText = count;
         }
 
-       // ==========================================
+        // ==========================================
         // FAST2SMS API AUTO MSG LOGIC (CORS BYPASS)
         // ==========================================
         function sendAutoMsg(parentPhone, studentName, time, mode) {
@@ -306,9 +303,6 @@
                 ? `Dear Parent, aapka baccha ${studentName} Sky Classes par ${time} baje pahunch gaya hai.`
                 : `Dear Parent, aapka baccha ${studentName} Sky Classes se ${time} baje nikal gaya hai.`;
 
-            console.log("Sending Msg: ", parentPhone, " -> ", msg);
-
-            // CORS bypass proxy URL
             const proxyUrl = "https://corsproxy.io/?https://www.fast2sms.com/dev/bulkV2";
 
             fetch(proxyUrl, {
@@ -326,17 +320,9 @@
                 })
             })
             .then(res => res.json())
-            .then(data => {
-                console.log("SMS API Response: ", data);
-                if(data.return) {
-                    console.log("Message Sent Successfully!");
-                } else {
-                    console.error("Fast2SMS Error: ", data.message);
-                }
-            })
+            .then(data => { if(data.return) console.log("Message Sent to " + parentPhone); else console.error("API Error: ", data.message); })
             .catch(err => console.error("Error Sending Msg:", err));
         }
-        // ==========================================
 
         function markManual(mode) {
             const rollNo = document.getElementById('manualRollNo').value.trim().toUpperCase();
@@ -347,6 +333,7 @@
             document.getElementById('manualRollNo').value = '';
         }
 
+        // --- FULLY SECURE PUSH ATTENDANCE DB FUNCTION ---
         function pushAttendanceToDB(name, rollNo, phone, mode) {
             const now = new Date();
             const timeStr = now.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' });
@@ -357,9 +344,21 @@
                 Time: timeStr, Timestamp: Date.now(), ScanType: mode
             });
 
-            // Trigger SMS logic using Parent's Number
-            const pPhone = allStudents[rollNo]?.ParentPhone || phone; 
-            sendAutoMsg(pPhone, name, timeStr, mode);
+            // Yahan check kar rahe hain taaki Face Scan ke waqt bhi Parent ka number dhoondh le
+            let targetPhone = "";
+            if (allStudents[rollNo]) {
+                targetPhone = allStudents[rollNo].ParentPhone || allStudents[rollNo].Phone;
+            } else {
+                for(let k in allStudents) {
+                    if(allStudents[k].Phone === phone || allStudents[k].Phone === rollNo) {
+                        targetPhone = allStudents[k].ParentPhone || allStudents[k].Phone;
+                        break;
+                    }
+                }
+            }
+            if(!targetPhone) targetPhone = phone; // ultimate fallback
+            
+            sendAutoMsg(targetPhone, name, timeStr, mode);
         }
 
         function filterAttendanceData() {
@@ -436,14 +435,22 @@
             });
         }
 
-        // --- FACE SCANNER ---
+        // --- FACE SCANNER WITH VOICE FIXES & SMS FIXES ---
         let liveFaceMatcher = null; let useFrontCamera = true; let isProcessingScan = false; let studentLiveHistory = {};
         function toggleScannerCamera() { useFrontCamera = !useFrontCamera; startLiveScannerMode(); }
 
         async function setupFaceMatcher() {
             const snapshot = await db.ref('Face_Data').once('value'); const data = snapshot.val(); if (!data) return;
             const descriptors = [];
-            for (const roll in data) { if (data[roll].FaceDescriptor) { descriptors.push(new faceapi.LabeledFaceDescriptors(data[roll].Name + "||" + roll + "||" + data[roll].Phone, [new Float32Array(Object.values(data[roll].FaceDescriptor))])); } }
+            for (const key in data) { 
+                if (data[key].FaceDescriptor) { 
+                    // Backwards compatibility for old records without RollNo field
+                    let roll = data[key].RollNo || key;
+                    let phone = data[key].Phone || "N/A";
+                    let name = data[key].Name || "Unknown";
+                    descriptors.push(new faceapi.LabeledFaceDescriptors(name + "||" + roll + "||" + phone, [new Float32Array(Object.values(data[key].FaceDescriptor))])); 
+                } 
+            }
             if(descriptors.length > 0) liveFaceMatcher = new faceapi.FaceMatcher(descriptors, 0.5);
         }
 
@@ -454,13 +461,16 @@
             const video = document.getElementById('liveVideo'); const canvas = document.getElementById('liveCanvas'); const status = document.getElementById('liveStatusText');
             stopAllCameras();
             navigator.mediaDevices.getUserMedia({ video: { facingMode: useFrontCamera ? "user" : "environment" } }).then(stream => { window.liveStream = stream; video.srcObject = stream; video.style.transform = useFrontCamera ? "scaleX(-1)" : "scaleX(1)"; canvas.style.transform = useFrontCamera ? "scaleX(-1)" : "scaleX(1)"; });
+            
             video.onplay = () => {
                 faceapi.matchDimensions(canvas, { width: video.clientWidth, height: video.clientHeight });
                 window.liveInterval = setInterval(async () => {
                     if (!liveFaceMatcher || isProcessingScan) return;
                     const detections = await faceapi.detectAllFaces(video, new faceapi.SsdMobilenetv1Options({minConfidence: 0.5})).withFaceLandmarks().withFaceDescriptors();
                     canvas.getContext('2d').clearRect(0, 0, canvas.width, canvas.height);
+                    
                     if(detections.length === 0) { status.innerHTML = "<i class='fa-solid fa-crosshairs fa-spin'></i> Scanning Area..."; status.style.color = "#fbbf24"; return; }
+                    
                     detections.forEach(det => {
                         const result = liveFaceMatcher.findBestMatch(det.descriptor);
                         if (result.label !== 'unknown') {
@@ -468,18 +478,41 @@
                             const eye1 = det.landmarks.getLeftEye(); const eye2 = det.landmarks.getRightEye();
                             const dist = (p1, p2) => Math.sqrt(Math.pow(p1.x - p2.x, 2) + Math.pow(p1.y - p2.y, 2));
                             const ear = ((dist(eye1[1], eye1[5]) + dist(eye1[2], eye1[4])) / (2.0 * dist(eye1[0], eye1[3])) + (dist(eye2[1], eye2[5]) + dist(eye2[2], eye2[4])) / (2.0 * dist(eye2[0], eye2[3]))) / 2;
-                            const now = Date.now(); let last = studentLiveHistory[rollNo] || { state: "OUT", Timestamp: 0 };
+                            
+                            const now = Date.now(); 
+                            let last = studentLiveHistory[rollNo] || { state: "OUT", Timestamp: 0 };
+                            
+                            // 5 Min Cooldown checks
                             if (last.state === "OUT" && last.Timestamp !== 0) { status.innerHTML = `✅ ${name}, Attendance Done!`; status.style.color = "#10b981"; return; }
                             if (now - last.Timestamp < 300000 && last.Timestamp !== 0) { status.innerHTML = `⏳ Wait 5 Mins for EXIT!`; status.style.color = "#f43f5e"; return; }
+                            
                             let nextMode = last.state === "IN" ? "OUT" : "IN";
+                            
                             if (ear < 0.28) {
-                                isProcessingScan = true; status.innerHTML = `<i class='fa-solid fa-fingerprint'></i> ${nextMode} Saved: ${name}`; status.style.color = nextMode==="IN"?"#10b981":"#f43f5e";
+                                isProcessingScan = true; 
+                                status.innerHTML = `<i class='fa-solid fa-fingerprint'></i> ${nextMode} Saved: ${name}`; 
+                                status.style.color = nextMode==="IN" ? "#10b981" : "#f43f5e";
+                                
                                 studentLiveHistory[rollNo] = { state: nextMode, Timestamp: now };
+                                
+                                // SMS & DB call
                                 pushAttendanceToDB(name, rollNo, phone, nextMode);
-                                if('speechSynthesis' in window) { const speech = new SpeechSynthesisUtterance(`${name}, ${nextMode} Successful`); speech.lang = 'en-IN'; window.speechSynthesis.speak(speech); }
+                                
+                                // HINDI VOICE LOGIC
+                                if('speechSynthesis' in window) { 
+                                    let speechText = nextMode === "IN" ? `Aapka swagat hai ${name}` : `Milte hai agle din ${name}`;
+                                    const speech = new SpeechSynthesisUtterance(speechText); 
+                                    speech.lang = 'hi-IN'; // Set language to Hindi
+                                    window.speechSynthesis.speak(speech); 
+                                }
+                                
                                 setTimeout(() => { isProcessingScan = false; }, 3500);
-                            } else { status.innerHTML = `${name} Recognized. Blink for ${nextMode}!`; status.style.color = "#38bdf8"; }
-                        } else { status.innerHTML = "UNKNOWN PERSON!"; status.style.color = "#f43f5e"; }
+                            } else { 
+                                status.innerHTML = `${name} Recognized. Blink for ${nextMode}!`; status.style.color = "#38bdf8"; 
+                            }
+                        } else { 
+                            status.innerHTML = "UNKNOWN PERSON!"; status.style.color = "#f43f5e"; 
+                        }
                     });
                 }, 250);
             };
