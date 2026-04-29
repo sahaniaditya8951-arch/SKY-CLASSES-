@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SKY ERP 2.0 | Director Sandesh Sir</title>
+    <title>SKY MEGA ERP 2.0 | Director Sandesh Sir</title>
     
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Outfit:wght@800&display=swap" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -16,107 +16,92 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.31/jspdf.plugin.autotable.min.js"></script>
 
     <style>
-        :root { --blue: #2563eb; --dark: #0f172a; --gold: #fbbf24; }
-        body { font-family: 'Poppins', sans-serif; background: #f8fafc; margin: 0; overflow: hidden; }
-        .sidebar { height: 100vh; background: var(--dark); color: white; width: 260px; position: fixed; z-index: 1000; transition: 0.3s; }
-        .sidebar a { padding: 15px 25px; color: #94a3b8; display: block; text-decoration: none; font-size: 14px; border-left: 4px solid transparent; cursor: pointer; }
-        .sidebar a:hover, .sidebar a.active { background: rgba(37, 99, 235, 0.1); color: white; border-left-color: var(--blue); }
-        .main-view { margin-left: 260px; padding: 30px; height: 100vh; overflow-y: auto; }
-        .glass-panel { background: white; border-radius: 20px; padding: 25px; box-shadow: 0 4px 20px rgba(0,0,0,0.05); border: 1px solid #e2e8f0; margin-bottom: 25px; }
-        .camera-box { position: relative; width: 100%; max-width: 400px; aspect-ratio: 3/4; border-radius: 20px; overflow: hidden; background: #000; margin: 0 auto; border: 4px solid #fff; box-shadow: 0 10px 30px rgba(0,0,0,0.2); }
-        video, canvas { position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; }
+        :root { --blue: #3b82f6; --dark: #0f172a; --gold: #f59e0b; }
+        body { font-family: 'Poppins', sans-serif; background: #f1f5f9; margin: 0; overflow: hidden; }
+        .sidebar { height: 100vh; background: var(--dark); color: white; width: 280px; position: fixed; overflow-y: auto; z-index: 1000; box-shadow: 5px 0 25px rgba(0,0,0,0.2); }
+        .sidebar a { padding: 12px 25px; color: #94a3b8; display: block; text-decoration: none; font-size: 13px; border-left: 4px solid transparent; cursor: pointer; transition: 0.3s; }
+        .sidebar a:hover, .sidebar a.active { background: rgba(59, 130, 246, 0.1); color: white; border-left-color: var(--blue); }
+        .sidebar h5 { letter-spacing: 2px; color: var(--gold); padding: 20px; font-weight: 800; border-bottom: 1px solid rgba(255,255,255,0.05); }
+
+        .main-view { margin-left: 280px; padding: 30px; height: 100vh; overflow-y: auto; }
+        .glass-panel { background: white; border-radius: 20px; padding: 25px; box-shadow: 0 10px 25px rgba(0,0,0,0.05); border: 1px solid #e2e8f0; margin-bottom: 25px; }
+
+        .camera-container { position: relative; width: 100%; max-width: 320px; height: 320px; margin: 0 auto 20px; border-radius: 15px; overflow: hidden; border: 4px solid var(--gold); background: #000; }
+        video, canvas { position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; transform: scaleX(-1); }
+
         .tab-content { display: none; }
-        .tab-content.active { display: block; animation: fadeIn 0.3s ease-in; }
+        .tab-content.active { display: block; animation: fadeIn 0.4s ease; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; } }
-        #loginOverlay { position: fixed; width:100%; height:100vh; background: var(--dark); z-index:10001; display:flex; align-items:center; justify-content:center; }
+
+        #loginOverlay { position: fixed; width:100%; height:100vh; background: linear-gradient(rgba(15,23,42,0.95), rgba(15,23,42,0.9)), url('https://images.unsplash.com/photo-1523240795612-9a054b0db644') center/cover; z-index:10001; display:flex; align-items:center; justify-content:center; }
     </style>
 </head>
 <body>
 
 <div id="loginOverlay">
-    <div class="text-center text-white p-5 rounded-4 shadow-lg" style="background:rgba(255,255,255,0.05); backdrop-filter:blur(10px); width: 350px; border: 1px solid rgba(255,255,255,0.1);">
-        <h1 class="fw-bold mb-4">SKY <span style="color:var(--blue)">ERP 2.0</span></h1>
-        <input type="password" id="pLock" class="form-control mb-3 text-center p-3 rounded-pill" placeholder="Admin PIN">
-        <button class="btn btn-primary w-100 p-3 rounded-pill fw-bold" onclick="unlock()">LOGIN</button>
+    <div class="text-center text-white" style="background:rgba(255,255,255,0.05); backdrop-filter:blur(20px); padding:50px; border-radius:30px; border:1px solid rgba(255,255,255,0.1);">
+        <h1 style="font-family:'Outfit'; font-size:3.5rem;">SKY <span style="color:var(--blue)">ERP</span></h1>
+        <p class="fw-bold text-uppercase mb-5">Director Sandesh Sir Login</p>
+        <input type="password" id="pLock" class="form-control mb-4 text-center p-3 rounded-pill" placeholder="Admin PIN">
+        <button class="btn btn-primary w-100 p-3 rounded-pill fw-bold" onclick="unlock()">ACCESS SYSTEM</button>
     </div>
 </div>
 
 <div id="app" style="display:none;">
     <div class="sidebar">
-        <div class="p-4 text-center"><h4 class="fw-bold text-white">SKY CLASSES</h4></div>
-        <a onclick="tab('dash')" id="m-dash" class="active"><i class="fa-solid fa-house me-2"></i> Dashboard</a>
+        <div class="p-4 text-center"><h5>SKY CLASSES</h5></div>
+        <a onclick="tab('dash')" id="m-dash" class="active"><i class="fa-solid fa-gauge me-2"></i> Dashboard</a>
+        <a onclick="tab('enroll')" id="m-enroll"><i class="fa-solid fa-camera me-2"></i> Enroll Face ID</a>
+        <a onclick="tab('admit')" id="m-admit"><i class="fa-solid fa-user-plus me-2"></i> Admissions</a>
         <a onclick="tab('gate')" id="m-gate"><i class="fa-solid fa-face-viewfinder me-2"></i> AI Smart Gate</a>
-        <a onclick="tab('admit')" id="m-admit"><i class="fa-solid fa-user-plus me-2"></i> Student Admissions</a>
-        <a onclick="tab('logs')" id="m-logs"><i class="fa-solid fa-list-check me-2"></i> Attendance Logs</a>
+        <a onclick="tab('logs')" id="m-logs"><i class="fa-solid fa-history me-2"></i> Daily Logs</a>
+        <hr class="opacity-25 mx-3">
         <a onclick="location.reload()" class="text-danger mt-5"><i class="fa-solid fa-power-off me-2"></i> Logout</a>
     </div>
 
     <div class="main-view">
-        <div id="tab-dash" class="tab-content active">
-            <div class="glass-panel">
-                <h3>Welcome, Sandesh Sir</h3>
-                <p class="text-muted">ERP 2.0 is active with Face Scan & Auto-Roll No.</p>
-            </div>
-        </div>
-
-        <div id="tab-gate" class="tab-content">
+        <div id="tab-dash" class="tab-content active"><div class="glass-panel"><h3>Welcome Sandesh Sir</h3><p>System Online. Total Students: <span id="dashSt">0</span></p></div></div>
+        
+        <div id="tab-enroll" class="tab-content">
             <div class="glass-panel text-center">
-                <h4 class="mb-3">AI Face Scanner 2.0</h4>
-                <div class="camera-box mb-3">
-                    <video id="vGate" autoplay muted playsinline></video>
-                    <canvas id="cGate"></canvas>
+                <h4>Face Registration Center</h4>
+                <div class="camera-container"><video id="vE" autoplay muted playsinline></video><canvas id="cE"></canvas></div>
+                <p id="eStatus" class="fw-bold text-danger">Waiting for Face Lock...</p>
+                <div class="mx-auto" style="max-width: 400px;">
+                    <input type="text" id="eName" class="form-control mb-2" placeholder="Full Name">
+                    <input type="tel" id="ePhone" class="form-control mb-3" placeholder="Phone Number">
+                    <button class="btn btn-primary w-100 p-3 fw-bold" id="eBtn" onclick="saveFaceID()" disabled>Capture & Register</button>
                 </div>
-                <h5 id="gateStatus" class="fw-bold text-primary">Initializing Camera...</h5>
-                <p class="small text-muted">Blink to send log to Firebase</p>
             </div>
         </div>
 
         <div id="tab-admit" class="tab-content">
             <div class="glass-panel">
                 <div class="d-flex justify-content-between mb-4">
-                    <h4 class="m-0">Student Registry</h4>
-                    <button class="btn btn-primary rounded-pill px-4" data-bs-toggle="modal" data-bs-target="#addModal">Add Student</button>
+                    <h4>Student Directory</h4>
+                    <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#adModal">+ Add Student</button>
                 </div>
-                <div class="table-responsive">
-                    <table class="table table-hover">
-                        <thead class="table-light"><tr><th>Roll No</th><th>Name</th><th>Phone</th><th>Class</th><th>Action</th></tr></thead>
-                        <tbody id="stuBody"></tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
-
-        <div id="tab-logs" class="tab-content">
-            <div class="glass-panel">
-                <div class="d-flex justify-content-between mb-4">
-                    <h4>Daily Logs</h4>
-                    <button class="btn btn-danger btn-sm" onclick="downloadPDF()"><i class="fa-solid fa-file-pdf me-1"></i> Download PDF</button>
-                </div>
-                <table class="table" id="logTable">
-                    <thead class="table-dark"><tr><th>Roll No</th><th>Name</th><th>Entry (IN)</th><th>Exit (OUT)</th></tr></thead>
-                    <tbody id="logBody"></tbody>
+                <table class="table">
+                    <thead><tr><th>Roll</th><th>Name</th><th>Phone</th><th>Action</th></tr></thead>
+                    <tbody id="adTable"></tbody>
                 </table>
             </div>
         </div>
-    </div>
-</div>
 
-<div class="modal fade" id="addModal" tabindex="-1">
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content border-0 shadow-lg">
-            <div class="modal-body p-4 text-center">
-                <h5 class="fw-bold mb-4">New Student Admission</h5>
-                <input type="text" id="sName" class="form-control mb-3" placeholder="Student Name">
-                <input type="text" id="sClass" class="form-control mb-3" placeholder="Class/Course">
-                <input type="tel" id="sPhone" class="form-control mb-4" placeholder="Phone Number">
-                <button class="btn btn-primary w-100 p-3 fw-bold rounded-pill" onclick="saveStudent()">GENERATE ROLL NO & SAVE</button>
+        <div id="tab-gate" class="tab-content text-center"><div class="glass-panel"><h4>AI Gate Scanner</h4><div class="camera-container"><video id="vG" autoplay muted playsinline></video><canvas id="cG"></canvas></div><h5 id="gStatus" class="mt-3 text-primary fw-bold">Ready...</h5></div></div>
+
+        <div id="tab-logs" class="tab-content">
+            <div class="glass-panel">
+                <div class="d-flex justify-content-between mb-4"><h4>Attendance Logs</h4><div class="d-flex gap-2"><input type="date" id="lDate" class="form-control" onchange="loadLogs()"><button class="btn btn-danger" onclick="downloadLogs()">Export PDF</button></div></div>
+                <table class="table" id="logMainTable"><thead><tr><th>Roll</th><th>Name</th><th>IN</th><th>OUT</th></tr></thead><tbody id="lBody"></tbody></table>
             </div>
         </div>
     </div>
 </div>
 
+<div class="modal fade" id="adModal" tabindex="-1"><div class="modal-dialog modal-dialog-centered"><div class="modal-content p-4"><h5 class="fw-bold mb-3">Admission Entry</h5><input type="text" id="aN" class="form-control mb-2" placeholder="Name"><input type="text" id="aC" class="form-control mb-2" placeholder="Class"><input type="tel" id="aP" class="form-control mb-3" placeholder="Phone"><button class="btn btn-primary w-100" onclick="saveAd()">Finalize Admission</button></div></div></div>
+
 <script>
-// Firebase Config
 const firebaseConfig = {
     apiKey: "AIzaSyC6bcqETEnTjLEQnISXjnWR2brPrVOAm-Y",
     authDomain: "sky-classes-db-d6140.firebaseapp.com",
@@ -126,112 +111,98 @@ const firebaseConfig = {
 };
 firebase.initializeApp(firebaseConfig);
 const db = firebase.database();
-
 const MODEL_URL = 'https://cdn.jsdelivr.net/npm/@vladmandic/face-api/model/';
-let faceMatcher = null, isProcessing = false;
+
+let sts = {}; let ats = []; let matcher = null; let proc = false;
 
 function unlock() {
     if(document.getElementById('pLock').value === "SkyAdmin123") {
         document.getElementById('loginOverlay').style.display='none';
         document.getElementById('app').style.display='block';
-        initSystem();
-    } else alert("Wrong PIN!");
+        initERP();
+    } else alert("Wrong!");
 }
 
-async function initSystem() {
-    await Promise.all([
-        faceapi.nets.ssdMobilenetv1.loadFromUri(MODEL_URL),
-        faceapi.nets.faceLandmark68Net.loadFromUri(MODEL_URL),
-        faceapi.nets.faceRecognitionNet.loadFromUri(MODEL_URL)
-    ]);
-    syncData();
+async function initERP() {
+    await Promise.all([faceapi.nets.tinyFaceDetector.loadFromUri(MODEL_URL), faceapi.nets.faceLandmark68Net.loadFromUri(MODEL_URL), faceapi.nets.faceRecognitionNet.loadFromUri(MODEL_URL), faceapi.nets.ssdMobilenetv1.loadFromUri(MODEL_URL)]);
+    db.ref('Student_Admissions').on('value', s => { sts = s.val() || {}; renderUI(); });
+    db.ref('Daily_Attendance').on('value', s => { ats = Object.values(s.val() || {}); loadLogs(); });
 }
 
 function tab(id) {
     document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
     document.querySelectorAll('.sidebar a').forEach(a => a.classList.remove('active'));
     document.getElementById('tab-'+id).classList.add('active');
-    document.getElementById('m-'+id).classList.add('active');
-    if(id === 'gate') startGateCam(); else stopCam();
+    document.getElementById('m-'+id)?.classList.add('active');
+    stopCams();
+    if(id === 'enroll') startCam('vE', 'cE', false);
+    if(id === 'gate') startCam('vG', 'cG', true);
 }
 
-// --- Admission & Auto Roll No Fix ---
-async function saveStudent() {
-    const name = document.getElementById('sName').value;
-    const cls = document.getElementById('sClass').value;
-    const phone = document.getElementById('sPhone').value;
+function stopCams() { if(window.st) window.st.getTracks().forEach(t => t.stop()); clearInterval(window.intv); }
 
-    if(!name || !phone) return alert("Fill all details!");
-
-    // Auto Roll Number Logic
-    const snap = await db.ref('Student_Admissions').limitToLast(1).once('value');
-    let lastNum = 1000;
-    if(snap.exists()) {
-        const lastData = Object.values(snap.val())[0];
-        lastNum = parseInt(lastData.RollNo.split('-')[1]);
-    }
-    const newRoll = "SKY-" + (lastNum + 1);
-
-    db.ref('Student_Admissions/' + newRoll).set({
-        RollNo: newRoll, Name: name, Class: cls, Phone: phone, DateAdded: new Date().toLocaleDateString()
-    }).then(() => {
-        alert("Admission Success! Roll No: " + newRoll);
-        location.reload();
-    });
-}
-
-function syncData() {
-    // Sync Student List
-    db.ref('Student_Admissions').on('value', snap => {
-        const b = document.getElementById('stuBody'); b.innerHTML = '';
-        if(!snap.exists()) return;
-        const students = Object.values(snap.val());
-        students.forEach(s => {
-            b.innerHTML += `<tr><td class='fw-bold text-primary'>${s.RollNo}</td><td>${s.Name}</td><td>${s.Phone}</td><td>${s.Class}</td><td><button class='btn btn-sm btn-danger' onclick="deleteStu('${s.RollNo}')">X</button></td></tr>`;
-        });
-        
-        // Prepare Face Matcher (using RollNo as label)
-        // Note: For actual scan, FaceDescriptor must be saved in Face_Data node
-    });
-
-    // Sync Attendance Logs
-    db.ref('Daily_Attendance').on('value', snap => {
-        const b = document.getElementById('logBody'); b.innerHTML = '';
-        const today = new Date().toLocaleDateString('en-IN');
-        const logs = {};
-        if(!snap.exists()) return;
-        Object.values(snap.val()).forEach(r => {
-            if(r.Date === today) {
-                if(!logs[r.RollNo]) logs[r.RollNo] = {n:r.Name, i:'--', o:'--'};
-                if(r.ScanType === 'IN') logs[r.RollNo].i = r.Time; else logs[r.RollNo].o = r.Time;
-            }
-        });
-        for(let r in logs) b.innerHTML += `<tr><td>${r}</td><td>${logs[r].n}</td><td class='text-success'>${logs[r].i}</td><td class='text-danger'>${logs[r].o}</td></tr>`;
-    });
-}
-
-function startGateCam() {
-    const v = document.getElementById('vGate'), c = document.getElementById('cGate');
-    navigator.mediaDevices.getUserMedia({ video: true }).then(s => { window.gStr = s; v.srcObject = s; });
+async function startCam(vId, cId, isGate) {
+    const v = document.getElementById(vId); const c = document.getElementById(cId);
+    navigator.mediaDevices.getUserMedia({video:true}).then(s => { window.st=s; v.srcObject=s; });
     v.onplay = () => {
         faceapi.matchDimensions(c, v);
-        window.gInt = setInterval(async () => {
-            const det = await faceapi.detectAllFaces(v).withFaceLandmarks().withFaceDescriptors();
-            if(det.length > 0 && !isProcessing) {
-                // Here: findBestMatch logic goes...
-                // Mocking logic for demo (Send to Daily_Attendance)
-                document.getElementById('gateStatus').innerText = "Face Detected!";
+        window.intv = setInterval(async () => {
+            const det = await faceapi.detectSingleFace(v, new faceapi.TinyFaceDetectorOptions()).withFaceLandmarks();
+            c.getContext('2d').clearRect(0,0,c.width,c.height);
+            if(det) {
+                if(!isGate) { document.getElementById('eBtn').disabled = false; document.getElementById('eStatus').innerText="Face Locked!"; }
+                faceapi.draw.drawDetections(c, faceapi.resizeResults(det, v));
             }
-        }, 500);
+        }, 200);
     };
 }
 
-function stopCam() { 
-    if(window.gStr) window.gStr.getTracks().forEach(t => t.stop()); 
-    clearInterval(window.gInt); 
+async function saveAd() {
+    const n = document.getElementById('aN').value, c = document.getElementById('aC').value, p = document.getElementById('aP').value;
+    const snap = await db.ref('Student_Admissions').limitToLast(1).once('value');
+    let last = 1000; if(snap.exists()) last = parseInt(Object.values(snap.val())[0].RollNo.split('-')[1]);
+    const roll = "SKY-"+(last+1);
+    await db.ref('Student_Admissions/'+roll).set({ RollNo:roll, Name:n, Class:c, Phone:p, Date:new Date().toLocaleDateString('en-IN') });
+    alert("Saved: "+roll); bootstrap.Modal.getInstance(document.getElementById('adModal')).hide();
 }
 
-function deleteStu(id) { if(confirm("Delete Student?")) db.ref('Student_Admissions/'+id).remove(); }
+function renderUI() {
+    const b = document.getElementById('adTable'); b.innerHTML = '';
+    Object.values(sts).forEach(s => {
+        b.innerHTML += `<tr><td>${s.RollNo}</td><td>${s.Name}</td><td>${s.Phone}</td><td><button class='btn btn-sm btn-danger' onclick="db.ref('Student_Admissions/${s.RollNo}').remove()">X</button></td></tr>`;
+    });
+    document.getElementById('dashSt').innerText = Object.keys(sts).length;
+}
+
+async function saveFaceID() {
+    const p = document.getElementById('ePhone').value, n = document.getElementById('eName').value;
+    const det = await faceapi.detectSingleFace(document.getElementById('vE'), new faceapi.TinyFaceDetectorOptions()).withFaceDescriptor();
+    if(det) {
+        await db.ref('Face_Data/'+p).set({ Name:n, Descriptor: Array.from(det.descriptor) });
+        alert("Face Registered!");
+    }
+}
+
+function loadLogs() {
+    const d = new Date(document.getElementById('lDate').value || new Date()).toLocaleDateString('en-IN');
+    const b = document.getElementById('lBody'); b.innerHTML = '';
+    const logs = {};
+    ats.forEach(r => {
+        if(r.Date === d) {
+            if(!logs[r.Phone]) logs[r.Phone] = {n:r.Name, i:'--', o:'--'};
+            if(r.ScanType === 'IN') logs[r.Phone].i = r.Time; else logs[r.Phone].o = r.Time;
+        }
+    });
+    for(let k in logs) b.innerHTML += `<tr><td>${k}</td><td>${logs[k].n}</td><td>${logs[k].i}</td><td>${logs[k].o}</td></tr>`;
+}
+
+function downloadLogs() {
+    const { jsPDF } = window.jspdf; const doc = new jsPDF();
+    doc.text("SKY CLASSES DAILY ATTENDANCE", 105, 20, {align:'center'});
+    doc.autoTable({ html: '#logMainTable', startY: 30 });
+    doc.save("Attendance.pdf");
+}
 </script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
