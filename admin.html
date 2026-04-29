@@ -9,8 +9,11 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
+    <script src="https://www.gstatic.com/firebasejs/10.11.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.11.0/firebase-database-compat.js"></script>
+
     <style>
-        :root { --blue: #3b82f6; --dark: #0f172a; --gold: #f59e0b; }
+        :root { --blue: #3b82f6; --dark: #0f172a; --gold: #f59e0b; --accent-red: #D90429; }
         body { font-family: 'Poppins', sans-serif; background: #f1f5f9; margin: 0; overflow: hidden; }
         
         /* Sidebar Styling */
@@ -23,13 +26,21 @@
         .main-view { margin-left: 280px; padding: 30px; height: 100vh; overflow-y: auto; }
         .glass-panel { background: white; border-radius: 20px; padding: 25px; box-shadow: 0 10px 25px rgba(0,0,0,0.05); border: 1px solid #e2e8f0; margin-bottom: 25px; }
 
+        /* Stats Cards */
+        .stat-card { background: white; padding: 20px; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.04); text-align: center; border-bottom: 5px solid var(--blue); margin-bottom: 20px;}
+
+        /* Buttons */
+        .btn-excel { background: #28a745; color: white; border: none; padding: 8px 18px; border-radius: 8px; font-weight: 600; transition: 0.3s; }
+        .btn-excel:hover { opacity: 0.8; }
+        .date-picker { border: 2px solid #e2e8f0; border-radius: 8px; padding: 6px 12px; outline: none; font-weight: 500; }
+
         /* Page Transitions */
         .tab-content { display: none; }
         .tab-content.active { display: block; animation: fadeIn 0.4s ease; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; } }
 
         /* Premium Login Overlay */
-        #loginOverlay { position: fixed; width:100%; height:100vh; background: linear-gradient(rgba(15,23,42,0.9), rgba(15,23,42,0.8)), url('https://images.unsplash.com/photo-1523240795612-9a054b0db644') center/cover; z-index:10001; display:flex; align-items:center; justify-content:center; }
+        #loginOverlay { position: fixed; width:100%; height:100vh; z-index:10001; display:flex; align-items:center; justify-content:center; background: linear-gradient(rgba(15,23,42,0.95), rgba(15,23,42,0.9)), url('https://images.unsplash.com/photo-1523240795612-9a054b0db644') center/cover; }
         .login-card { background: rgba(255,255,255,0.05); backdrop-filter: blur(20px); padding: 50px; border-radius: 30px; text-align: center; color: white; width: 450px; border: 1px solid rgba(255,255,255,0.1); }
     </style>
 </head>
@@ -49,60 +60,202 @@
         <div class="p-4 text-center"><h5>SKY CLASSES</h5></div>
         <a onclick="tab('dash')" id="m-dash" class="active"><i class="fa-solid fa-gauge me-2"></i> Dashboard</a>
         <a onclick="tab('admit')" id="m-admit"><i class="fa-solid fa-user-plus me-2"></i> Admissions</a>
+        <a onclick="tab('logs')" id="m-logs"><i class="fa-solid fa-clock-rotate-left me-2"></i> Attendance Logs</a>
         <a onclick="tab('gate')" id="m-gate"><i class="fa-solid fa-face-viewfinder me-2"></i> AI Gate</a>
-        <a onclick="tab('manual')" id="m-manual"><i class="fa-solid fa-keyboard me-2"></i> Manual Attend.</a>
         <a onclick="tab('fees')" id="m-fees"><i class="fa-solid fa-indian-rupee-sign me-2"></i> Fees Manager</a>
         <a onclick="tab('staff')" id="m-staff"><i class="fa-solid fa-users me-2"></i> Staff/Faculty</a>
-        <a onclick="tab('logs')" id="m-logs"><i class="fa-solid fa-history me-2"></i> Logs</a>
         <a onclick="tab('enroll')" id="m-enroll"><i class="fa-solid fa-camera me-2"></i> Face Enroll</a>
         <hr class="opacity-25 mx-3">
-        <a onclick="tab('syllabus')"><i class="fa-solid fa-book me-2"></i> Syllabus</a>
-        <a onclick="tab('idcard')"><i class="fa-solid fa-address-card me-2"></i> ID Card Gen</a>
         <a onclick="location.reload()" class="text-danger mt-5"><i class="fa-solid fa-power-off me-2"></i> Logout</a>
     </div>
 
     <div class="main-view">
-        <div id="tab-dash" class="tab-content active"><div class="glass-panel"><h3>Welcome Sandesh Sir</h3><p>Dashboard UI is ready.</p></div></div>
         
-        <div id="tab-admit" class="tab-content"><div class="glass-panel"><h4>Admissions</h4><p>Student Directory UI.</p></div></div>
+        <div id="tab-dash" class="tab-content active">
+            <div class="row g-4 mb-4">
+                <div class="col-md-6">
+                    <div class="stat-card">
+                        <h2 id="countAdmissions">0</h2>
+                        <p class="text-muted fw-bold mb-0">Total Admissions</p>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="stat-card" style="border-color: #28a745;">
+                        <h2 id="countAttendance">0</h2>
+                        <p class="text-muted fw-bold mb-0" id="attendanceCardLabel">Students Present Today</p>
+                    </div>
+                </div>
+            </div>
+            <div class="glass-panel"><h3>Welcome Sandesh Sir</h3><p>Coaching summary is ready.</p></div>
+        </div>
+        
+        <div id="tab-admit" class="tab-content">
+            <div class="glass-panel">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <h5 class="fw-bold m-0 text-primary"><i class="fa-solid fa-users me-2"></i> Admission Data</h5>
+                    <button class="btn-excel" onclick="downloadCSV('admissions')"><i class="fa-solid fa-download me-2"></i> Excel</button>
+                </div>
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle">
+                        <thead class="table-light">
+                            <tr><th>Date</th><th>Name</th><th>Phone</th><th>Course</th></tr>
+                        </thead>
+                        <tbody id="admissionsBody"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div id="tab-logs" class="tab-content">
+            <div class="glass-panel">
+                <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-3">
+                    <h5 class="fw-bold m-0 text-success"><i class="fa-solid fa-clock-rotate-left me-2"></i> Daily Entry/Exit Log</h5>
+                    <div class="d-flex gap-2 align-items-center">
+                        <input type="date" id="dateFilter" class="date-picker" onchange="filterAttendanceData()">
+                        <button class="btn-excel" style="background: #17a2b8;" onclick="downloadCSV('attendance')">
+                            <i class="fa-solid fa-file-csv me-2"></i> Download Excel
+                        </button>
+                    </div>
+                </div>
+                <div class="table-responsive">
+                    <table class="table table-hover text-center align-middle">
+                        <thead class="table-dark">
+                            <tr>
+                                <th>S.No</th>
+                                <th class="text-start">Student Name</th>
+                                <th>Phone</th>
+                                <th class="text-success">ENTRY (IN)</th>
+                                <th class="text-danger">EXIT (OUT)</th>
+                                <th>Current Status</th>
+                            </tr>
+                        </thead>
+                        <tbody id="attendanceBody"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
 
         <div id="tab-gate" class="tab-content text-center"><div class="glass-panel"><h4>AI Gate Scanner</h4><div style="height:300px; background:#000; border-radius:20px;"></div></div></div>
-
-        <div id="tab-manual" class="tab-content"><div class="glass-panel"><h4>Attendance Override</h4><p>Manual Mark UI.</p></div></div>
-
         <div id="tab-fees" class="tab-content"><div class="glass-panel"><h4>Fees Manager</h4></div></div>
         <div id="tab-staff" class="tab-content"><div class="glass-panel"><h4>Staff & Faculty</h4></div></div>
-        <div id="tab-logs" class="tab-content"><div class="glass-panel"><h4>Attendance Logs</h4></div></div>
-        <div id="tab-enroll" class="tab-content text-center"><div class="glass-panel"><h4>Face Enrollment UI</h4></div></div>
-        <div id="tab-syllabus" class="tab-content"><div class="glass-panel"><h4>Syllabus</h4></div></div>
-        <div id="tab-idcard" class="tab-content"><div class="glass-panel"><h4>ID Card Generator</h4></div></div>
+        <div id="tab-enroll" class="tab-content text-center"><div class="glass-panel"><h4>Face Enrollment</h4></div></div>
     </div>
 </div>
 
 <script>
-// --- UI Control Logic ---
+// --- Firebase Config ---
+const firebaseConfig = {
+    apiKey: "AIzaSyC6bcqETEnTjLEQnISXjnWR2brPrVOAm-Y",
+    authDomain: "sky-classes-db-d6140.firebaseapp.com",
+    databaseURL: "https://sky-classes-db-d6140-default-rtdb.firebaseio.com",
+    projectId: "sky-classes-db-d6140",
+    storageBucket: "sky-classes-db-d6140.firebasestorage.app"
+};
+firebase.initializeApp(firebaseConfig);
+const db = firebase.database();
 
+let admissionsList = [];
+let allAttendanceList = []; 
+let currentSmartAttendanceList = [];
+
+// --- Auth ---
 function unlock() {
-    // Basic password for UI access
     if(document.getElementById('pLock').value === "SkyAdmin123") {
         document.getElementById('loginOverlay').style.display='none';
         document.getElementById('app').style.display='block';
-    } else {
-        alert("Wrong PIN!");
-    }
+        setDefaultDate();
+        startRealtimeData();
+    } else alert("Wrong PIN!");
 }
 
 function tab(id) {
-    // Clear active states
     document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
     document.querySelectorAll('.sidebar a').forEach(a => a.classList.remove('active'));
-    
-    // Set active tab
     const target = document.getElementById('tab-'+id);
     if(target) {
         target.classList.add('active');
         document.getElementById('m-'+id).classList.add('active');
     }
+}
+
+// --- Logic ---
+function setDefaultDate() {
+    const today = new Date();
+    document.getElementById('dateFilter').value = today.toISOString().split('T')[0];
+}
+
+function formatInputDate(dateStr) {
+    if(!dateStr) return "";
+    const parts = dateStr.split('-');
+    return `${parts[2]}/${parts[1]}/${parts[0]}`; 
+}
+
+function startRealtimeData() {
+    db.ref('Student_Admissions').on('value', snap => {
+        const body = document.getElementById('admissionsBody');
+        body.innerHTML = ''; admissionsList = [];
+        if(snap.val()) {
+            Object.values(snap.val()).reverse().forEach(st => {
+                admissionsList.push(st);
+                body.innerHTML += `<tr><td>${st.Date}</td><td class="fw-bold">${st.Name}</td><td>${st.Phone}</td><td><span class="badge bg-light text-dark border">${st.Course}</span></td></tr>`;
+            });
+        }
+        document.getElementById('countAdmissions').innerText = admissionsList.length;
+    });
+
+    db.ref('Daily_Attendance').on('value', snap => {
+        allAttendanceList = snap.val() ? Object.values(snap.val()) : [];
+        filterAttendanceData(); 
+    });
+}
+
+function filterAttendanceData() {
+    const selectedDateVal = document.getElementById('dateFilter').value;
+    const targetFormat1 = formatInputDate(selectedDateVal);
+    const parts = selectedDateVal.split('-');
+    const targetFormat2 = `${parseInt(parts[2])}/${parseInt(parts[1])}/${parts[0]}`; 
+
+    let studentRecords = {};
+    allAttendanceList.forEach(record => {
+        if(record.Date === targetFormat1 || record.Date === targetFormat2) {
+            let phone = record.Phone;
+            if (!studentRecords[phone]) {
+                studentRecords[phone] = { date: record.Date, name: record.Name, phone: phone, entryTime: "--", exitTime: "--" };
+            }
+            if (record.ScanType === "IN" || !record.ScanType) {
+                if(studentRecords[phone].entryTime === "--") studentRecords[phone].entryTime = record.Time;
+            } else if (record.ScanType === "OUT") {
+                studentRecords[phone].exitTime = record.Time;
+            }
+        }
+    });
+
+    const body = document.getElementById('attendanceBody');
+    body.innerHTML = '';
+    currentSmartAttendanceList = Object.values(studentRecords);
+    
+    currentSmartAttendanceList.forEach((student, index) => {
+        let statusBadge = student.exitTime !== "--" ? '<span class="badge bg-success">Left Class</span>' : '<span class="badge bg-warning text-dark">Inside</span>';
+        body.innerHTML += `<tr><td>${index+1}</td><td class="text-start fw-bold">${student.name}</td><td>${student.phone}</td><td class="text-success fw-bold">${student.entryTime}</td><td class="text-danger fw-bold">${student.exitTime}</td><td>${statusBadge}</td></tr>`;
+    });
+
+    document.getElementById('countAttendance').innerText = currentSmartAttendanceList.length;
+}
+
+function downloadCSV(type) {
+    let csv = "";
+    if(type === 'admissions') {
+        csv = "Date,Name,Phone,Course\n";
+        admissionsList.forEach(r => csv += `"${r.Date}","${r.Name}","${r.Phone}","${r.Course}"\n`);
+    } else {
+        csv = "Date,Name,Phone,Entry,Exit\n";
+        currentSmartAttendanceList.forEach(r => csv += `"${r.date}","${r.name}","${r.phone}","${r.entryTime}","${r.exitTime}"\n`);
+    }
+    const blob = new Blob([csv], { type: 'text/csv' });
+    const link = document.createElement("a");
+    link.href = URL.createObjectURL(blob);
+    link.download = `Sky_${type}.csv`;
+    link.click();
 }
 </script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
