@@ -11,9 +11,7 @@
     
     <script src="https://www.gstatic.com/firebasejs/10.11.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.11.0/firebase-database-compat.js"></script>
-    
     <script src="https://cdn.jsdelivr.net/npm/@vladmandic/face-api/dist/face-api.js"></script>
-
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.31/jspdf.plugin.autotable.min.js"></script>
 
@@ -62,13 +60,12 @@
         .btn-pdf { background: #ef4444; color: white; border: none; padding: 8px 16px; border-radius: 8px; font-weight: 600; display: flex; align-items: center; gap: 8px; }
         .btn-add { background: var(--accent-blue); color: white; border: none; padding: 8px 16px; border-radius: 8px; font-weight: 600; }
         
-        /* FACE REGISTER CSS (From User) */
+        /* FACE REGISTER & SCANNER */
         .register-wrapper { background: linear-gradient(135deg, #07192F, #0A2540); padding: 40px 20px; border-radius: 20px; display: flex; justify-content: center; align-items: center; }
         .scanner-box { background: white; padding: 30px; border-radius: 20px; width: 100%; max-width: 500px; text-align: center; }
         .reg-camera-container { position: relative; width: 100%; max-width: 320px; height: 320px; margin: 0 auto 20px; border-radius: 15px; overflow: hidden; border: 4px solid #E6B31E; background: #000; }
         #regVideo, #regCanvas { position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; transform: scaleX(-1); }
 
-        /* FACE SCANNER CSS (From User) */
         .live-wrapper { font-family: 'Outfit', sans-serif; background: radial-gradient(circle at 50% 0%, #1e293b, #020617 80%, #000); padding: 40px 20px; border-radius: 20px; min-height: 70vh; display: flex; flex-direction: column; align-items: center; justify-content: center; position: relative; overflow: hidden; }
         .live-badge { background: rgba(217, 4, 41, 0.15); color: #ff3366; padding: 6px 18px; border-radius: 50px; border: 1px solid rgba(255, 51, 102, 0.3); font-size: 12px; font-weight: 700; margin-bottom: 20px;}
         .scan-container { position: relative; width: 85vw; max-width: 400px; aspect-ratio: 3/4; border-radius: 24px; overflow: hidden; background: #000; box-shadow: 0 20px 50px rgba(0,0,0,0.5), 0 0 0 2px rgba(251, 191, 36, 0.2); }
@@ -95,7 +92,7 @@
         
         <div class="sidebar">
             <div class="sidebar-brand"><h4><span>SKY</span> CLASSES</h4></div>
-            <a onclick="showSection('admissions')" id="link-admissions" class="active"><i class="fa-solid fa-users"></i> Admissions (Roll No)</a>
+            <a onclick="showSection('admissions')" id="link-admissions" class="active"><i class="fa-solid fa-users"></i> Admissions</a>
             <a onclick="showSection('face-register')" id="link-face-register"><i class="fa-solid fa-face-viewfinder"></i> Register AI Face</a>
             <a onclick="showSection('face-scanner')" id="link-face-scanner"><i class="fa-solid fa-expand"></i> Live Auto Gate</a>
             <a onclick="showSection('manual-entry')" id="link-manual-entry"><i class="fa-solid fa-pen-to-square"></i> Manual Auth</a>
@@ -116,7 +113,7 @@
                     <button class="btn-add" data-bs-toggle="modal" data-bs-target="#addStudentModal"><i class="fa-solid fa-plus"></i> Add New Student</button>
                 </div>
                 <table class="table align-middle" id="admissionsTable">
-                    <thead class="table-light"><tr><th>Roll No</th><th>Student Name</th><th>Phone</th><th>Course</th><th>Action</th></tr></thead>
+                    <thead class="table-light"><tr><th>Roll No</th><th>Student Name</th><th>Contacts</th><th>Course</th><th>Action</th></tr></thead>
                     <tbody id="admissionsBody"></tbody>
                 </table>
             </div>
@@ -154,27 +151,15 @@
                 <div class="register-wrapper">
                     <div class="scanner-box">
                         <h4 class="fw-bold mb-4" style="color: #0A2540;">Face Lock Registration</h4>
-                        
                         <div class="input-group mb-3">
                             <input type="text" id="searchRollReg" class="form-control fw-bold" placeholder="Enter Roll No (SKY-XXXX)">
                             <button class="btn btn-primary fw-bold" onclick="fetchStudentForReg()">Search</button>
                         </div>
-                        
                         <p id="regStudentDetails" class="text-success fw-bold"></p>
-
-                        <div class="reg-camera-container">
-                            <video id="regVideo" autoplay muted playsinline></video>
-                            <canvas id="regCanvas"></canvas>
-                        </div>
+                        <div class="reg-camera-container"><video id="regVideo" autoplay muted playsinline></video><canvas id="regCanvas"></canvas></div>
                         <p id="regStatusText" class="fw-bold text-danger"><i class="fa-solid fa-camera"></i> Searching for Face...</p>
-                        
-                        <input type="hidden" id="regHiddenRoll">
-                        <input type="hidden" id="regHiddenName">
-                        <input type="hidden" id="regHiddenPhone">
-
-                        <button class="btn btn-dark w-100 p-3 fw-bold" id="registerBtn" onclick="registerFace()" disabled>
-                            <i class="fa-solid fa-lock"></i> Lock Face & Save
-                        </button>
+                        <input type="hidden" id="regHiddenRoll"><input type="hidden" id="regHiddenName"><input type="hidden" id="regHiddenPhone">
+                        <button class="btn btn-dark w-100 p-3 fw-bold" id="registerBtn" onclick="registerFace()" disabled><i class="fa-solid fa-lock"></i> Lock Face & Save</button>
                     </div>
                 </div>
             </div>
@@ -182,15 +167,8 @@
             <div id="section-face-scanner" class="table-container p-0 border-0">
                 <div class="live-wrapper">
                     <div class="live-badge"><div class="live-dot" style="width:8px; height:8px; background:#ff3366; border-radius:50%; display:inline-block; margin-right:5px; animation: pulse 1.5s infinite;"></div> AUTO SMART GATE</div>
-                    
                     <button class="btn btn-outline-light mb-3 rounded-pill px-4" onclick="toggleScannerCamera()"><i class="fa-solid fa-camera-rotate"></i> Flip Camera</button>
-
-                    <div class="scan-container">
-                        <video id="liveVideo" autoplay muted playsinline></video>
-                        <canvas id="liveCanvas"></canvas>
-                        <div class="scan-line"></div>
-                    </div>
-
+                    <div class="scan-container"><video id="liveVideo" autoplay muted playsinline></video><canvas id="liveCanvas"></canvas><div class="scan-line"></div></div>
                     <div class="status-box">
                         <p id="liveStatusText" style="font-size: 18px; font-weight: 700; color: #fbbf24; margin: 0;"><i class="fa-solid fa-crosshairs fa-spin"></i> Initializing System...</p>
                         <p style="font-size: 13px; color: #94a3b8; margin-top: 8px;">Blink to mark attendance</p>
@@ -210,7 +188,8 @@
                 </div>
                 <div class="modal-body p-4">
                     <input type="text" id="newStudentName" class="form-control mb-3" placeholder="Full Name" required>
-                    <input type="tel" id="newStudentPhone" class="form-control mb-3" placeholder="Phone Number" required>
+                    <input type="tel" id="newStudentPhone" class="form-control mb-3" placeholder="Student Phone No" required>
+                    <input type="tel" id="newParentPhone" class="form-control mb-3" placeholder="Parent's Mobile Number" required>
                     <input type="text" id="newStudentCourse" class="form-control mb-3" placeholder="Course / Class" required>
                     <button class="btn btn-primary w-100 fw-bold" onclick="addStudent()">Generate Roll No & Add</button>
                 </div>
@@ -232,13 +211,11 @@
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
 
-        // --- GLOBAL VARIABLES ---
         let allStudents = {}; 
         let allAttendanceList = []; 
         let currentSmartAttendanceList = []; 
         let faceModelsLoaded = false;
         
-        // --- LOGIN & NAVIGATION ---
         function checkPassword() {
             if(document.getElementById('adminPassword').value === "SkyAdmin123") {
                 document.getElementById('loginScreen').style.display = 'none';
@@ -253,10 +230,7 @@
             document.querySelectorAll('.sidebar a').forEach(el => el.classList.remove('active'));
             document.getElementById('section-' + id).classList.add('active-section');
             document.getElementById('link-' + id).classList.add('active');
-
-            // CAMERA MANAGEMENT (Stop cameras when tab changes)
             stopAllCameras();
-
             if(id === 'face-register') { startRegisterMode(); }
             else if(id === 'face-scanner') { startLiveScannerMode(); }
         }
@@ -268,7 +242,6 @@
             clearInterval(window.liveInterval);
         }
 
-        // --- CORE DATABASE LOGIC ---
         function startDatabaseListeners() {
             db.ref('Student_Admissions').on('value', snap => {
                 allStudents = snap.val() || {};
@@ -281,27 +254,27 @@
             });
         }
 
-        // --- FEATURE 1: ADD / REMOVE STUDENT & AUTO ROLL NO ---
         function addStudent() {
             const name = document.getElementById('newStudentName').value;
             const phone = document.getElementById('newStudentPhone').value;
+            const parentPhone = document.getElementById('newParentPhone').value;
             const course = document.getElementById('newStudentCourse').value;
 
-            if(!name || !phone) return alert("Fill required fields!");
+            if(!name || !phone || !parentPhone) return alert("Fill all required fields!");
 
             const rollNo = 'SKY-' + Math.floor(1000 + Math.random() * 9000);
             
             db.ref('Student_Admissions/' + rollNo).set({
-                RollNo: rollNo, Name: name, Phone: phone, Course: course, Date: new Date().toLocaleDateString('en-IN')
+                RollNo: rollNo, Name: name, Phone: phone, ParentPhone: parentPhone, Course: course, Date: new Date().toLocaleDateString('en-IN')
             }).then(() => {
                 alert(`Student Added! Roll No: ${rollNo}`);
                 bootstrap.Modal.getInstance(document.getElementById('addStudentModal')).hide();
-                document.getElementById('newStudentName').value = ''; document.getElementById('newStudentPhone').value = '';
+                document.getElementById('newStudentName').value = ''; document.getElementById('newStudentPhone').value = ''; document.getElementById('newParentPhone').value = '';
             });
         }
 
         function deleteStudent(rollNo) {
-            if(confirm(`Remove ${rollNo} permanently? This will delete their Face ID too.`)) {
+            if(confirm(`Remove ${rollNo} permanently?`)) {
                 db.ref('Student_Admissions/' + rollNo).remove();
                 db.ref('Face_Data/' + rollNo).remove();
             }
@@ -315,7 +288,7 @@
                 body.innerHTML += `<tr>
                     <td class="fw-bold text-primary">${st.RollNo}</td>
                     <td class="fw-bold">${st.Name}</td>
-                    <td>${st.Phone}</td>
+                    <td><small>S: ${st.Phone}<br>P: ${st.ParentPhone || "N/A"}</small></td>
                     <td><span class="badge bg-secondary">${st.Course}</span></td>
                     <td><button class="btn btn-sm btn-danger" onclick="deleteStudent('${st.RollNo}')"><i class="fa-solid fa-trash"></i></button></td>
                 </tr>`;
@@ -323,11 +296,43 @@
             document.getElementById('countAdmissions').innerText = count;
         }
 
-        // --- FEATURE 4: MANUAL ATTENDANCE ---
+        // ==========================================
+        // FAST2SMS API AUTO MSG LOGIC
+        // ==========================================
+        function sendAutoMsg(parentPhone, studentName, time, mode) {
+            if(!parentPhone || parentPhone.length < 10) return;
+
+            // Message text depending on ENTRY or EXIT
+            let msg = mode === "IN" 
+                ? `Dear Parent, aapka baccha ${studentName} Sky Classes par ${time} baje pahunch gaya hai.`
+                : `Dear Parent, aapka baccha ${studentName} Sky Classes se ${time} baje nikal gaya hai.`;
+
+            console.log("Sending Msg: ", parentPhone, " -> ", msg);
+
+            // Using the API Key provided
+            fetch("https://www.fast2sms.com/dev/bulkV2", {
+                method: "POST",
+                headers: {
+                    "authorization": "5kO3otv1Ra9gTwlQDUze6IWVhBmKNnb80c2AJMP4CLXiFrpYdSrHbiDTSLOZM65YR4QeqBFKd3sN0gpv",
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    "route": "q",
+                    "message": msg,
+                    "language": "english",
+                    "flash": 0,
+                    "numbers": parentPhone
+                })
+            })
+            .then(res => res.json())
+            .then(data => console.log("SMS API Response: ", data))
+            .catch(err => console.error("Error Sending Msg:", err));
+        }
+        // ==========================================
+
         function markManual(mode) {
             const rollNo = document.getElementById('manualRollNo').value.trim().toUpperCase();
-            if(!rollNo || !allStudents[rollNo]) return alert("Invalid Roll Number! Ensure format is SKY-XXXX");
-
+            if(!rollNo || !allStudents[rollNo]) return alert("Invalid Roll Number!");
             const student = allStudents[rollNo];
             pushAttendanceToDB(student.Name, rollNo, student.Phone, mode);
             alert(`${student.Name} marked ${mode} manually!`);
@@ -336,31 +341,32 @@
 
         function pushAttendanceToDB(name, rollNo, phone, mode) {
             const now = new Date();
+            const timeStr = now.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' });
+            
             db.ref('Daily_Attendance').push({
                 RollNo: rollNo, Name: name, Phone: phone, 
                 Date: now.toLocaleDateString('en-IN'),
-                Time: now.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' }),
-                Timestamp: Date.now(), ScanType: mode
+                Time: timeStr, Timestamp: Date.now(), ScanType: mode
             });
+
+            // Trigger SMS logic using Parent's Number
+            const pPhone = allStudents[rollNo]?.ParentPhone || phone; 
+            sendAutoMsg(pPhone, name, timeStr, mode);
         }
 
-        // --- ATTENDANCE FILTER LOGIC ---
         function filterAttendanceData() {
             const targetDateStr = new Date(document.getElementById('dateFilter').value).toLocaleDateString('en-IN');
             let grouped = {};
-
             allAttendanceList.forEach(record => {
                 if(record.Date === targetDateStr) {
-                    let rNo = record.RollNo || record.Phone; // Fallback for old data
+                    let rNo = record.RollNo || record.Phone;
                     if (!grouped[rNo]) grouped[rNo] = { name: record.Name, roll: rNo, inTime: "--", outTime: "--" };
                     if (record.ScanType === "IN") { if(grouped[rNo].inTime === "--") grouped[rNo].inTime = record.Time; }
                     else if (record.ScanType === "OUT") { grouped[rNo].outTime = record.Time; }
                 }
             });
-
             const body = document.getElementById('attendanceBody'); body.innerHTML = '';
             currentSmartAttendanceList = Object.values(grouped);
-            
             currentSmartAttendanceList.forEach(st => {
                 let status = st.outTime !== "--" ? '<span class="badge bg-success">Left Class</span>' : '<span class="badge bg-warning text-dark">Inside Class</span>';
                 body.innerHTML += `<tr><td class="fw-bold">${st.roll}</td><td class="text-start fw-bold">${st.name}</td><td class="text-success fw-bold">${st.inTime}</td><td class="text-danger fw-bold">${st.outTime}</td><td>${status}</td></tr>`;
@@ -368,44 +374,28 @@
             document.getElementById('countAttendance').innerText = currentSmartAttendanceList.length;
         }
 
-        // --- FEATURE 3: DOWNLOAD PDF (Replaced CSV) ---
         function downloadPDF() {
             if(currentSmartAttendanceList.length === 0) return alert("No data for selected date!");
             const { jsPDF } = window.jspdf; const doc = new jsPDF();
-            
             doc.setFontSize(18); doc.text("Sky Classes - Daily Attendance Report", 14, 20);
             doc.setFontSize(11); doc.text(`Date: ${document.getElementById('dateFilter').value}`, 14, 30);
-            
-            const tableData = currentSmartAttendanceList.map((st, index) => [
-                index + 1, st.roll, st.name, st.inTime, st.outTime, st.outTime !== "--" ? "Left Class" : "Inside Class"
-            ]);
-
-            doc.autoTable({
-                startY: 35, head: [['S.No', 'Roll No', 'Student Name', 'Entry (IN)', 'Exit (OUT)', 'Status']],
-                body: tableData, theme: 'grid', headStyles: { fillColor: [15, 23, 42] }
-            });
+            const tableData = currentSmartAttendanceList.map((st, index) => [index + 1, st.roll, st.name, st.inTime, st.outTime, st.outTime !== "--" ? "Left Class" : "Inside Class"]);
+            doc.autoTable({ startY: 35, head: [['S.No', 'Roll No', 'Student Name', 'Entry (IN)', 'Exit (OUT)', 'Status']], body: tableData, theme: 'grid', headStyles: { fillColor: [15, 23, 42] } });
             doc.save(`Sky_Attendance_${document.getElementById('dateFilter').value}.pdf`);
         }
 
-        // =======================================================
-        // --- AI FACE REGISTER (User Code 1 Integrated) ---
-        // =======================================================
+        // --- FACE REGISTER ---
         async function loadFaceModels() {
             if(faceModelsLoaded) return;
             const MODEL_URL = 'https://cdn.jsdelivr.net/npm/@vladmandic/face-api/model/';
-            await Promise.all([
-                faceapi.nets.tinyFaceDetector.loadFromUri(MODEL_URL),
-                faceapi.nets.ssdMobilenetv1.loadFromUri(MODEL_URL),
-                faceapi.nets.faceLandmark68Net.loadFromUri(MODEL_URL),
-                faceapi.nets.faceRecognitionNet.loadFromUri(MODEL_URL)
-            ]);
+            await Promise.all([faceapi.nets.tinyFaceDetector.loadFromUri(MODEL_URL), faceapi.nets.ssdMobilenetv1.loadFromUri(MODEL_URL), faceapi.nets.faceLandmark68Net.loadFromUri(MODEL_URL), faceapi.nets.faceRecognitionNet.loadFromUri(MODEL_URL)]);
             faceModelsLoaded = true;
         }
 
         function fetchStudentForReg() {
             const roll = document.getElementById('searchRollReg').value.trim().toUpperCase();
             if(allStudents[roll]) {
-                document.getElementById('regStudentDetails').innerText = `Linked: ${allStudents[roll].Name} | ${allStudents[roll].Phone}`;
+                document.getElementById('regStudentDetails').innerText = `Linked: ${allStudents[roll].Name}`;
                 document.getElementById('regHiddenRoll').value = roll;
                 document.getElementById('regHiddenName').value = allStudents[roll].Name;
                 document.getElementById('regHiddenPhone').value = allStudents[roll].Phone;
@@ -414,26 +404,15 @@
 
         async function startRegisterMode() {
             await loadFaceModels();
-            const video = document.getElementById('regVideo');
-            const canvas = document.getElementById('regCanvas');
-            const status = document.getElementById('regStatusText');
-            const btn = document.getElementById('registerBtn');
-
-            navigator.mediaDevices.getUserMedia({ video: { facingMode: "user" } }).then(stream => {
-                window.regStream = stream; video.srcObject = stream;
-            });
-
+            const video = document.getElementById('regVideo'); const canvas = document.getElementById('regCanvas'); const status = document.getElementById('regStatusText'); const btn = document.getElementById('registerBtn');
+            navigator.mediaDevices.getUserMedia({ video: { facingMode: "user" } }).then(stream => { window.regStream = stream; video.srcObject = stream; });
             video.onplay = () => {
                 faceapi.matchDimensions(canvas, { width: video.clientWidth, height: video.clientHeight });
                 window.regInterval = setInterval(async () => {
                     const detection = await faceapi.detectSingleFace(video, new faceapi.TinyFaceDetectorOptions()).withFaceLandmarks();
                     canvas.getContext('2d').clearRect(0, 0, canvas.width, canvas.height);
-                    if (detection) {
-                        status.innerHTML = "<i class='fa-solid fa-lock'></i> Face Locked! You can Register."; status.className = "text-success fw-bold";
-                        btn.disabled = false; faceapi.draw.drawDetections(canvas, faceapi.resizeResults(detection, video));
-                    } else {
-                        status.innerHTML = "<i class='fa-solid fa-camera'></i> Center your face..."; status.className = "text-warning fw-bold"; btn.disabled = true;
-                    }
+                    if (detection) { status.innerHTML = "<i class='fa-solid fa-lock'></i> Face Locked! You can Register."; status.className = "text-success fw-bold"; btn.disabled = false; faceapi.draw.drawDetections(canvas, faceapi.resizeResults(detection, video)); } 
+                    else { status.innerHTML = "<i class='fa-solid fa-camera'></i> Center your face..."; status.className = "text-warning fw-bold"; btn.disabled = true; }
                 }, 300);
             };
         }
@@ -441,120 +420,58 @@
         async function registerFace() {
             const roll = document.getElementById('regHiddenRoll').value;
             if(!roll) return alert("Please search a Roll Number first!");
-
-            const btn = document.getElementById('registerBtn');
-            btn.innerText = "Processing AI Logic..."; btn.disabled = true;
-
+            const btn = document.getElementById('registerBtn'); btn.innerText = "Processing AI Logic..."; btn.disabled = true;
             const detection = await faceapi.detectSingleFace(document.getElementById('regVideo'), new faceapi.TinyFaceDetectorOptions()).withFaceLandmarks().withFaceDescriptor();
             if (!detection) { alert("Face lost! Try again."); btn.innerText = "Lock Face & Save"; btn.disabled = false; return; }
-
-            db.ref('Face_Data/' + roll).set({
-                RollNo: roll, Name: document.getElementById('regHiddenName').value,
-                Phone: document.getElementById('regHiddenPhone').value,
-                FaceDescriptor: Array.from(detection.descriptor)
-            }).then(() => {
-                alert("Face ID Registered to " + roll);
-                document.getElementById('searchRollReg').value = ''; document.getElementById('regStudentDetails').innerText = '';
+            db.ref('Face_Data/' + roll).set({ RollNo: roll, Name: document.getElementById('regHiddenName').value, Phone: document.getElementById('regHiddenPhone').value, FaceDescriptor: Array.from(detection.descriptor) }).then(() => {
+                alert("Face ID Registered to " + roll); document.getElementById('searchRollReg').value = ''; document.getElementById('regStudentDetails').innerText = '';
             });
         }
 
-        // =======================================================
-        // --- AI LIVE SCANNER (User Code 2 Integrated) ---
-        // =======================================================
-        let liveFaceMatcher = null;
-        let useFrontCamera = true;
-        let isProcessingScan = false;
-        let studentLiveHistory = {};
-
+        // --- FACE SCANNER ---
+        let liveFaceMatcher = null; let useFrontCamera = true; let isProcessingScan = false; let studentLiveHistory = {};
         function toggleScannerCamera() { useFrontCamera = !useFrontCamera; startLiveScannerMode(); }
 
         async function setupFaceMatcher() {
-            const snapshot = await db.ref('Face_Data').once('value');
-            const data = snapshot.val();
-            if (!data) return;
-
+            const snapshot = await db.ref('Face_Data').once('value'); const data = snapshot.val(); if (!data) return;
             const descriptors = [];
-            for (const roll in data) {
-                if (data[roll].FaceDescriptor) {
-                    descriptors.push(new faceapi.LabeledFaceDescriptors(
-                        data[roll].Name + "||" + roll + "||" + data[roll].Phone, 
-                        [new Float32Array(Object.values(data[roll].FaceDescriptor))]
-                    ));
-                }
-            }
+            for (const roll in data) { if (data[roll].FaceDescriptor) { descriptors.push(new faceapi.LabeledFaceDescriptors(data[roll].Name + "||" + roll + "||" + data[roll].Phone, [new Float32Array(Object.values(data[roll].FaceDescriptor))])); } }
             if(descriptors.length > 0) liveFaceMatcher = new faceapi.FaceMatcher(descriptors, 0.5);
         }
 
         async function startLiveScannerMode() {
-            await loadFaceModels();
-            await setupFaceMatcher();
-            
-            // Sync history for today
+            await loadFaceModels(); await setupFaceMatcher();
             const todayStr = new Date().toLocaleDateString('en-IN');
-            allAttendanceList.forEach(r => {
-                if(r.Date === todayStr && (!studentLiveHistory[r.RollNo] || studentLiveHistory[r.RollNo].Timestamp < r.Timestamp)) {
-                    studentLiveHistory[r.RollNo] = { state: r.ScanType, Timestamp: r.Timestamp };
-                }
-            });
-
-            const video = document.getElementById('liveVideo');
-            const canvas = document.getElementById('liveCanvas');
-            const status = document.getElementById('liveStatusText');
-
-            stopAllCameras(); // clear existing
-            navigator.mediaDevices.getUserMedia({ video: { facingMode: useFrontCamera ? "user" : "environment" } }).then(stream => {
-                window.liveStream = stream; video.srcObject = stream;
-                video.style.transform = useFrontCamera ? "scaleX(-1)" : "scaleX(1)";
-                canvas.style.transform = useFrontCamera ? "scaleX(-1)" : "scaleX(1)";
-            });
-
+            allAttendanceList.forEach(r => { if(r.Date === todayStr && (!studentLiveHistory[r.RollNo] || studentLiveHistory[r.RollNo].Timestamp < r.Timestamp)) { studentLiveHistory[r.RollNo] = { state: r.ScanType, Timestamp: r.Timestamp }; } });
+            const video = document.getElementById('liveVideo'); const canvas = document.getElementById('liveCanvas'); const status = document.getElementById('liveStatusText');
+            stopAllCameras();
+            navigator.mediaDevices.getUserMedia({ video: { facingMode: useFrontCamera ? "user" : "environment" } }).then(stream => { window.liveStream = stream; video.srcObject = stream; video.style.transform = useFrontCamera ? "scaleX(-1)" : "scaleX(1)"; canvas.style.transform = useFrontCamera ? "scaleX(-1)" : "scaleX(1)"; });
             video.onplay = () => {
                 faceapi.matchDimensions(canvas, { width: video.clientWidth, height: video.clientHeight });
                 window.liveInterval = setInterval(async () => {
                     if (!liveFaceMatcher || isProcessingScan) return;
-                    
                     const detections = await faceapi.detectAllFaces(video, new faceapi.SsdMobilenetv1Options({minConfidence: 0.5})).withFaceLandmarks().withFaceDescriptors();
                     canvas.getContext('2d').clearRect(0, 0, canvas.width, canvas.height);
-
-                    if(detections.length === 0) {
-                        status.innerHTML = "<i class='fa-solid fa-crosshairs fa-spin'></i> Scanning Area..."; status.style.color = "#fbbf24"; return;
-                    }
-
+                    if(detections.length === 0) { status.innerHTML = "<i class='fa-solid fa-crosshairs fa-spin'></i> Scanning Area..."; status.style.color = "#fbbf24"; return; }
                     detections.forEach(det => {
                         const result = liveFaceMatcher.findBestMatch(det.descriptor);
                         if (result.label !== 'unknown') {
                             const [name, rollNo, phone] = result.label.split("||");
-                            
-                            // Blink Logic (EAR)
                             const eye1 = det.landmarks.getLeftEye(); const eye2 = det.landmarks.getRightEye();
                             const dist = (p1, p2) => Math.sqrt(Math.pow(p1.x - p2.x, 2) + Math.pow(p1.y - p2.y, 2));
                             const ear = ((dist(eye1[1], eye1[5]) + dist(eye1[2], eye1[4])) / (2.0 * dist(eye1[0], eye1[3])) + (dist(eye2[1], eye2[5]) + dist(eye2[2], eye2[4])) / (2.0 * dist(eye2[0], eye2[3]))) / 2;
-
-                            const now = Date.now();
-                            let last = studentLiveHistory[rollNo] || { state: "OUT", Timestamp: 0 };
-
+                            const now = Date.now(); let last = studentLiveHistory[rollNo] || { state: "OUT", Timestamp: 0 };
                             if (last.state === "OUT" && last.Timestamp !== 0) { status.innerHTML = `✅ ${name}, Attendance Done!`; status.style.color = "#10b981"; return; }
                             if (now - last.Timestamp < 300000 && last.Timestamp !== 0) { status.innerHTML = `⏳ Wait 5 Mins for EXIT!`; status.style.color = "#f43f5e"; return; }
-
                             let nextMode = last.state === "IN" ? "OUT" : "IN";
-
                             if (ear < 0.28) {
-                                isProcessingScan = true;
-                                status.innerHTML = `<i class='fa-solid fa-fingerprint'></i> ${nextMode} Saved: ${name}`; status.style.color = nextMode==="IN"?"#10b981":"#f43f5e";
+                                isProcessingScan = true; status.innerHTML = `<i class='fa-solid fa-fingerprint'></i> ${nextMode} Saved: ${name}`; status.style.color = nextMode==="IN"?"#10b981":"#f43f5e";
                                 studentLiveHistory[rollNo] = { state: nextMode, Timestamp: now };
                                 pushAttendanceToDB(name, rollNo, phone, nextMode);
-                                
-                                if('speechSynthesis' in window) {
-                                    const speech = new SpeechSynthesisUtterance(`${name}, ${nextMode} Successful`);
-                                    speech.lang = 'en-IN'; window.speechSynthesis.speak(speech);
-                                }
+                                if('speechSynthesis' in window) { const speech = new SpeechSynthesisUtterance(`${name}, ${nextMode} Successful`); speech.lang = 'en-IN'; window.speechSynthesis.speak(speech); }
                                 setTimeout(() => { isProcessingScan = false; }, 3500);
-                            } else {
-                                status.innerHTML = `${name} Recognized. Blink for ${nextMode}!`; status.style.color = "#38bdf8";
-                            }
-                        } else {
-                            status.innerHTML = "UNKNOWN PERSON!"; status.style.color = "#f43f5e";
-                        }
+                            } else { status.innerHTML = `${name} Recognized. Blink for ${nextMode}!`; status.style.color = "#38bdf8"; }
+                        } else { status.innerHTML = "UNKNOWN PERSON!"; status.style.color = "#f43f5e"; }
                     });
                 }, 250);
             };
