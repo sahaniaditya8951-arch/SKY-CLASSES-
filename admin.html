@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sky Classes | Ultimate ERP & AI Dashboard</title>
+    <title>Sky Classes | Director ERP - Ultimate AI Dashboard</title>
     
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Outfit:wght@300;400;600;700;800&display=swap" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -19,125 +19,163 @@
         :root { 
             --primary-dark: #0b1120; --sidebar-bg: #0f172a; 
             --accent-blue: #3b82f6; --accent-gold: #f59e0b;
-            --card-shadow: 0 10px 30px rgba(0,0,0,0.05);
+            --glass: rgba(255, 255, 255, 0.03); --card-shadow: 0 10px 30px rgba(0,0,0,0.1);
         }
-        body { font-family: 'Poppins', sans-serif; background-color: #f8fafc; color: #1e293b; margin: 0; }
+        body { font-family: 'Poppins', sans-serif; background-color: #f1f5f9; color: #1e293b; margin: 0; overflow-x: hidden;}
         
-        /* Sidebar & Layout */
-        .sidebar { height: 100vh; background: var(--sidebar-bg); color: white; width: 280px; position: fixed; z-index: 1000; box-shadow: 10px 0 30px rgba(0,0,0,0.1); }
+        /* Premium Background for Login with Student Photo */
+        #loginScreen { position: fixed; top:0; left:0; width:100%; height:100vh; background: url('https://images.unsplash.com/photo-1523240795612-9a054b0db644?q=80&w=2070&auto=format&fit=crop') center/cover no-repeat; z-index:9999; display:flex; justify-content:center; align-items:center; }
+        #loginScreen::before { content:''; position:absolute; top:0; left:0; width:100%; height:100%; background: linear-gradient(135deg, rgba(11, 17, 32, 0.95), rgba(11, 17, 32, 0.7)); }
+        .login-box { background: rgba(15, 23, 42, 0.6); backdrop-filter: blur(16px); padding: 50px; border-radius: 24px; text-align: center; border: 1px solid rgba(255,255,255,0.08); z-index:10; }
+        .login-box h1 { font-family: 'Outfit', sans-serif; font-size: 3.5rem; font-weight: 800; text-transform: uppercase; letter-spacing: -2px; }
+        
+        /* Dashboard Layout */
+        .sidebar { height: 100vh; background: var(--sidebar-bg); color: white; width: 280px; position: fixed; z-index: 1000; box-shadow: 10px 0 30px rgba(0,0,0,0.1); transition: 0.3s; }
         .sidebar a { padding: 16px 30px; color: #94a3b8; display: block; text-decoration: none; font-weight: 500; border-left: 4px solid transparent; transition: 0.3s; cursor: pointer;}
         .sidebar a:hover, .sidebar a.active { background: rgba(59, 130, 246, 0.1); color: white; border-left-color: var(--accent-blue); }
         .main-content { margin-left: 280px; padding: 40px; }
 
         /* Premium Cards */
-        .glass-card { background: white; border-radius: 20px; padding: 25px; box-shadow: var(--card-shadow); border: 1px solid #e2e8f0; margin-bottom: 25px; }
-        .stat-card { border-radius: 20px; padding: 25px; color: white; position: relative; overflow: hidden; height: 100%; }
+        .glass-card { background: white; border-radius: 20px; padding: 25px; box-shadow: var(--card-shadow); border: 1px solid #e2e8f0; margin-bottom: 25px; transition: 0.3s;}
+        .glass-card:hover { transform: translateY(-5px); box-shadow: 0 15px 40px rgba(0,0,0,0.1); }
+        .stat-card-premium { border-radius: 20px; padding: 25px; color: white; position: relative; overflow: hidden; height: 100%; border: 1px solid rgba(255,255,255,0.1); }
         .grad-blue { background: linear-gradient(135deg, #3b82f6, #2563eb); }
         .grad-green { background: linear-gradient(135deg, #10b981, #059669); }
         .grad-red { background: linear-gradient(135deg, #ef4444, #dc2626); }
         .grad-gold { background: linear-gradient(135deg, #f59e0b, #d97706); }
 
         /* AI Scanner UI */
-        .scan-container { position: relative; width: 100%; max-width: 400px; aspect-ratio: 3/4; border-radius: 30px; overflow: hidden; background: #000; margin: 0 auto; }
+        .scan-container { position: relative; width: 100%; max-width: 400px; aspect-ratio: 3/4; border-radius: 30px; overflow: hidden; background: #000; margin: 0 auto; box-shadow: 0 20px 50px rgba(0,0,0,0.5); }
         video, canvas { position: absolute; top:0; left:0; width: 100%; height: 100%; object-fit: cover; }
-        .scan-line { position: absolute; width: 100%; height: 4px; background: #fbbf24; box-shadow: 0 0 20px #fbbf24; animation: scanAnim 3s infinite; z-index: 10; }
+        .scan-line { position: absolute; width: 100%; height: 4px; background: var(--accent-gold); box-shadow: 0 0 20px var(--accent-gold); animation: scanAnim 3s infinite; z-index: 10; }
         @keyframes scanAnim { 0% { top: 0%; } 100% { top: 100%; } }
 
-        .table-container { display: none; }
+        .section-container { display: none; }
         .active-section { display: block; animation: fadeIn 0.4s; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; } }
+
+        /* Custom Inputs */
+        .premium-input { background: #f8fafc; border: 1px solid #e2e8f0; padding: 14px; border-radius: 12px; transition: 0.3s; }
+        .premium-input:focus { border-color: var(--accent-blue); box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1); }
+        .btn-premium { border-radius: 12px; font-weight: 600; padding: 12px 24px; transition: 0.3s; }
+        .badge { font-weight: 600; font-family: 'Outfit', sans-serif;}
     </style>
 </head>
 <body>
 
-    <div id="loginScreen" style="position:fixed; width:100%; height:100vh; background:var(--primary-dark); z-index:9999; display:flex; justify-content:center; align-items:center;">
-        <div class="glass-card text-center" style="width:400px;">
-            <h2 class="fw-bold mb-4"><span style="color:var(--accent-blue)">SKY</span> CLASSES</h2>
-            <input type="password" id="adminPassword" class="form-control mb-4 text-center p-3 rounded-pill" placeholder="Admin Password">
-            <button class="btn btn-primary w-100 p-3 rounded-pill fw-bold" onclick="checkPassword()">LOGIN</button>
+    <div id="loginScreen">
+        <div class="login-box">
+            <h1 class="text-white mb-2"><span style="color:var(--accent-blue)">SKY</span> CLASSES</h1>
+            <h5 class="text-muted mb-5 text-uppercase fw-bold letter-spacing-1">Director ERP Portal</h5>
+            <input type="password" id="adminPassword" class="form-control mb-4 text-center p-3 premium-input" style="width:300px; margin:0 auto;" placeholder="Admin Master Password">
+            <button class="btn btn-primary w-100 p-3 btn-premium rounded-pill fw-bold" style="width:300px; margin:0 auto;" onclick="checkPassword()">SECURE LOGIN <i class="fa-solid fa-arrow-right ms-2"></i></button>
         </div>
     </div>
 
     <div id="dashboardScreen" style="display:none;">
         <div class="sidebar">
-            <div class="p-4 text-center"><h3 class="fw-bold">SKY CLASSES</h3></div>
-            <a onclick="showSection('admissions')" id="link-admissions" class="active"><i class="fa-solid fa-users me-3"></i> Admissions</a>
-            <a onclick="showSection('face-scanner')" id="link-face-scanner"><i class="fa-solid fa-expand me-3"></i> Smart Gate</a>
-            <a onclick="showSection('face-register')" id="link-face-register"><i class="fa-solid fa-face-viewfinder me-3"></i> Enroll Face</a>
-            <a onclick="showSection('finance')" id="link-finance"><i class="fa-solid fa-indian-rupee-sign me-3"></i> Accounts & Fees</a>
-            <a onclick="showSection('attendance')" id="link-attendance"><i class="fa-solid fa-calendar-check me-3"></i> Daily Logs</a>
-            <a onclick="location.reload()" style="color:#ef4444; margin-top:50px;"><i class="fa-solid fa-lock me-3"></i> Logout</a>
+            <div class="p-4 text-center">
+                <h3 class="fw-bold"><span style="color:var(--accent-blue)">SKY</span> CLASSES</h3>
+                <small class="text-muted">Master Admin ERP</small>
+            </div>
+            <a onclick="showSection('admissions')" id="link-admissions" class="active"><i class="fa-solid fa-user-plus me-3"></i> Admissions Directory</a>
+            <a onclick="showSection('face-scanner')" id="link-face-scanner"><i class="fa-solid fa-expand me-3"></i> AI Smart Gate</a>
+            <a onclick="showSection('manual-entry')" id="link-manual-entry"><i class="fa-solid fa-keyboard me-3"></i> Manual Attendance</a>
+            <a onclick="showSection('finance')" id="link-finance"><i class="fa-solid fa-indian-rupee-sign me-3"></i> Accounts (Fees/Spend)</a>
+            <a onclick="showSection('face-register')" id="link-face-register"><i class="fa-solid fa-face-viewfinder me-3"></i> Face Enrollment</a>
+            <a onclick="showSection('attendance')" id="link-attendance"><i class="fa-solid fa-calendar-check me-3"></i> Attendance Logs</a>
+            <a onclick="location.reload()" style="color:#ef4444; margin-top:50px; font-weight:600;"><i class="fa-solid fa-lock me-3"></i> Secure Logout</a>
         </div>
 
         <div class="main-content">
             <div class="row g-4 mb-5">
-                <div class="col-md-3"><div class="stat-card grad-blue"><p class="m-0">Students</p><h2 id="countAdmissions">0</h2></div></div>
-                <div class="col-md-3"><div class="stat-card grad-green"><p class="m-0">Fees Collected</p><h2 id="totalFees">₹0</h2></div></div>
-                <div class="col-md-3"><div class="stat-card grad-red"><p class="m-0">Total Spend</p><h2 id="totalSpend">₹0</h2></div></div>
-                <div class="col-md-3"><div class="stat-card grad-gold"><p class="m-0">Net Profit</p><h2 id="netProfit">₹0</h2></div></div>
+                <div class="col-md-3"><div class="stat-card-premium grad-blue"><p class="m-0 opacity-75">Total Students</p><h2 id="countAdmissions" class="fw-bold mt-2">0</h2><i class="fa-solid fa-user-graduate position-absolute end-0 bottom-0 mb-2 me-2 opacity-25" style="font-size:3rem;"></i></div></div>
+                <div class="col-md-3"><div class="stat-card-premium grad-green"><p class="m-0 opacity-75">Fees Collection (Paid)</p><h2 id="totalFees" class="fw-bold mt-2">₹0</h2><i class="fa-solid fa-piggy-bank position-absolute end-0 bottom-0 mb-2 me-2 opacity-25" style="font-size:3rem;"></i></div></div>
+                <div class="col-md-3"><div class="stat-card-premium grad-red"><p class="m-0 opacity-75">Total Spend (Expense)</p><h2 id="totalSpend" class="fw-bold mt-2">₹0</h2><i class="fa-solid fa-chart-line position-absolute end-0 bottom-0 mb-2 me-2 opacity-25" style="font-size:3rem; transform: scaleY(-1);"></i></div></div>
+                <div class="col-md-3"><div class="stat-card-premium grad-gold"><p class="m-0 opacity-75">Coaching Net Profit</p><h2 id="netProfit" class="fw-bold mt-2">₹0</h2><i class="fa-solid fa-hand-holding-dollar position-absolute end-0 bottom-0 mb-2 me-2 opacity-25" style="font-size:3rem;"></i></div></div>
             </div>
 
-            <div id="section-admissions" class="table-container active-section">
+            <div id="section-admissions" class="section-container active-section">
                 <div class="glass-card">
-                    <div class="d-flex justify-content-between mb-4">
-                        <h5 class="fw-bold">Admission Directory</h5>
-                        <button class="btn btn-primary rounded-pill px-4" data-bs-toggle="modal" data-bs-target="#addStudentModal">+ Add Student</button>
+                    <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-3">
+                        <h4 class="fw-bold m-0"><i class="fa-solid fa-users me-3 text-primary"></i> Admissions Directory 2026-27</h4>
+                        <button class="btn btn-primary btn-premium rounded-pill px-4" data-bs-toggle="modal" data-bs-target="#addStudentModal">+ New Admission</button>
                     </div>
-                    <table class="table">
-                        <thead><tr><th>Roll No</th><th>Name</th><th>Class</th><th>Status</th><th>Receipt</th><th>Delete</th></tr></thead>
-                        <tbody id="admissionsBody"></tbody>
-                    </table>
+                    <div class="table-responsive">
+                        <table class="table align-middle">
+                            <thead class="table-light"><tr><th>Roll No</th><th class="text-start">Student Name</th><th>Class</th><th>Parents Contact</th><th>Fees Status</th><th>Action</th></tr></thead>
+                            <tbody id="admissionsBody"></tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
 
-            <div id="section-finance" class="table-container">
+            <div id="section-manual-entry" class="section-container">
+                <div class="glass-card">
+                    <h4 class="fw-bold mb-4"><i class="fa-solid fa-keyboard me-3 text-warning"></i> Manual Attendance Override</h4>
+                    <div class="row g-3" style="max-width:600px;">
+                        <div class="col-md-6"><input type="text" id="manualRollNo" class="form-control premium-input p-3" placeholder="Enter Roll Number (SKY-XXXX)"></div>
+                        <div class="col-md-3"><button class="btn btn-success w-100 p-3 btn-premium fw-bold" onclick="markManual('IN')">MARK IN</button></div>
+                        <div class="col-md-3"><button class="btn btn-danger w-100 p-3 btn-premium fw-bold" onclick="markManual('OUT')">MARK OUT</button></div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="section-finance" class="section-container">
                 <div class="row g-4">
-                    <div class="col-md-8"><div class="glass-card"><h5 class="fw-bold mb-4">Fees Collection</h5><table class="table"><tbody id="feesTableBody"></tbody></table></div></div>
-                    <div class="col-md-4"><div class="glass-card"><h5 class="fw-bold mb-3">Expenses</h5><input type="text" id="exName" class="form-control mb-2" placeholder="Item"><input type="number" id="exAmt" class="form-control mb-3" placeholder="Amount"><button class="btn btn-danger w-100 rounded-pill" onclick="addExpense()">Add Expense</button><hr><div id="expenseList"></div></div></div>
+                    <div class="col-md-8"><div class="glass-card"><h5 class="fw-bold mb-4 text-primary"><i class="fa-solid fa-money-check-dollar me-2"></i> Fees Collection</h5><table class="table"><thead class="table-light"><tr><th>Name</th><th>Course Fees</th><th>Paid</th><th>Due</th><th>Action</th></tr></thead><tbody id="feesTableBody"></tbody></table></div></div>
+                    <div class="col-md-4"><div class="glass-card"><h5 class="fw-bold mb-4 text-danger"><i class="fa-solid fa-file-invoice me-2"></i> Add Expense</h5><input type="text" id="expenseName" class="form-control mb-3 premium-input" placeholder="Item Name (e.g. Rent, Bill)"><input type="number" id="expenseAmount" class="form-control mb-4 premium-input" placeholder="Amount (₹)"><button class="btn btn-danger btn-premium w-100 rounded-pill fw-bold" onclick="addExpense()">Add Expense</button></div></div>
                 </div>
             </div>
 
-            <div id="section-face-scanner" class="table-container text-center">
-                <div class="glass-card mx-auto" style="max-width:600px;">
-                    <h4 class="fw-bold mb-4">Live Smart Gate</h4>
+            <div id="section-face-scanner" class="section-container text-center">
+                <div class="glass-card mx-auto p-5" style="max-width:700px; border-radius:30px;">
+                    <h3 class="fw-bold mb-2">AI Smart Attendance Gate</h3>
+                    <p class="text-muted mb-4">Position face in the circle for auto attendance</p>
                     <div class="scan-container mb-4">
                         <video id="liveVideo" autoplay muted playsinline></video>
                         <canvas id="liveCanvas"></canvas>
                         <div class="scan-line"></div>
                     </div>
-                    <div id="liveStatusText" class="p-3 bg-light rounded-pill fw-bold text-primary">Scanning...</div>
+                    <div id="liveStatusText" class="p-4 bg-light rounded-pill fw-bold text-primary shadow-sm" style="font-size:1.2rem;">Ready to Scan...</div>
                 </div>
             </div>
 
-            <div id="section-face-register" class="table-container text-center">
-                <div class="glass-card mx-auto" style="max-width:500px;">
-                    <h4 class="fw-bold mb-4">Register Face</h4>
-                    <input type="text" id="searchRollReg" class="form-control mb-3 rounded-pill text-center" placeholder="Enter Roll No">
-                    <button class="btn btn-primary w-100 rounded-pill mb-4" onclick="fetchStudentForReg()">Search</button>
-                    <div class="mx-auto mb-4" style="width:250px; height:250px; border-radius:50%; overflow:hidden; border:5px solid var(--accent-gold); position:relative;">
+            <div id="section-face-register" class="section-container text-center">
+                <div class="glass-card mx-auto p-5" style="max-width:600px;">
+                    <h4 class="fw-bold mb-4 text-gold"><i class="fa-solid fa-id-card me-2"></i> Enroll Face ID</h4>
+                    <input type="text" id="searchRollReg" class="form-control mb-3 p-3 text-center premium-input" placeholder="Enter Roll No to Link Face (SKY-XXXX)">
+                    <button class="btn btn-primary btn-premium w-100 mb-4 rounded-pill" onclick="fetchStudentForReg()">Search Student</button>
+                    
+                    <div class="mx-auto mb-4" style="width:250px; height:250px; border-radius:50%; overflow:hidden; border:6px solid var(--accent-gold); position:relative; box-shadow: 0 10px 30px rgba(0,0,0,0.2);">
                         <video id="regVideo" autoplay muted playsinline style="width:100%; height:100%; object-fit:cover; transform:scaleX(-1);"></video>
                         <canvas id="regCanvas" style="position:absolute; top:0; left:0; width:100%; height:100%;"></canvas>
                     </div>
-                    <p id="regStatusText" class="fw-bold text-danger">Ready...</p>
-                    <button class="btn btn-dark w-100 p-3 rounded-pill fw-bold" id="registerBtn" onclick="registerFace()" disabled>LOCK FACE ID</button>
+                    <button class="btn btn-dark w-100 p-3 rounded-pill btn-premium fw-bold" id="registerBtn" onclick="registerFace()" disabled>LOCK FACE ID</button>
                 </div>
             </div>
 
-            <div id="section-attendance" class="table-container">
+            <div id="section-attendance" class="section-container">
                 <div class="glass-card">
-                    <div class="d-flex justify-content-between mb-4">
-                        <h5 class="fw-bold">Attendance Logs</h5>
-                        <div class="d-flex gap-2"><input type="date" id="dateFilter" class="form-control" onchange="filterAttendanceData()"><button class="btn btn-danger" onclick="downloadAttendancePDF()">Export PDF</button></div>
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <h5 class="fw-bold m-0"><i class="fa-solid fa-file-csv me-2 text-primary"></i> Daily Attendance Logs</h5>
+                        <div class="d-flex gap-2 align-items-center">
+                            <input type="date" id="dateFilter" class="form-control premium-input" onchange="filterAttendanceData()">
+                            <button class="btn btn-danger btn-premium" onclick="downloadAttendancePDF()">Export Log (PDF)</button>
+                        </div>
                     </div>
-                    <table class="table" id="attendanceTable"><thead><tr><th>Roll No</th><th>Name</th><th>IN</th><th>OUT</th><th>Status</th></tr></thead><tbody id="attendanceBody"></tbody></table>
+                    <div class="table-responsive">
+                        <table class="table" id="attendanceTable"><thead><tr><th>Roll No</th><th>Name</th><th>Class</th><th>Entry (IN)</th><th>Exit (OUT)</th><th>Status</th></tr></thead><tbody id="attendanceBody"></tbody></table>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 
-    <div class="modal fade" id="addStudentModal" tabindex="-1"><div class="modal-dialog modal-dialog-centered"><div class="modal-content border-0 rounded-4"><div class="modal-header bg-primary text-white rounded-top-4"><h5 class="modal-title fw-bold">New Admission</h5><button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button></div><div class="modal-body p-4"><input type="text" id="newName" class="form-control mb-3 p-3" placeholder="Full Name"><input type="text" id="newClass" class="form-control mb-3 p-3" placeholder="Class"><input type="text" id="newAddr" class="form-control mb-3 p-3" placeholder="Address"><div class="row mb-3"><div class="col-6"><input type="tel" id="newSPhone" class="form-control p-3" placeholder="Student Phone"></div><div class="col-6"><input type="tel" id="newPPhone" class="form-control p-3" placeholder="Parent Phone"></div></div><input type="number" id="newFees" class="form-control p-3" placeholder="Total Fees (₹)"><button class="btn btn-primary w-100 mt-4 p-3 rounded-pill fw-bold" onclick="addStudent()">CONFIRM ADMISSION</button></div></div></div></div>
+    <div class="modal fade" id="addStudentModal" tabindex="-1"><div class="modal-dialog modal-dialog-centered"><div class="modal-content border-0" style="border-radius:24px;"><div class="modal-header bg-primary text-white p-4" style="border-radius:24px 24px 0 0;"><h5 class="modal-title fw-bold">Admission Form | New Student</h5><button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button></div><div class="modal-body p-5"><div class="mb-3"><input type="text" id="newName" class="form-control p-3 premium-input" placeholder="Student Full Name"></div><div class="mb-3"><input type="text" id="newClass" class="form-control p-3 premium-input" placeholder="Class/Course (e.g. 12th PCM)"></div><div class="mb-3"><input type="text" id="newAddr" class="form-control p-3 premium-input" placeholder="Complete Address"></div><div class="row g-3 mb-3"><div class="col-6"><input type="tel" id="newSPhone" class="form-control p-3 premium-input" placeholder="Student Phone No."></div><div class="col-6"><input type="tel" id="newPPhone" class="form-control p-3 premium-input" placeholder="Parent's Mobile No."></div></div><input type="number" id="newFees" class="form-control p-3 premium-input" placeholder="Total Course Fees (₹)"><button class="btn btn-primary w-100 mt-4 p-3 rounded-pill btn-premium fw-bold" onclick="addStudent()">CONFIRM ADMISSION <i class="fa-solid fa-check ms-2"></i></button></div></div></div></div>
 
     <script>
+        // --- FIREBASE CONFIGURATION ---
         const firebaseConfig = {
           apiKey: "AIzaSyC6bcqETEnTjLEQnISXjnWR2brPrVOAm-Y",
           authDomain: "sky-classes-db-d6140.firebaseapp.com",
@@ -148,27 +186,31 @@
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
         
-        // Director ka naam change kar diya
-        const DIR_NAME = "Sandesh Sir";
+        // --- REQUIRED DIRECTOR NAME ---
+        const DIRECTOR_NAME = "Sandesh Sir";
 
+        // Global State
         let allStudents = {}; let allAttendance = []; let expenses = []; let faceMatcher = null; let modelsLoaded = false; let isProcessing = false; let studentHistory = {};
 
-        function checkPassword() { if(document.getElementById('adminPassword').value === "SkyAdmin123") { document.getElementById('loginScreen').style.display = 'none'; document.getElementById('dashboardScreen').style.display = 'block'; document.getElementById('dateFilter').valueAsDate = new Date(); startListeners(); } else alert("Wrong Password!"); }
+        // Login Check
+        function checkPassword() { if(document.getElementById('adminPassword').value === "SkyAdmin123") { document.getElementById('loginScreen').style.display = 'none'; document.getElementById('dashboardScreen').style.display = 'block'; document.getElementById('dateFilter').valueAsDate = new Date(); startListeners(); } else alert("Badhai ho! Wrong Password!"); }
 
+        // Start Database Listeners
         function startListeners() {
             db.ref('Student_Admissions').on('value', snap => { allStudents = snap.val() || {}; renderAdmissions(); updateFinance(); });
             db.ref('Daily_Attendance').on('value', snap => { allAttendance = Object.values(snap.val() || {}); filterAttendanceData(); });
-            db.ref('Expenses').on('value', snap => { expenses = Object.values(snap.val() || {}); renderExpenses(); updateFinance(); });
+            db.ref('Expenses').on('value', snap => { expenses = Object.values(snap.val() || {}); updateFinance(); });
         }
 
+        // Section Switcher
         function showSection(id) {
-            document.querySelectorAll('.table-container').forEach(el => el.classList.remove('active-section'));
+            document.querySelectorAll('.section-container').forEach(el => el.classList.remove('active-section'));
             document.querySelectorAll('.sidebar a').forEach(el => el.classList.remove('active'));
             document.getElementById('section-' + id).classList.add('active-section');
             document.getElementById('link-' + id).classList.add('active');
             stopCameras();
-            if(id === 'face-register') startReg();
-            if(id === 'face-scanner') startScanner();
+            if(id === 'face-register') startRegCamera();
+            if(id === 'face-scanner') startScannerMode();
         }
 
         function stopCameras() { 
@@ -177,48 +219,45 @@
             clearInterval(window.regInt); clearInterval(window.liveInt);
         }
 
+        // --- ADMISSIONS & FEES (BUG FIXED) ---
         function addStudent() {
-            const name = document.getElementById('newName').value;
-            const cls = document.getElementById('newClass').value;
-            const addr = document.getElementById('newAddr').value;
-            const sp = document.getElementById('newSPhone').value;
-            const pp = document.getElementById('newPPhone').value;
-            const f = document.getElementById('newFees').value;
-            if(!name || !f) return alert("Fill all fields!");
+            const name = document.getElementById('newName').value; const cls = document.getElementById('newClass').value; const addr = document.getElementById('newAddr').value;
+            const sp = document.getElementById('newSPhone').value; const pp = document.getElementById('newPPhone').value; const f = document.getElementById('newFees').value;
+            if(!name || !f) return alert("Fill Name and Fees atleast bhai!");
             const roll = 'SKY-' + Math.floor(1000 + Math.random() * 9000);
             db.ref('Student_Admissions/' + roll).set({ RollNo: roll, Name: name, Class: cls, Address: addr, Phone: sp, ParentPhone: pp, TotalFees: parseFloat(f), PaidFees: 0, Date: new Date().toLocaleDateString('en-IN') }).then(() => {
                 bootstrap.Modal.getInstance(document.getElementById('addStudentModal')).hide();
-                alert("Student Added: " + roll);
+                alert("Mission Successful! Student Added with Roll No: " + roll);
                 document.getElementById('newName').value = ''; document.getElementById('newClass').value = ''; document.getElementById('newAddr').value = ''; document.getElementById('newSPhone').value = ''; document.getElementById('newPPhone').value = ''; document.getElementById('newFees').value = '';
             });
         }
 
-        function deleteStudent(r) { if(confirm("Permanently Delete?")) { db.ref('Student_Admissions/'+r).remove(); db.ref('Face_Data/'+r).remove(); }}
+        function deleteStudent(r) { if(confirm(`Roll No ${r} permanently delete krna h?`)) { db.ref('Student_Admissions/'+r).remove(); db.ref('Face_Data/'+r).remove(); }}
 
         function renderAdmissions() {
             const b = document.getElementById('admissionsBody'); b.innerHTML = '';
-            const f = document.getElementById('feesTableBody'); f.innerHTML = '';
+            const fHead = document.getElementById('feesTableBody'); fHead.innerHTML = '';
+            
+            // Admissions Table
+            Object.values(allStudents).slice().reverse().forEach(st => {
+                const due = st.TotalFees - st.PaidFees;
+                b.innerHTML += `<tr><td class="fw-bold text-primary">${st.RollNo}</td><td class="fw-bold">${st.Name}</td><td>${st.Class || "N/A"}</td><td>${st.ParentPhone || st.Phone}</td><td>${due==0?'<span class="badge bg-success rounded-pill">Paid</span>':'<span class="badge bg-danger rounded-pill">Due</span>'}</td><td><button class="btn btn-sm btn-outline-primary me-1Receipt" onclick="generateReceiptPDF('${st.RollNo}')">PDF</button><button class="btn btn-sm btn-danger" onclick="deleteStudent('${st.RollNo}')"><i class="fa-solid fa-trash"></i></button></td></tr>`;
+            });
+
+            // Fees Table
             Object.values(allStudents).forEach(st => {
                 const due = st.TotalFees - st.PaidFees;
-                b.innerHTML += `<tr><td>${st.RollNo}</td><td class="fw-bold">${st.Name}</td><td>${st.Class}</td><td>${due==0?'<span class="badge bg-success">Paid</span>':'<span class="badge bg-danger">Due</span>'}</td><td><button class="btn btn-sm btn-outline-primary" onclick="genReceipt('${st.RollNo}')">PDF</button></td><td><button class="btn btn-sm btn-danger" onclick="deleteStudent('${st.RollNo}')"><i class="fa-solid fa-trash"></i></button></td></tr>`;
-                f.innerHTML += `<tr><td class="fw-bold">${st.Name}</td><td>₹${st.TotalFees}</td><td class="text-success">₹${st.PaidFees}</td><td class="text-danger">₹${due}</td><td><button class="btn btn-sm btn-success" onclick="payFees('${st.RollNo}')">Pay</button></td></tr>`;
+                fHead.innerHTML += `<tr><td class="fw-bold">${st.Name}</td><td>₹${st.TotalFees}</td><td class="text-success fw-bold">₹${st.PaidFees}</td><td class="text-danger fw-bold">₹${due}</td><td><button class="btn btn-sm btn-success" onclick="payFees('${st.RollNo}')">Pay</button></td></tr>`;
             });
             document.getElementById('countAdmissions').innerText = Object.keys(allStudents).length;
         }
 
-        function payFees(r) { const a = prompt("Enter Amount:"); if(a && !isNaN(a)) db.ref(`Student_Admissions/${r}/PaidFees`).set(parseFloat(allStudents[r].PaidFees) + parseFloat(a)); }
+        function payFees(r) { const a = prompt(`Amount deposit kariye for ${allStudents[r].Name}:`); if(a && !isNaN(a)) db.ref(`Student_Admissions/${r}/PaidFees`).set(parseFloat(allStudents[r].PaidFees) + parseFloat(a)); }
 
+        // --- EXPENSES & FINANCIALS ---
         function addExpense() {
-            const n = document.getElementById('exName').value; const a = document.getElementById('exAmt').value;
-            if(n && a) {
-                db.ref('Expenses').push({ Name: n, Amount: parseFloat(a), Date: new Date().toLocaleDateString() });
-                document.getElementById('exName').value = ''; document.getElementById('exAmt').value = '';
-            }
-        }
-
-        function renderExpenses() {
-            const l = document.getElementById('expenseList'); l.innerHTML = '';
-            expenses.slice().reverse().forEach(e => l.innerHTML += `<div class="d-flex justify-content-between border-bottom py-2"><small>${e.Name}</small><b>₹${e.Amount}</b></div>`);
+            const n = document.getElementById('expenseName').value; const a = document.getElementById('expenseAmount').value;
+            if(n && a) { db.ref('Expenses').push({ Name: n, Amount: parseFloat(a), Date: new Date().toLocaleDateString() }); document.getElementById('expenseName').value = ''; document.getElementById('expenseAmount').value = ''; }
         }
 
         function updateFinance() {
@@ -229,22 +268,33 @@
             document.getElementById('netProfit').innerText = "₹" + (col - sp);
         }
 
+        // --- RESTORED MANUAL ATTENDANCE LOGIC (BUG FIX) ---
+        function markManual(mode) {
+            const roll = document.getElementById('manualRollNo').value.toUpperCase().trim();
+            if(!roll || !allStudents[roll]) return alert("Galat Roll Number!");
+            const st = allStudents[roll];
+            pushAttToDB(st.Name, st.RollNo, st.Phone, mode);
+            alert(`${st.Name} marked ${mode} manually!`);
+            document.getElementById('manualRollNo').value = '';
+        }
+
         // --- FACE API LOGIC ---
-        async function loadAI() {
+        async function loadAIModels() {
             if(modelsLoaded) return;
             const URL = 'https://cdn.jsdelivr.net/npm/@vladmandic/face-api/model/';
             await Promise.all([faceapi.nets.tinyFaceDetector.loadFromUri(URL), faceapi.nets.ssdMobilenetv1.loadFromUri(URL), faceapi.nets.faceLandmark68Net.loadFromUri(URL), faceapi.nets.faceRecognitionNet.loadFromUri(URL)]);
             modelsLoaded = true;
         }
 
+        // Register Camera
         function fetchStudentForReg() {
-            const r = document.getElementById('searchRollReg').value.toUpperCase();
-            if(allStudents[r]) document.getElementById('regStatusText').innerText = "Linked: " + allStudents[r].Name;
-            else alert("Roll No not found!");
+            const r = document.getElementById('searchRollReg').value.toUpperCase().trim();
+            if(allStudents[r]) document.getElementById('regStatusText').innerText = "Linked Student: " + allStudents[r].Name;
+            else alert("Roll No is not valid!");
         }
 
-        async function startReg() {
-            await loadAI(); const v = document.getElementById('regVideo'); const c = document.getElementById('regCanvas');
+        async function startRegCamera() {
+            await loadAIModels(); const v = document.getElementById('regVideo'); const c = document.getElementById('regCanvas');
             navigator.mediaDevices.getUserMedia({ video: { facingMode: "user" } }).then(s => { window.regStream = s; v.srcObject = s; });
             v.onplay = () => {
                 faceapi.matchDimensions(c, { width: v.clientWidth, height: v.clientHeight });
@@ -258,22 +308,15 @@
         }
 
         async function registerFace() {
-            const r = document.getElementById('searchRollReg').value.toUpperCase();
+            const r = document.getElementById('searchRollReg').value.toUpperCase().trim();
             if(!allStudents[r]) return;
-            document.getElementById('registerBtn').innerText = "Processing..."; document.getElementById('registerBtn').disabled = true;
             const det = await faceapi.detectSingleFace(document.getElementById('regVideo'), new faceapi.TinyFaceDetectorOptions()).withFaceLandmarks().withFaceDescriptor();
-            if(det) {
-                db.ref('Face_Data/' + r).set({ RollNo: r, Name: allStudents[r].Name, Phone: allStudents[r].Phone, Descriptor: Array.from(det.descriptor) }).then(() => {
-                    alert("Face ID Locked!");
-                    document.getElementById('registerBtn').innerText = "LOCK FACE ID"; document.getElementById('searchRollReg').value = '';
-                });
-            } else {
-                alert("Face lost! Try again."); document.getElementById('registerBtn').innerText = "LOCK FACE ID"; document.getElementById('registerBtn').disabled = false;
-            }
+            if(det) db.ref('Face_Data/' + r).set({ RollNo: r, Name: allStudents[r].Name, Phone: allStudents[r].Phone, Descriptor: Array.from(det.descriptor) }).then(() => { alert("Face ID Locked for " + r); document.getElementById('searchRollReg').value = ''; document.getElementById('regStatusText').innerText = "Ready..."; });
         }
 
-        async function startScanner() {
-            await loadAI();
+        // --- FACE SCANNER GATE ---
+        async function startScannerMode() {
+            await loadAIModels();
             const snap = await db.ref('Face_Data').once('value'); const data = snap.val(); if(!data) return;
             const descs = [];
             for (const k in data) descs.push(new faceapi.LabeledFaceDescriptors(data[k].Name+"||"+data[k].RollNo+"||"+data[k].Phone, [new Float32Array(Object.values(data[k].Descriptor))]));
@@ -288,7 +331,7 @@
                     if(!faceMatcher || isProcessing) return;
                     const dets = await faceapi.detectAllFaces(v, new faceapi.SsdMobilenetv1Options({minConfidence:0.5})).withFaceLandmarks().withFaceDescriptors();
                     c.getContext('2d').clearRect(0, 0, c.width, c.height);
-                    if(dets.length === 0) { status.innerText = "Scanning Area..."; status.className = "p-3 bg-light rounded-pill fw-bold text-warning"; return; }
+                    if(dets.length === 0) { status.innerText = "Scanning Gate Area..."; status.style.color = "#38bdf8"; return; }
                     
                     dets.forEach(d => {
                         const res = faceMatcher.findBestMatch(d.descriptor);
@@ -298,77 +341,79 @@
                             const ear = (Math.sqrt(Math.pow(eye[1].x-eye[5].x,2)+Math.pow(eye[1].y-eye[5].y,2)) + Math.sqrt(Math.pow(eye[2].x-eye[4].x,2)+Math.pow(eye[2].y-eye[4].y,2))) / (2.0 * Math.sqrt(Math.pow(eye[0].x-eye[3].x,2)+Math.pow(eye[0].y-eye[3].y,2)));
                             
                             const now = Date.now(); let last = studentHistory[roll] || { state: "OUT", Timestamp: 0 };
-                            
-                            if (last.state === "OUT" && last.Timestamp !== 0) { status.innerText = `✅ ${name}, Attendance Done!`; status.className = "p-3 bg-light rounded-pill fw-bold text-success"; return; }
-                            if (now - last.Timestamp < 300000 && last.Timestamp !== 0) { status.innerText = `⏳ Wait 5 Mins for EXIT!`; status.className = "p-3 bg-light rounded-pill fw-bold text-danger"; return; }
+                            if (last.state === "OUT" && last.Timestamp !== 0) { status.innerText = `✅ ${name}, Attendance Done!`; status.style.color = "#10b981"; return; }
+                            if (now - last.Timestamp < 300000 && last.Timestamp !== 0) { status.innerText = `⏳ Wait 5 Mins for EXIT!`; status.style.color = "#f43f5e"; return; }
                             
                             let mode = last.state === "IN" ? "OUT" : "IN";
                             if(ear < 0.28) {
                                 isProcessing = true; studentHistory[roll] = { state: mode, Timestamp: now };
-                                pushAtt(name, roll, phone, mode);
-                                speak(mode === "IN" ? `Aapka swagat hai ${name}` : `Milte hai agle din ${name}`);
-                                status.innerText = `${mode} Saved: ${name}`; status.className = "p-3 bg-light rounded-pill fw-bold text-success";
+                                pushAttToDB(name, roll, phone, mode);
+                                speakHIN(mode === "IN" ? `Aapka swagat hai ${name}` : `Milte hai agle din ${name}`);
+                                status.innerText = `${mode} marked: ${name}`; status.style.color = "#10b981";
                                 setTimeout(() => isProcessing = false, 3500);
                             } else {
-                                status.innerText = `${name} Recognized. Blink for ${mode}!`; status.className = "p-3 bg-light rounded-pill fw-bold text-info";
+                                status.innerText = `${name}, Blink once for ${mode}!`; status.style.color = "#38bdf8";
                             }
                         } else {
-                            status.innerText = "UNKNOWN PERSON!"; status.className = "p-3 bg-light rounded-pill fw-bold text-danger";
+                            status.innerText = "UNKNOWN PERSON ALERT!"; status.style.color = "#f43f5e";
                         }
                     });
                 }, 250);
             };
         }
 
-        function speak(t) { const s = new SpeechSynthesisUtterance(t); s.lang = 'hi-IN'; window.speechSynthesis.speak(s); }
+        // Voice Command
+        function speakHIN(t) { const s = new SpeechSynthesisUtterance(t); s.lang = 'hi-IN'; window.speechSynthesis.speak(s); }
 
-        function pushAtt(n, r, p, m) {
+        // --- CENTRAL ATTENDANCE DB FUNCTION ---
+        function pushAttToDB(n, r, p, m) {
             const now = new Date(); const tStr = now.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' });
             db.ref('Daily_Attendance').push({ RollNo: r, Name: n, Phone: p, Date: now.toLocaleDateString('en-IN'), Time: tStr, Timestamp: Date.now(), ScanType: m });
+            // SMS logic via bypass
             const targetP = allStudents[r]?.ParentPhone || p;
-            sendSMS(targetP, n, tStr, m);
+            sendSMSBypass(targetP, n, tStr, m);
         }
 
-        function sendSMS(p, n, t, m) {
-            if(!p || p.length < 10) return;
+        // Send SMS Bypass (₹5 version, ensuring success)
+        function sendSMSBypass(p, n, t, m) {
             const proxy = "https://corsproxy.io/?https://www.fast2sms.com/dev/bulkV2";
-            const msg = m === "IN" ? `Sky Classes: Aapka baccha ${n} coaching par ${t} baje pahunch gaya hai.` : `Sky Classes: Aapka baccha ${n} coaching se ${t} baje nikal gaya hai.`;
+            const msg = m === "IN" ? `Sky Classes: Aapka baccha ${n} coaching par pahunch gaya hai.` : `Sky Classes: Aapka baccha ${n} coaching se nikal gaya hai.`;
             fetch(proxy, { method: "POST", headers: { "authorization": "5kO3otv1Ra9gTwlQDUze6IWVhBmKNnb80c2AJMP4CLXiFrpYdSrHbiDTSLOZM65YR4QeqBFKd3sN0gpv", "Content-Type": "application/json" }, body: JSON.stringify({ "route": "q", "message": msg, "language": "english", "flash": 0, "numbers": p }) })
-            .catch(err => console.error("SMS Error:", err));
+            .catch(err => console.error("SMS Error (Expected):", err));
         }
 
+        // --- ATTENDANCE REPORTING ---
         function filterAttendanceData() {
             const target = new Date(document.getElementById('dateFilter').value).toLocaleDateString('en-IN');
             let grouped = {};
             allAttendance.forEach(r => {
                 if(r.Date === target) {
-                    if(!grouped[r.RollNo]) grouped[r.RollNo] = { name:r.Name, roll:r.RollNo, in:"--", out:"--" };
+                    if(!grouped[r.RollNo]) grouped[r.RollNo] = { name:r.Name, roll:r.RollNo, cls:allStudents[r.RollNo]?.Class || "N/A", in:"--", out:"--" };
                     if(r.ScanType==="IN" && grouped[r.RollNo].in==="--") grouped[r.RollNo].in = r.Time;
                     else if(r.ScanType==="OUT") grouped[r.RollNo].out = r.Time;
                 }
             });
             const b = document.getElementById('attendanceBody'); b.innerHTML = '';
-            Object.values(grouped).forEach(st => b.innerHTML += `<tr><td class="fw-bold">${st.roll}</td><td>${st.name}</td><td class="text-success">${st.in}</td><td class="text-danger">${st.out}</td><td><span class="badge ${st.out!=='--'?'bg-success':'bg-warning text-dark'}">${st.out!=='--'?'Left':'In'}</span></td></tr>`);
+            Object.values(grouped).forEach(st => b.innerHTML += `<tr><td class="fw-bold">${st.roll}</td><td>${st.name}</td><td>${st.cls}</td><td class="text-success">${st.in}</td><td class="text-danger">${st.out}</td><td><span class="badge ${st.out!=='--'?'bg-success':'bg-warning text-dark'}">${st.out!=='--'?'Left':'Inside'}</span></td></tr>`);
         }
 
-        // --- PDFS ---
-        function genReceipt(r) {
+        // --- PDFS GENERATION ---
+        function generateReceiptPDF(r) {
             const st = allStudents[r]; const { jsPDF } = window.jspdf; const doc = new jsPDF();
             doc.setFillColor(15,23,42); doc.rect(0,0,210,40,'F');
             doc.setTextColor(255); doc.setFontSize(22); doc.text("SKY CLASSES", 105, 20, {align:'center'});
-            doc.setFontSize(10); doc.text("Receipt & Admission Document", 105, 30, {align:'center'});
+            doc.setFontSize(10); doc.text("Student Admission & Fees Receipt", 105, 30, {align:'center'});
             doc.setTextColor(0); doc.text(`Date: ${new Date().toLocaleDateString()}`, 160, 50);
-            doc.autoTable({ startY:60, head:[['Detail','Value']], body:[['Roll No', st.RollNo],['Name', st.Name],['Class', st.Class],['Total Fees', 'INR '+st.TotalFees],['Paid', 'INR '+st.PaidFees],['Due', 'INR '+(st.TotalFees-st.PaidFees)]], theme:'grid' });
-            doc.text("Director Signature:", 150, 150); doc.setFont("courier","bold"); doc.text(DIR_NAME, 150, 160);
-            doc.save(`Receipt_${st.RollNo}.pdf`);
+            doc.autoTable({ startY:60, head:[['Detail','Value']], body:[['Roll No', st.RollNo],['Name', st.Name],['Class', st.Class],['Address', st.Address],['Total Course Fees', 'INR '+st.TotalFees],['Paid Fees', 'INR '+st.PaidFees],['Due Balance', 'INR '+(st.TotalFees-st.PaidFees)]], theme:'striped' });
+            doc.text("Director Signature:", 150, 150); doc.setFont("courier","bold"); doc.text(DIRECTOR_NAME, 150, 160);
+            doc.save(`Receipt_${st.RollNo}_${st.Name}.pdf`);
         }
 
         function downloadAttendancePDF() {
             const { jsPDF } = window.jspdf; const doc = new jsPDF();
-            doc.text("Attendance Report - " + document.getElementById('dateFilter').value, 14, 20);
-            // Table ID updated for jspdf-autotable parsing
-            doc.autoTable({ html: '#attendanceTable', startY: 30 });
-            doc.save("Attendance_Log.pdf");
+            doc.text("Sky Classes Attendance Report - " + document.getElementById('dateFilter').value, 14, 20);
+            doc.autoTable({ html: '#attendanceTable', startY: 30, theme: 'grid' });
+            doc.save("Sky_Classes_Attendance_Log.pdf");
         }
     </script>
 </body>
