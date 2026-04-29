@@ -296,21 +296,22 @@
             document.getElementById('countAdmissions').innerText = count;
         }
 
-        // ==========================================
-        // FAST2SMS API AUTO MSG LOGIC
+       // ==========================================
+        // FAST2SMS API AUTO MSG LOGIC (CORS BYPASS)
         // ==========================================
         function sendAutoMsg(parentPhone, studentName, time, mode) {
             if(!parentPhone || parentPhone.length < 10) return;
 
-            // Message text depending on ENTRY or EXIT
             let msg = mode === "IN" 
                 ? `Dear Parent, aapka baccha ${studentName} Sky Classes par ${time} baje pahunch gaya hai.`
                 : `Dear Parent, aapka baccha ${studentName} Sky Classes se ${time} baje nikal gaya hai.`;
 
             console.log("Sending Msg: ", parentPhone, " -> ", msg);
 
-            // Using the API Key provided
-            fetch("https://www.fast2sms.com/dev/bulkV2", {
+            // CORS bypass proxy URL
+            const proxyUrl = "https://corsproxy.io/?https://www.fast2sms.com/dev/bulkV2";
+
+            fetch(proxyUrl, {
                 method: "POST",
                 headers: {
                     "authorization": "5kO3otv1Ra9gTwlQDUze6IWVhBmKNnb80c2AJMP4CLXiFrpYdSrHbiDTSLOZM65YR4QeqBFKd3sN0gpv",
@@ -325,7 +326,14 @@
                 })
             })
             .then(res => res.json())
-            .then(data => console.log("SMS API Response: ", data))
+            .then(data => {
+                console.log("SMS API Response: ", data);
+                if(data.return) {
+                    console.log("Message Sent Successfully!");
+                } else {
+                    console.error("Fast2SMS Error: ", data.message);
+                }
+            })
             .catch(err => console.error("Error Sending Msg:", err));
         }
         // ==========================================
