@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SKY MEGA ERP | Director Sandesh Sir Edition</title>
+    <title>SKY MEGA ERP | Director Sandesh Sir</title>
     
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Outfit:wght@800&display=swap" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -16,120 +16,137 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.31/jspdf.plugin.autotable.min.js"></script>
 
     <style>
-        :root { --blue: #3b82f6; --dark: #0f172a; --gold: #f59e0b; --accent-red: #D90429; }
+        :root { --blue: #3b82f6; --dark: #0f172a; --gold: #f59e0b; }
         body { font-family: 'Poppins', sans-serif; background: #f1f5f9; margin: 0; overflow: hidden; }
         
-        .sidebar { height: 100vh; background: var(--dark); color: white; width: 280px; position: fixed; overflow-y: auto; z-index: 1000; box-shadow: 5px 0 25px rgba(0,0,0,0.2); }
+        /* Sidebar */
+        .sidebar { height: 100vh; background: var(--dark); color: white; width: 260px; position: fixed; overflow-y: auto; z-index: 1000; box-shadow: 5px 0 25px rgba(0,0,0,0.2); }
         .sidebar a { padding: 12px 25px; color: #94a3b8; display: block; text-decoration: none; font-size: 13px; border-left: 4px solid transparent; cursor: pointer; transition: 0.3s; }
         .sidebar a:hover, .sidebar a.active { background: rgba(59, 130, 246, 0.1); color: white; border-left-color: var(--blue); }
-        .sidebar h5 { letter-spacing: 2px; color: var(--gold); padding: 20px; font-weight: 800; border-bottom: 1px solid rgba(255,255,255,0.05); }
+        .sidebar h5 { letter-spacing: 2px; color: var(--gold); padding: 20px; font-weight: 800; text-align: center; }
 
-        .main-view { margin-left: 280px; padding: 30px; height: 100vh; overflow-y: auto; }
+        /* Main Content */
+        .main-view { margin-left: 260px; padding: 30px; height: 100vh; overflow-y: auto; }
         .glass-panel { background: white; border-radius: 20px; padding: 25px; box-shadow: 0 10px 25px rgba(0,0,0,0.05); border: 1px solid #e2e8f0; margin-bottom: 25px; }
 
-        .scanner-container { width: 100%; max-width: 400px; aspect-ratio: 3/4; background: #000; border-radius: 25px; overflow: hidden; position: relative; margin: 0 auto; border: 4px solid var(--gold); }
-        video, canvas { position: absolute; width: 100%; height: 100%; object-fit: cover; transform: scaleX(-1); top:0; left:0; }
-        .scan-line { position: absolute; width: 100%; height: 2px; background: #fbbf24; box-shadow: 0 0 15px #fbbf24; animation: scan 2.5s infinite; z-index: 5; }
-        @keyframes scan { 0% { top: 5%; } 100% { top: 95%; } }
+        /* Camera UI */
+        .camera-wrapper { position: relative; width: 100%; max-width: 350px; aspect-ratio: 3/4; border-radius: 20px; overflow: hidden; background: #000; margin: 0 auto; border: 4px solid #fff; }
+        video, canvas { position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; }
+        .scan-line { position: absolute; top: 0; left: 0; width: 100%; height: 2px; background: #fbbf24; box-shadow: 0 0 15px #fbbf24; animation: scanAnim 2.5s infinite; z-index: 5; }
+        @keyframes scanAnim { 0% { top: 5%; } 100% { top: 95%; } }
 
         .tab-content { display: none; }
         .tab-content.active { display: block; animation: fadeIn 0.4s ease; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; } }
 
-        #loginOverlay { position: fixed; width:100%; height:100vh; z-index:10001; display:flex; align-items:center; justify-content:center; background: linear-gradient(rgba(15,23,42,0.95), rgba(15,23,42,0.9)), url('https://images.unsplash.com/photo-1523240795612-9a054b0db644') center/cover; }
-        .login-card { background: rgba(255,255,255,0.05); backdrop-filter: blur(20px); padding: 50px; border-radius: 30px; text-align: center; color: white; width: 450px; border: 1px solid rgba(255,255,255,0.1); }
+        #loginOverlay { position: fixed; width:100%; height:100vh; background: linear-gradient(rgba(15,23,42,0.95), rgba(15,23,42,0.9)), url('https://images.unsplash.com/photo-1523240795612-9a054b0db644') center/cover; z-index:10001; display:flex; align-items:center; justify-content:center; }
     </style>
 </head>
 <body>
 
 <div id="loginOverlay">
-    <div class="login-card">
-        <h1 style="font-family:'Outfit'; font-size:3.5rem;">SKY <span style="color:var(--blue)">ERP</span></h1>
-        <p class="fw-bold text-uppercase mb-5" style="letter-spacing:2px; color:#94a3b8;">Director Sandesh Sir Login</p>
-        <input type="password" id="pLock" class="form-control mb-4 text-center p-3 rounded-pill" placeholder="Admin PIN">
+    <div class="text-center text-white p-5 rounded-5" style="background:rgba(255,255,255,0.05); backdrop-filter:blur(20px); border:1px solid rgba(255,255,255,0.1); width: 400px;">
+        <h1 style="font-family:'Outfit'; font-size:3rem;">SKY <span style="color:var(--blue)">ERP</span></h1>
+        <p class="small text-uppercase mb-4">Director Sandesh Sir</p>
+        <input type="password" id="pLock" class="form-control mb-3 text-center p-3 rounded-pill" placeholder="Enter PIN">
         <button class="btn btn-primary w-100 p-3 rounded-pill fw-bold" onclick="unlock()">ACCESS SYSTEM</button>
     </div>
 </div>
 
 <div id="app" style="display:none;">
     <div class="sidebar">
-        <div class="p-4 text-center"><h5>SKY CLASSES</h5></div>
+        <h5>SKY CLASSES</h5>
         <a onclick="tab('dash')" id="m-dash" class="active"><i class="fa-solid fa-gauge me-2"></i> Dashboard</a>
+        <a onclick="tab('gate')" id="m-gate"><i class="fa-solid fa-face-viewfinder me-2"></i> AI Smart Gate</a>
+        <a onclick="tab('enroll')" id="m-enroll"><i class="fa-solid fa-camera me-2"></i> Enroll Face</a>
         <a onclick="tab('admit')" id="m-admit"><i class="fa-solid fa-user-plus me-2"></i> Admissions</a>
-        <a onclick="tab('enroll')" id="m-enroll"><i class="fa-solid fa-camera me-2"></i> Face Registration</a>
-        <a onclick="tab('gate')" id="m-gate"><i class="fa-solid fa-face-viewfinder me-2"></i> AI Gate Scanner</a>
         <a onclick="tab('logs')" id="m-logs"><i class="fa-solid fa-history me-2"></i> Attendance Logs</a>
-        <hr class="opacity-25 mx-3">
         <a onclick="location.reload()" class="text-danger mt-5"><i class="fa-solid fa-power-off me-2"></i> Logout</a>
     </div>
 
     <div class="main-view">
         <div id="tab-dash" class="tab-content active">
-            <div class="row g-4 mb-4">
-                <div class="col-md-6"><div class="glass-panel text-center"><h6>Total Students</h6><h2 id="stC">0</h2></div></div>
-                <div class="col-md-6"><div class="glass-panel text-center"><h6>Present Today</h6><h2 id="atC">0</h2></div></div>
-            </div>
-            <div class="glass-panel"><h3>Welcome Sandesh Sir</h3><p>Coaching ERP is fully synced.</p></div>
-        </div>
-        
-        <div id="tab-admit" class="tab-content">
             <div class="glass-panel">
-                <div class="d-flex justify-content-between mb-4">
-                    <h4>Student Directory</h4>
-                    <button class="btn btn-success" onclick="downloadCSV('admissions')">Export Excel</button>
-                </div>
-                <table class="table">
-                    <thead><tr><th>Roll</th><th>Name</th><th>Phone</th><th>Action</th></tr></thead>
-                    <tbody id="admissionsBody"></tbody>
-                </table>
-            </div>
-        </div>
-
-        <div id="tab-enroll" class="tab-content">
-            <div class="glass-panel text-center">
-                <h4>Fast Student Registration</h4>
-                <div class="scanner-container mb-3">
-                    <video id="vReg" autoplay muted playsinline></video>
-                    <canvas id="cReg"></canvas>
-                </div>
-                <p id="regStatus" class="fw-bold text-danger">Align face for Blue Box...</p>
-                <input type="text" id="rName" class="form-control mb-2" placeholder="Full Name">
-                <input type="tel" id="rPhone" class="form-control mb-2" placeholder="Student Phone">
-                <input type="tel" id="rParent" class="form-control mb-3" placeholder="Parent Phone">
-                <button class="btn btn-primary w-100 p-3" id="regBtn" onclick="registerFace()" disabled>Waiting for Face Lock...</button>
+                <h3>Namaste, Sandesh Sir!</h3>
+                <p class="text-muted">System is online. Total 5 features integrated.</p>
             </div>
         </div>
 
         <div id="tab-gate" class="tab-content text-center">
             <div class="glass-panel">
-                <h4>AI Auto Smart Gate</h4>
-                <div class="scanner-container mb-3">
+                <div class="d-flex justify-content-between mb-3">
+                    <h4>AI Smart Gate</h4>
+                    <button class="btn btn-sm btn-outline-dark" onclick="toggleCamera()">Flip Camera</button>
+                </div>
+                <div class="camera-wrapper">
                     <video id="vGate" autoplay muted playsinline></video>
                     <canvas id="cGate"></canvas>
                     <div class="scan-line"></div>
                 </div>
-                <p id="gateStatus" class="fw-bold text-primary">Scanning Area...</p>
-                <p class="small text-muted">Blink to mark attendance</p>
+                <h5 id="gateStatus" class="mt-4 fw-bold text-primary">Scanning...</h5>
+            </div>
+        </div>
+
+        <div id="tab-enroll" class="tab-content">
+            <div class="glass-panel text-center">
+                <h4>Face Registration</h4>
+                <div class="camera-wrapper mb-3" style="max-height: 250px;">
+                    <video id="vEnroll" autoplay muted playsinline></video>
+                    <canvas id="cEnroll"></canvas>
+                </div>
+                <p id="eStatus" class="text-danger fw-bold">Align Face...</p>
+                <div class="mx-auto" style="max-width: 350px;">
+                    <input type="text" id="eName" class="form-control mb-2" placeholder="Full Name">
+                    <input type="tel" id="ePhone" class="form-control mb-3" placeholder="Mobile Number">
+                    <button id="btnE" class="btn btn-success w-100 p-3 fw-bold" onclick="enrollFace()" disabled>Capture & Save</button>
+                </div>
+            </div>
+        </div>
+
+        <div id="tab-admit" class="tab-content">
+            <div class="glass-panel">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <h4>Student Admissions</h4>
+                    <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addModal">New Student</button>
+                </div>
+                <table class="table">
+                    <thead><tr><th>Roll No</th><th>Name</th><th>Phone</th><th>Action</th></tr></thead>
+                    <tbody id="stuBody"></tbody>
+                </table>
             </div>
         </div>
 
         <div id="tab-logs" class="tab-content">
             <div class="glass-panel">
-                <div class="d-flex justify-content-between mb-4">
-                    <h4>Daily Logs</h4>
-                    <input type="date" id="dateFilter" class="form-control" style="width:200px" onchange="filterAttendanceData()">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <h4>Attendance Logs</h4>
+                    <div class="d-flex gap-2">
+                        <input type="date" id="logDate" class="form-control" onchange="loadLogs()">
+                        <button class="btn btn-danger" onclick="downloadLogsPDF()">PDF</button>
+                    </div>
                 </div>
-                <table class="table" id="logTable">
-                    <thead><tr><th>Name</th><th>Entry</th><th>Exit</th><th>Status</th></tr></thead>
-                    <tbody id="attendanceBody"></tbody>
+                <table class="table">
+                    <thead class="table-dark"><tr><th>Roll</th><th>Name</th><th>In</th><th>Out</th></tr></thead>
+                    <tbody id="logBody"></tbody>
                 </table>
             </div>
         </div>
     </div>
 </div>
 
+<div class="modal fade" id="addModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content p-4">
+            <h5>New Admission</h5>
+            <input type="text" id="sN" class="form-control mb-2" placeholder="Student Name">
+            <input type="text" id="sC" class="form-control mb-2" placeholder="Class">
+            <input type="tel" id="sP" class="form-control mb-3" placeholder="Parent Phone">
+            <button class="btn btn-primary w-100" onclick="saveAdmission()">Save & Generate Roll No</button>
+        </div>
+    </div>
+</div>
+
 <script>
-// --- Config ---
 const firebaseConfig = {
     apiKey: "AIzaSyC6bcqETEnTjLEQnISXjnWR2brPrVOAm-Y",
     authDomain: "sky-classes-db-d6140.firebaseapp.com",
@@ -139,29 +156,16 @@ const firebaseConfig = {
 };
 firebase.initializeApp(firebaseConfig);
 const db = firebase.database();
+
 const MODEL_URL = 'https://cdn.jsdelivr.net/npm/@vladmandic/face-api/model/';
+let faceMatcher = null, isProc = false, useFront = true, studentHistory = {};
 
-let studentData = {}; let attendanceList = []; let faceMatcher = null; let proc = false; let history = {};
-
-// --- Auth ---
 function unlock() {
     if(document.getElementById('pLock').value === "SkyAdmin123") {
         document.getElementById('loginOverlay').style.display='none';
         document.getElementById('app').style.display='block';
         init();
-    } else alert("Wrong PIN!");
-}
-
-function init() {
-    db.ref('Student_Admissions').on('value', s => { 
-        studentData = s.val() || {}; 
-        renderDirectory(); 
-        fetchFaces();
-    });
-    db.ref('Daily_Attendance').on('value', s => { 
-        attendanceList = Object.values(s.val() || {}); 
-        filterAttendanceData(); 
-    });
+    } else alert("Wrong PIN");
 }
 
 function tab(id) {
@@ -170,117 +174,116 @@ function tab(id) {
     document.getElementById('tab-'+id).classList.add('active');
     document.getElementById('m-'+id).classList.add('active');
     stopCams();
-    if(id === 'enroll') startRegCam();
-    if(id === 'gate') startGateCam();
+    if(id === 'gate') startCam('vGate', 'cGate', true);
+    if(id === 'enroll') startCam('vEnroll', 'cEnroll', false);
 }
 
-function stopCams() {
-    if(window.gS) window.gS.getTracks().forEach(t => t.stop());
-    if(window.rS) window.eS.getTracks().forEach(t => t.stop());
+async function init() {
+    await Promise.all([
+        faceapi.nets.ssdMobilenetv1.loadFromUri(MODEL_URL),
+        faceapi.nets.tinyFaceDetector.loadFromUri(MODEL_URL),
+        faceapi.nets.faceLandmark68Net.loadFromUri(MODEL_URL),
+        faceapi.nets.faceRecognitionNet.loadFromUri(MODEL_URL)
+    ]);
+    db.ref('Face_Data').on('value', snap => {
+        const data = snap.val(); if(!data) return;
+        const labeled = [];
+        for (let p in data) labeled.push(new faceapi.LabeledFaceDescriptors(data[p].Name+"||"+p, [new Float32Array(data[p].FaceDescriptor)]));
+        faceMatcher = new faceapi.FaceMatcher(labeled, 0.5);
+    });
+    loadAdmissions();
+    document.getElementById('logDate').valueAsDate = new Date();
 }
 
-// --- Face Registration Logic ---
-async function startRegCam() {
-    await Promise.all([faceapi.nets.tinyFaceDetector.loadFromUri(MODEL_URL), faceapi.nets.faceLandmark68Net.loadFromUri(MODEL_URL), faceapi.nets.faceRecognitionNet.loadFromUri(MODEL_URL)]);
-    const v = document.getElementById('vReg'); const c = document.getElementById('cReg');
-    navigator.mediaDevices.getUserMedia({ video: true }).then(s => { window.rS = s; v.srcObject = s; });
-    v.onplay = () => {
-        faceapi.matchDimensions(c, v);
-        setInterval(async () => {
-            const det = await faceapi.detectSingleFace(v, new faceapi.TinyFaceDetectorOptions()).withFaceLandmarks();
-            c.getContext('2d').clearRect(0,0,c.width,c.height);
-            if(det) {
-                document.getElementById('regBtn').disabled = false;
-                document.getElementById('regBtn').innerHTML = "Capture & Save Data";
-                document.getElementById('regStatus').innerHTML = "Face Locked!";
-                faceapi.draw.drawDetections(c, faceapi.resizeResults(det, v));
-            }
-        }, 200);
-    }
-}
-
-async function registerFace() {
-    const name = document.getElementById('rName').value;
-    const phone = document.getElementById('rPhone').value;
-    const roll = 'SKY-' + Math.floor(1000 + Math.random() * 9000);
+function startCam(vidId, canId, isGate) {
+    const v = document.getElementById(vidId), c = document.getElementById(canId);
+    navigator.mediaDevices.getUserMedia({ video: { facingMode: useFront?"user":"environment" } })
+    .then(s => { window.stream = s; v.srcObject = s; v.style.transform = useFront?"scaleX(-1)":"scaleX(1)"; });
     
-    const det = await faceapi.detectSingleFace(document.getElementById('vReg'), new faceapi.TinyFaceDetectorOptions()).withFaceLandmarks().withFaceDescriptor();
-    if(det) {
-        // Save to Face_Data for AI
-        await db.ref('Face_Data/' + phone).set({ Name: name, FaceDescriptor: Array.from(det.descriptor) });
-        // Save to Admissions for Directory with Auto Roll
-        await db.ref('Student_Admissions/' + roll).set({ RollNo: roll, Name: name, Phone: phone, Parent: document.getElementById('rParent').value, Date: new Date().toLocaleDateString('en-IN') });
-        
-        generatePDF(name, roll, phone);
-        alert("Success! Roll: " + roll);
-        location.reload();
-    }
-}
-
-// --- AI Gate Logic ---
-async function fetchFaces() {
-    const snap = await db.ref('Face_Data').once('value');
-    const data = snap.val(); if(!data) return;
-    const labeled = [];
-    for (let p in data) {
-        labeled.push(new faceapi.LabeledFaceDescriptors(data[p].Name+"||"+p, [new Float32Array(data[p].FaceDescriptor)]));
-    }
-    faceMatcher = new faceapi.FaceMatcher(labeled, 0.5);
-}
-
-async function startGateCam() {
-    await faceapi.nets.ssdMobilenetv1.loadFromUri(MODEL_URL);
-    const v = document.getElementById('vGate'); const c = document.getElementById('cGate');
-    navigator.mediaDevices.getUserMedia({ video: true }).then(s => { window.gS = s; v.srcObject = s; });
     v.onplay = () => {
         faceapi.matchDimensions(c, v);
-        setInterval(async () => {
-            if(!faceMatcher || proc) return;
-            const dets = await faceapi.detectAllFaces(v).withFaceLandmarks().withFaceDescriptors();
-            if(dets.length > 0) {
-                const best = faceMatcher.findBestMatch(dets[0].descriptor);
+        window.intv = setInterval(async () => {
+            const det = isGate ? await faceapi.detectAllFaces(v).withFaceLandmarks().withFaceDescriptors() : await faceapi.detectSingleFace(v, new faceapi.TinyFaceDetectorOptions()).withFaceLandmarks();
+            const ctx = c.getContext('2d'); ctx.clearRect(0,0,c.width,c.height);
+            if(!det) return;
+
+            if(isGate && faceMatcher && !isProc) {
+                const best = faceMatcher.findBestMatch(det[0].descriptor);
                 if(best.label !== 'unknown') {
-                    const [name, phone] = best.label.split("||");
-                    // Blink logic simplified for ear < 0.28
-                    proc = true; 
-                    markAttendance(name, phone);
-                    setTimeout(()=> proc=false, 5000);
+                    const [n, p] = best.label.split("||");
+                    const eye = det[0].landmarks.getLeftEye();
+                    const ear = (Math.sqrt(Math.pow(eye[1].x-eye[5].x,2)+Math.pow(eye[1].y-eye[5].y,2)) + Math.sqrt(Math.pow(eye[2].x-eye[4].x,2)+Math.pow(eye[2].y-eye[4].y,2))) / (2 * Math.sqrt(Math.pow(eye[0].x-eye[3].x,2)+Math.pow(eye[0].y-eye[3].y,2)));
+                    if(ear < 0.28) { isProc = true; handleGate(n, p); setTimeout(()=>isProc=false, 5000); }
+                    else document.getElementById('gateStatus').innerText = `${n} Found. Blink!`;
                 }
+            } else if(!isGate) {
+                document.getElementById('eStatus').innerText = "Face Locked!";
+                document.getElementById('btnE').disabled = false;
             }
-        }, 500);
+        }, 300);
+    };
+}
+
+function handleGate(n, p) {
+    const now = Date.now(), last = studentHistory[p] || {s:"OUT", t:0};
+    if(now - last.t < 300000 && last.t !== 0) return alert("Wait 5 mins");
+    const m = last.s === "IN" ? "OUT" : "IN";
+    studentHistory[p] = {s:m, t:now};
+    db.ref('Daily_Attendance').push({ Name:n, Phone:p, Time:new Date().toLocaleTimeString(), Date:new Date().toLocaleDateString('en-IN'), ScanType:m, Timestamp:now });
+    const u = new SpeechSynthesisUtterance(n + " " + m); window.speechSynthesis.speak(u);
+}
+
+async function enrollFace() {
+    const n = document.getElementById('eName').value, p = document.getElementById('ePhone').value;
+    const det = await faceapi.detectSingleFace(document.getElementById('vEnroll')).withFaceLandmarks().withFaceDescriptor();
+    if(det) {
+        await db.ref('Face_Data/'+p).set({ Name:n, FaceDescriptor: Array.from(det.descriptor) });
+        alert("Enrolled!"); location.reload();
     }
 }
 
-function markAttendance(n, p) {
-    const now = new Date();
-    db.ref('Daily_Attendance').push({ Name: n, Phone: p, Time: now.toLocaleTimeString(), Date: now.toLocaleDateString('en-IN'), ScanType: "IN" });
-    const u = new SpeechSynthesisUtterance("Welcome " + n); u.lang='en-IN'; window.speechSynthesis.speak(u);
+async function saveAdmission() {
+    const n = document.getElementById('sN').value, c = document.getElementById('sC').value, p = document.getElementById('sP').value;
+    const snap = await db.ref('Student_Admissions').limitToLast(1).once('value');
+    let last = 1000; if(snap.exists()) last = parseInt(Object.values(snap.val())[0].RollNo.split('-')[1]);
+    const roll = "SKY-"+(last+1);
+    await db.ref('Student_Admissions/'+roll).set({ RollNo:roll, Name:n, Class:c, Phone:p, Date:new Date().toLocaleDateString('en-IN') });
+    alert("Saved! Roll: "+roll); location.reload();
 }
 
-// --- UI Rendering ---
-function renderDirectory() {
-    const b = document.getElementById('admissionsBody'); b.innerHTML = '';
-    Object.values(studentData).forEach(s => {
-        b.innerHTML += `<tr><td>${s.RollNo}</td><td>${s.Name}</td><td>${s.Phone}</td><td><button class="btn btn-sm btn-danger" onclick="del('${s.RollNo}')">Delete</button></td></tr>`;
-    });
-    document.getElementById('stC').innerText = Object.keys(studentData).length;
-}
-
-function filterAttendanceData() {
-    const b = document.getElementById('attendanceBody'); b.innerHTML = '';
-    attendanceList.forEach(a => {
-        b.innerHTML += `<tr><td>${a.Name}</td><td>${a.Time}</td><td>--</td><td>Present</td></tr>`;
+function loadAdmissions() {
+    db.ref('Student_Admissions').on('value', snap => {
+        const b = document.getElementById('stuBody'); b.innerHTML = '';
+        if(snap.exists()) Object.values(snap.val()).forEach(s => {
+            b.innerHTML += `<tr><td>${s.RollNo}</td><td>${s.Name}</td><td>${s.Phone}</td><td><button class='btn btn-sm btn-danger' onclick="db.ref('Student_Admissions/${s.RollNo}').remove()">X</button></td></tr>`;
+        });
     });
 }
 
-function generatePDF(name, roll, phone) {
+function loadLogs() {
+    const d = new Date(document.getElementById('logDate').value).toLocaleDateString('en-IN');
+    db.ref('Daily_Attendance').once('value', snap => {
+        const b = document.getElementById('logBody'); b.innerHTML = '';
+        const logs = {};
+        if(snap.exists()) Object.values(snap.val()).forEach(r => {
+            if(r.Date === d) {
+                if(!logs[r.Phone]) logs[r.Phone] = {n:r.Name, i:'--', o:'--'};
+                if(r.ScanType === 'IN') logs[r.Phone].i = r.Time; else logs[r.Phone].o = r.Time;
+            }
+        });
+        for(let k in logs) b.innerHTML += `<tr><td>${k}</td><td>${logs[k].n}</td><td>${logs[k].i}</td><td>${logs[k].o}</td></tr>`;
+    });
+}
+
+function downloadLogsPDF() {
     const { jsPDF } = window.jspdf; const doc = new jsPDF();
-    doc.text(`SKY CLASSES - ADMISSION RECEIPT`, 20, 20);
-    doc.text(`Roll No: ${roll}`, 20, 40);
-    doc.text(`Name: ${name}`, 20, 50);
-    doc.text(`Phone: ${phone}`, 20, 60);
-    doc.save(`${name}_Receipt.pdf`);
+    doc.text("SKY CLASSES - DAILY ATTENDANCE", 105, 20, {align:'center'});
+    doc.autoTable({ html: '#tab-logs table', startY: 30 });
+    doc.save("Attendance.pdf");
 }
+
+function stopCams() { if(window.stream) window.stream.getTracks().forEach(t=>t.stop()); clearInterval(window.intv); }
+function toggleCamera() { useFront = !useFront; stopCams(); startCam('vGate', 'cGate', true); }
 </script>
 </body>
 </html>
