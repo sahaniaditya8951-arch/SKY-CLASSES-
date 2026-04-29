@@ -19,27 +19,24 @@
         :root { --blue: #3b82f6; --dark: #0f172a; --gold: #f59e0b; --light: #f1f5f9; }
         body { font-family: 'Poppins', sans-serif; background: var(--light); margin: 0; overflow: hidden; }
         
-        /* Sidebar Design */
         .sidebar { height: 100vh; background: var(--dark); color: white; width: 280px; position: fixed; overflow-y: auto; z-index: 1000; box-shadow: 5px 0 20px rgba(0,0,0,0.2); }
         .sidebar a { padding: 14px 25px; color: #94a3b8; display: block; text-decoration: none; font-size: 13px; border-left: 4px solid transparent; cursor: pointer; transition: 0.3s; }
         .sidebar a:hover, .sidebar a.active { background: rgba(59, 130, 246, 0.1); color: white; border-left-color: var(--blue); }
         .sidebar h5 { letter-spacing: 2px; color: var(--gold); padding: 20px; font-weight: 800; border-bottom: 1px solid rgba(255,255,255,0.05); }
 
-        /* Main Area */
-        .main-view { margin-left: 280px; padding: 30px; height: 100vh; overflow-y: auto; transition: 0.3s; }
+        .main-view { margin-left: 280px; padding: 30px; height: 100vh; overflow-y: auto; }
         .glass-panel { background: white; border-radius: 20px; padding: 30px; box-shadow: 0 10px 30px rgba(0,0,0,0.05); border: 1px solid #e2e8f0; margin-bottom: 25px; }
 
-        /* Scanner Styling */
         .scanner-frame { width: 100%; max-width: 450px; aspect-ratio: 3/4; background: #000; border-radius: 30px; overflow: hidden; position: relative; margin: 0 auto; border: 8px solid #fff; box-shadow: 0 20px 50px rgba(0,0,0,0.2); }
         video, canvas { position: absolute; width: 100%; height: 100%; object-fit: cover; transform: scaleX(-1); top:0; left:0; }
         .laser-line { position: absolute; width: 100%; height: 3px; background: var(--gold); box-shadow: 0 0 20px var(--gold); animation: laserMove 3s infinite linear; z-index: 10; }
         @keyframes laserMove { 0% { top: 0%; } 100% { top: 100%; } }
 
-        .tab-content { display: none; }
-        .tab-content.active { display: block; animation: fadeIn 0.4s ease; }
+        .tab-section { display: none; }
+        .tab-section.active { display: block; animation: fadeIn 0.4s ease; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
-        #loginScreen { position: fixed; width:100%; height:100vh; background: linear-gradient(rgba(15,23,42,0.95), rgba(15,23,42,0.9)), url('https://images.unsplash.com/photo-1524178232363-1fb2b075b655?q=80&w=2070') center/cover; z-index:10001; display:flex; align-items:center; justify-content:center; }
+        #loginScreen { position: fixed; width:100%; height:100vh; background: linear-gradient(rgba(11,17,32,0.95), rgba(11,17,32,0.9)), url('https://images.unsplash.com/photo-1523240795612-9a054b0db644?q=80&w=2070') center/cover; z-index:10001; display:flex; align-items:center; justify-content:center; }
         .login-card { background: rgba(255,255,255,0.05); backdrop-filter: blur(20px); padding: 50px; border-radius: 30px; text-align: center; color: white; width: 450px; border: 1px solid rgba(255,255,255,0.1); }
     </style>
 </head>
@@ -48,15 +45,15 @@
 <div id="loginScreen">
     <div class="login-card">
         <h1 style="font-family:'Outfit'; font-size:3.5rem;">SKY <span style="color:var(--blue)">ERP</span></h1>
-        <p class="fw-bold text-uppercase mb-5" style="letter-spacing:3px;">Director Sandesh Sir</p>
-        <input type="password" id="pLock" class="form-control mb-4 text-center p-3 rounded-pill" style="background:rgba(255,255,255,0.1); color:white; border:none;" placeholder="Enter Director PIN">
+        <p class="fw-bold text-uppercase mb-5" style="letter-spacing:3px;">Director Sandesh Sir Login</p>
+        <input type="password" id="pLock" class="form-control mb-4 text-center p-3 rounded-pill" style="background:rgba(255,255,255,0.1); color:white; border:none;" placeholder="Admin Master Password">
         <button class="btn btn-primary w-100 p-3 rounded-pill fw-bold" onclick="unlock()">ACCESS SYSTEM</button>
     </div>
 </div>
 
 <div id="app" style="display:none;">
     <div class="sidebar">
-        <div class="p-4 text-center"><h5>SKY CLASSES</h5><small class="text-muted">ERP VERSION 3.0</small></div>
+        <div class="p-4 text-center"><h5>SKY CLASSES</h5><small class="text-muted">Master Admin</small></div>
         <a onclick="tab('dash')" id="m-dash" class="active"><i class="fa-solid fa-gauge me-2"></i> Dashboard</a>
         <a onclick="tab('admit')" id="m-admit"><i class="fa-solid fa-user-plus me-2"></i> Admissions</a>
         <a onclick="tab('gate')" id="m-gate"><i class="fa-solid fa-face-viewfinder me-2"></i> AI Gate</a>
@@ -65,92 +62,63 @@
         <a onclick="tab('logs')" id="m-logs"><i class="fa-solid fa-history me-2"></i> Daily Logs</a>
         <a onclick="tab('enroll')" id="m-enroll"><i class="fa-solid fa-camera me-2"></i> Face Enroll</a>
         <hr class="mx-3 opacity-25">
-        <a onclick="tab('syllabus')" id="m-syllabus"><i class="fa-solid fa-book me-2"></i> Syllabus Tracker</a>
-        <a onclick="tab('salary')" id="m-salary"><i class="fa-solid fa-money-bill me-2"></i> Staff Salary</a>
-        <a onclick="tab('exam')" id="m-exam"><i class="fa-solid fa-file-pen me-2"></i> Exam Schedule</a>
-        <a onclick="tab('idcard')" id="m-idcard"><i class="fa-solid fa-id-card me-2"></i> ID Generator</a>
+        <a onclick="tab('syllabus')" id="m-syllabus"><i class="fa-solid fa-book me-2"></i> Syllabus</a>
+        <a onclick="tab('salary')" id="m-salary"><i class="fa-solid fa-money-bill me-2"></i> Salary</a>
+        <a onclick="tab('exam')" id="m-exam"><i class="fa-solid fa-file-pen me-2"></i> Exams</a>
+        <a onclick="tab('idcard')" id="m-idcard"><i class="fa-solid fa-id-card me-2"></i> ID Card</a>
         <a onclick="tab('notice')" id="m-notice"><i class="fa-solid fa-bullhorn me-2"></i> Notice Board</a>
-        <a onclick="tab('crm')" id="m-crm"><i class="fa-solid fa-phone me-2"></i> Inquiry CRM</a>
-        <a onclick="tab('todo')" id="m-todo"><i class="fa-solid fa-list-check me-2"></i> Director's To-Do</a>
+        <a onclick="tab('crm')" id="m-crm"><i class="fa-solid fa-phone me-2"></i> CRM</a>
+        <a onclick="tab('todo')" id="m-todo"><i class="fa-solid fa-check-double me-2"></i> To-Do</a>
         <a onclick="tab('library')" id="m-library"><i class="fa-solid fa-book-bookmark me-2"></i> Library</a>
-        <a onclick="tab('inventory')" id="m-inventory"><i class="fa-solid fa-box me-2"></i> Assets/Inventory</a>
-        <a onclick="tab('timetable')" id="m-timetable"><i class="fa-solid fa-calendar-alt me-2"></i> Timetable</a>
-        <a onclick="tab('birthday')" id="m-birthday"><i class="fa-solid fa-cake-candles me-2"></i> Birthdays</a>
-        <a onclick="tab('results')" id="m-results"><i class="fa-solid fa-chart-simple me-2"></i> Results</a>
+        <a onclick="tab('inventory')" id="m-inventory"><i class="fa-solid fa-box me-2"></i> Inventory</a>
+        <a onclick="tab('timetable')" id="m-timetable"><i class="fa-solid fa-calendar me-2"></i> Timetable</a>
+        <a onclick="tab('birthday')" id="m-birthday"><i class="fa-solid fa-cake me-2"></i> Birthdays</a>
+        <a onclick="tab('results')" id="m-results"><i class="fa-solid fa-chart-line me-2"></i> Results</a>
         <a onclick="tab('holiday')" id="m-holiday"><i class="fa-solid fa-sun me-2"></i> Holidays</a>
         <a onclick="tab('feedback')" id="m-feedback"><i class="fa-solid fa-comments me-2"></i> Feedback</a>
-        <a onclick="tab('security')" id="m-security"><i class="fa-solid fa-shield me-2"></i> Security Logs</a>
-        <a onclick="tab('settings')" id="m-settings"><i class="fa-solid fa-gears me-2"></i> ERP Settings</a>
+        <a onclick="tab('security')" id="m-security"><i class="fa-solid fa-shield me-2"></i> Security</a>
+        <a onclick="tab('settings')" id="m-settings"><i class="fa-solid fa-gear me-2"></i> Settings</a>
         <a onclick="location.reload()" class="text-danger mt-5"><i class="fa-solid fa-power-off me-2"></i> Logout</a>
     </div>
 
     <div class="main-view">
-        <div id="tab-dash" class="tab-content active">
-            <div class="row g-4 mb-5">
+        <div id="tab-dash" class="tab-section active">
+            <div class="row g-4 mb-4">
                 <div class="col-md-3"><div class="glass-panel text-white bg-primary"><h6>Students</h6><h2 id="stC">0</h2></div></div>
                 <div class="col-md-3"><div class="glass-panel text-white bg-success"><h6>Revenue</h6><h2 id="inC">₹0</h2></div></div>
                 <div class="col-md-3"><div class="glass-panel text-white bg-danger"><h6>Expense</h6><h2 id="exC">₹0</h2></div></div>
                 <div class="col-md-3"><div class="glass-panel text-white bg-warning text-dark"><h6>Net Profit</h6><h2 id="prC">₹0</h2></div></div>
             </div>
-            <div class="glass-panel"><h3>Welcome back, Sandesh Sir!</h3><p>Your coaching system is 100% operational. Everything is synced.</p></div>
+            <div class="glass-panel"><h3>Welcome back, Sandesh Sir!</h3><p>Your ERP is ready.</p></div>
         </div>
 
-        <div id="tab-admit" class="tab-content">
-            <div class="glass-panel">
-                <div class="d-flex justify-content-between mb-4"><h4>Admission Directory</h4><button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#adModal">+ New Admission</button></div>
-                <div class="table-responsive"><table class="table align-middle"><thead class="table-light"><tr><th>Roll No</th><th>Name</th><th>Class</th><th>Fees</th><th>Actions</th></tr></thead><tbody id="adTable"></tbody></table></div>
-            </div>
-        </div>
-
-        <div id="tab-gate" class="tab-content text-center">
-            <div class="glass-panel">
-                <h4>AI Gate Smart Attendance</h4>
-                <div class="scanner-frame mb-3"><video id="vG" autoplay muted playsinline></video><canvas id="cG"></canvas><div class="laser-line"></div></div>
-                <div id="gStatus" class="p-3 bg-light rounded-pill fw-bold text-primary">System Ready... Position Face</div>
-            </div>
-        </div>
-
-        <div id="tab-manual" class="tab-content">
-            <div class="glass-panel">
-                <h4>Manual Attendance Override</h4>
-                <div class="row g-3 mt-2" style="max-width:550px;"><div class="col-12"><input type="text" id="mR" class="form-control p-3" placeholder="Enter SKY-XXXX"></div><div class="col-6"><button class="btn btn-success w-100 p-3" onclick="manualM('IN')">MARK IN</button></div><div class="col-6"><button class="btn btn-danger w-100 p-3" onclick="manualM('OUT')">MARK OUT</button></div></div>
-            </div>
-        </div>
-
-        <div id="tab-enroll" class="tab-content text-center">
-            <div class="glass-panel">
-                <h4>Enroll Student Face ID</h4>
-                <input type="text" id="eR" class="form-control mb-3 text-center" placeholder="Search Roll No (SKY-XXXX)">
-                <button class="btn btn-primary w-100 mb-4" onclick="verifyForEnroll()">Verify Roll No</button>
-                <div class="scanner-frame mx-auto mb-4" style="width:250px; height:250px; border-radius:50%; border:6px solid var(--gold);"><video id="vE" autoplay muted playsinline></video></div>
-                <button id="eB" class="btn btn-dark w-100 p-3 rounded-pill fw-bold" onclick="saveFaceID()" disabled>LOCK FACE ID</button>
-            </div>
-        </div>
-
-        <div id="tab-fees" class="tab-section"><div class="glass-panel"><h4>Fees Manager</h4><div class="table-responsive"><table class="table"><tbody id="fBody"></tbody></table></div></div></div>
+        <div id="tab-admit" class="tab-section"><div class="glass-panel"><h4>Admissions</h4><button class="btn btn-primary mb-3" data-bs-toggle="modal" data-bs-target="#adModal">+ Admission</button><table class="table"><thead><tr><th>Roll</th><th>Name</th><th>Class</th><th>Action</th></tr></thead><tbody id="adTable"></tbody></table></div></div>
+        <div id="tab-gate" class="tab-section text-center"><div class="glass-panel"><h4>AI Gate</h4><div class="scanner-frame"><video id="vG" autoplay muted></video><canvas id="cG"></canvas><div class="laser-line"></div></div><p id="gStatus" class="mt-3 fw-bold text-primary">Position Face...</p></div></div>
+        <div id="tab-manual" class="tab-section"><div class="glass-panel"><h4>Manual Entry</h4><div class="row g-3" style="max-width:500px;"><div class="col-12"><input type="text" id="mR" class="form-control mb-2" placeholder="SKY-XXXX"></div><div class="col-6"><button class="btn btn-success w-100" onclick="mMark('IN')">IN</button></div><div class="col-6"><button class="btn btn-danger w-100" onclick="mMark('OUT')">OUT</button></div></div></div></div>
+        <div id="tab-enroll" class="tab-section text-center"><div class="glass-panel"><h4>Face Enrollment</h4><input type="text" id="eR" class="form-control mb-3 text-center" placeholder="Roll No"><div class="scanner-frame" style="width:250px; height:250px; border-radius:50%"><video id="vE" autoplay muted></video></div><button id="eB" class="btn btn-dark w-100 mt-4" onclick="saveF()" disabled>Lock Face ID</button></div></div>
         
-        <div id="tab-logs" class="tab-section"><div class="glass-panel"><h4>Daily Logs</h4><div class="d-flex justify-content-between mb-3"><input type="date" id="lDate" class="form-control" style="width:200px" onchange="loadL()"><button class="btn btn-danger" onclick="downloadReport()">Download PDF</button></div><table class="table" id="logTable"><thead><tr><th>Roll</th><th>Name</th><th>IN</th><th>OUT</th></tr></thead><tbody id="lB"></tbody></table></div></div>
-
-        <div id="tab-syllabus" class="tab-content"><div class="glass-panel"><h4>Syllabus</h4></div></div>
-        <div id="tab-salary" class="tab-content"><div class="glass-panel"><h4>Salary</h4></div></div>
-        <div id="tab-exam" class="tab-content"><div class="glass-panel"><h4>Exam</h4></div></div>
-        <div id="tab-idcard" class="tab-content"><div class="glass-panel"><h4>ID Card</h4><div id="idG"></div></div></div>
-        <div id="tab-notice" class="tab-content"><div class="glass-panel"><h4>Notice</h4></div></div>
-        <div id="tab-crm" class="tab-content"><div class="glass-panel"><h4>CRM</h4></div></div>
-        <div id="tab-todo" class="tab-content"><div class="glass-panel"><h4>To-Do</h4></div></div>
-        <div id="tab-library" class="tab-content"><div class="glass-panel"><h4>Library</h4></div></div>
-        <div id="tab-inventory" class="tab-content"><div class="glass-panel"><h4>Inventory</h4></div></div>
-        <div id="tab-timetable" class="tab-content"><div class="glass-panel"><h4>Timetable</h4></div></div>
-        <div id="tab-birthday" class="tab-content"><div class="glass-panel"><h4>Birthday</h4></div></div>
-        <div id="tab-results" class="tab-content"><div class="glass-panel"><h4>Results</h4></div></div>
-        <div id="tab-holiday" class="tab-content"><div class="glass-panel"><h4>Holiday</h4></div></div>
-        <div id="tab-feedback" class="tab-content"><div class="glass-panel"><h4>Feedback</h4></div></div>
-        <div id="tab-security" class="tab-content"><div class="glass-panel"><h4>Security</h4></div></div>
-        <div id="tab-settings" class="tab-content"><div class="glass-panel"><h4>Settings</h4></div></div>
+        <div id="tab-fees" class="tab-section"><div class="glass-panel"><h4>Fees</h4><table class="table"><tbody id="fBody"></tbody></table></div></div>
+        <div id="tab-logs" class="tab-section"><div class="glass-panel"><h4>Daily Logs</h4><input type="date" id="lDate" class="form-control mb-3" onchange="loadL()"><table class="table" id="logTable"><thead><tr><th>Roll</th><th>Name</th><th>IN</th><th>OUT</th></tr></thead><tbody id="lB"></tbody></table></div></div>
+        <div id="tab-syllabus" class="tab-section"><div class="glass-panel"><h4>Syllabus</h4></div></div>
+        <div id="tab-salary" class="tab-section"><div class="glass-panel"><h4>Salary</h4></div></div>
+        <div id="tab-exam" class="tab-section"><div class="glass-panel"><h4>Exams</h4></div></div>
+        <div id="tab-idcard" class="tab-section"><div class="glass-panel"><h4>ID Cards</h4><div id="idG"></div></div></div>
+        <div id="tab-notice" class="tab-section"><div class="glass-panel"><h4>Notice</h4></div></div>
+        <div id="tab-crm" class="tab-section"><div class="glass-panel"><h4>CRM</h4></div></div>
+        <div id="tab-todo" class="tab-section"><div class="glass-panel"><h4>To-Do</h4></div></div>
+        <div id="tab-library" class="tab-section"><div class="glass-panel"><h4>Library</h4></div></div>
+        <div id="tab-inventory" class="tab-section"><div class="glass-panel"><h4>Inventory</h4></div></div>
+        <div id="tab-timetable" class="tab-section"><div class="glass-panel"><h4>Timetable</h4></div></div>
+        <div id="tab-birthday" class="tab-section"><div class="glass-panel"><h4>Birthdays</h4></div></div>
+        <div id="tab-results" class="tab-section"><div class="glass-panel"><h4>Results</h4></div></div>
+        <div id="tab-holiday" class="tab-section"><div class="glass-panel"><h4>Holidays</h4></div></div>
+        <div id="tab-feedback" class="tab-section"><div class="glass-panel"><h4>Feedback</h4></div></div>
+        <div id="tab-security" class="tab-section"><div class="glass-panel"><h4>Security</h4></div></div>
+        <div id="tab-settings" class="tab-section"><div class="glass-panel"><h4>Settings</h4></div></div>
     </div>
 </div>
 
-<div class="modal fade" id="adModal" tabindex="-1"><div class="modal-dialog modal-dialog-centered"><div class="modal-content p-4"><h5 class="fw-bold mb-4">Admission Form</h5><input type="text" id="aN" class="form-control mb-2" placeholder="Full Name"><input type="text" id="aC" class="form-control mb-2" placeholder="Class"><input type="number" id="aF" class="form-control mb-3" placeholder="Total Fees (₹)"><button class="btn btn-primary w-100" onclick="saveAd()">CONFIRM ADMISSION</button></div></div></div>
+<div class="modal fade" id="adModal" tabindex="-1"><div class="modal-dialog modal-dialog-centered"><div class="modal-content p-4"><input type="text" id="aN" class="form-control mb-2" placeholder="Full Name"><input type="number" id="aF" class="form-control mb-3" placeholder="Total Fees"><button class="btn btn-primary w-100" onclick="sA()">Submit Admission</button></div></div></div>
 
 <script>
 const firebaseConfig = {
@@ -163,55 +131,50 @@ const firebaseConfig = {
 firebase.initializeApp(firebaseConfig);
 const db = firebase.database();
 
-let sts = {}; let ats = []; let matcher = null; let proc = false; let history = {};
+let sts = {}; let ats = []; let matcher = null; let proc = false;
 
 function unlock() {
     if(document.getElementById('pLock').value === "SkyAdmin123") {
         document.getElementById('loginScreen').style.display='none';
         document.getElementById('app').style.display='block';
-        initERP();
-    } else alert("Wrong Director PIN!");
+        init();
+    } else alert("Wrong!");
 }
 
-function initERP() {
-    db.ref('Student_Admissions').on('value', s => { sts = s.val() || {}; renderUI(); });
+function init() {
+    db.ref('Student_Admissions').on('value', s => { sts = s.val() || {}; rUI(); });
     db.ref('Daily_Attendance').on('value', s => { ats = Object.values(s.val() || {}); });
 }
 
 function tab(id) {
-    document.querySelectorAll('.tab-content').forEach(s => s.classList.remove('active'));
+    document.querySelectorAll('.tab-section').forEach(s => s.classList.remove('active'));
     document.querySelectorAll('.sidebar a').forEach(a => a.classList.remove('active'));
-    
-    let target = document.getElementById('tab-'+id);
-    let menu = document.getElementById('m-'+id);
-    if(target) target.classList.add('active');
-    if(menu) menu.classList.add('active');
-    
-    stopAllCams();
-    if(id === 'gate') startGate();
-    if(id === 'enroll') startEnroll();
+    document.getElementById('tab-'+id).classList.add('active');
+    document.getElementById('m-'+id).classList.add('active');
+    stopC();
+    if(id === 'gate') startG();
+    if(id === 'enroll') startE();
 }
 
-function stopAllCams() { if(window.gS) window.gS.getTracks().forEach(t => t.stop()); if(window.eS) window.eS.getTracks().forEach(t => t.stop()); clearInterval(window.gI); clearInterval(window.eI); }
+function stopC() { if(window.gS) window.gS.getTracks().forEach(t => t.stop()); if(window.eS) window.eS.getTracks().forEach(t => t.stop()); clearInterval(window.gI); }
 
-function saveAd() {
+function sA() {
     const n = document.getElementById('aN').value; const f = document.getElementById('aF').value;
-    if(!n || !f) return alert("Error!");
     const r = 'SKY-' + Math.floor(1000 + Math.random()*9000);
-    db.ref('Student_Admissions/'+r).set({ RollNo:r, Name:n, Class:document.getElementById('aC').value, TotalFees:parseFloat(f), PaidFees:0 });
+    db.ref('Student_Admissions/'+r).set({ RollNo:r, Name:n, TotalFees:parseFloat(f), PaidFees:0 });
     bootstrap.Modal.getInstance(document.getElementById('adModal')).hide();
 }
 
-function renderUI() {
+function rUI() {
     const ab = document.getElementById('adTable'); ab.innerHTML = '';
     const fb = document.getElementById('fBody'); fb.innerHTML = '';
     const idG = document.getElementById('idG'); if(idG) idG.innerHTML = '';
     let rev = 0;
     Object.values(sts).forEach(s => {
         rev += (s.PaidFees || 0);
-        ab.innerHTML += `<tr><td>${s.RollNo}</td><td class="fw-bold">${s.Name}</td><td>${s.Class}</td><td>${s.TotalFees-s.PaidFees==0?'Paid':'Due'}</td><td><button class="btn btn-sm btn-outline-danger" onclick="del('${s.RollNo}')">X</button></td></tr>`;
-        fb.innerHTML += `<tr><td>${s.Name}</td><td><button class="btn btn-sm btn-success" onclick="pay('${s.RollNo}')">Pay Fees</button></td></tr>`;
-        if(idG) idG.innerHTML += `<button class="btn btn-sm btn-dark m-1" onclick="genID('${s.RollNo}')">${s.Name} ID</button>`;
+        ab.innerHTML += `<tr><td>${s.RollNo}</td><td>${s.Name}</td><td><button class="btn btn-sm btn-danger" onclick="del('${s.RollNo}')">X</button></td></tr>`;
+        fb.innerHTML += `<tr><td>${s.Name}</td><td><button class="btn btn-sm btn-success" onclick="pay('${s.RollNo}')">Pay</button></td></tr>`;
+        if(idG) idG.innerHTML += `<button class="btn btn-sm btn-dark m-1" onclick="genI('${s.RollNo}')">${s.Name}</button>`;
     });
     document.getElementById('stC').innerText = Object.keys(sts).length;
     document.getElementById('inC').innerText = "₹"+rev;
@@ -220,7 +183,7 @@ function renderUI() {
 function pay(r) { const a = prompt("Amt:"); if(a) db.ref(`Student_Admissions/${r}/PaidFees`).set(parseFloat(sts[r].PaidFees) + parseFloat(a)); }
 function del(r) { if(confirm("Del?")) db.ref('Student_Admissions/'+r).remove(); }
 
-async function startGate() {
+async function startG() {
     const URL = 'https://cdn.jsdelivr.net/npm/@vladmandic/face-api/model/';
     await Promise.all([faceapi.nets.ssdMobilenetv1.loadFromUri(URL), faceapi.nets.faceRecognitionNet.loadFromUri(URL)]);
     const snap = await db.ref('Face_Data').once('value'); const d = snap.val(); if(!d) return;
@@ -234,48 +197,38 @@ async function startGate() {
             const r = matcher.findBestMatch(det.descriptor);
             if(r.label !== 'unknown') {
                 proc = true; const [n, rl] = r.label.split("||");
-                manualM("IN", rl); 
+                mMark("IN", rl); 
                 document.getElementById('gStatus').innerText = "Matched: "+n;
-                setTimeout(() => { proc=false; document.getElementById('gStatus').innerText="Awaiting Face..."; }, 5000);
+                setTimeout(() => { proc=false; document.getElementById('gStatus').innerText="Position Face..."; }, 5000);
             }
         }
     }, 1000);
 }
 
-function manualM(m, rOv) {
+function mMark(m, rOv) {
     const r = rOv || document.getElementById('mR').value.toUpperCase();
     if(!sts[r]) return;
     db.ref('Daily_Attendance').push({ RollNo:r, Name:sts[r].Name, Date:new Date().toLocaleDateString('en-IN'), Time:new Date().toLocaleTimeString(), ScanType:m });
-    const u = new SpeechSynthesisUtterance(m==="IN" ? "Welcome "+sts[r].Name : "Goodbye"); u.lang='hi-IN'; window.speechSynthesis.speak(u);
+    const u = new SpeechSynthesisUtterance(m==="IN" ? "Welcome" : "Bye"); window.speechSynthesis.speak(u);
 }
 
-async function startEnroll() {
+async function startE() {
     const URL = 'https://cdn.jsdelivr.net/npm/@vladmandic/face-api/model/';
     await faceapi.nets.tinyFaceDetector.loadFromUri(URL);
     const v = document.getElementById('vE'); navigator.mediaDevices.getUserMedia({video:true}).then(s => { window.eS=s; v.srcObject=s; });
-    window.eI = setInterval(async () => { 
-        const det = await faceapi.detectSingleFace(v, new faceapi.TinyFaceDetectorOptions()); 
-        document.getElementById('eB').disabled = !det; 
-    }, 500);
+    setInterval(async () => { const det = await faceapi.detectSingleFace(v, new faceapi.TinyFaceDetectorOptions()); document.getElementById('eB').disabled = !det; }, 500);
 }
 
-function verifyForEnroll() { const r = document.getElementById('eR').value.toUpperCase(); if(sts[r]) alert("Verified: "+sts[r].Name); else alert("Invalid Roll!"); }
-
-async function saveFaceID() {
+async function saveF() {
     const r = document.getElementById('eR').value.toUpperCase();
     const det = await faceapi.detectSingleFace(document.getElementById('vE'), new faceapi.TinyFaceDetectorOptions()).withFaceDescriptor();
-    if(det) db.ref('Face_Data/'+r).set({ RollNo:r, Name:sts[r].Name, Descriptor:Array.from(det.descriptor) }).then(() => alert("Locked!"));
+    if(det) db.ref('Face_Data/'+r).set({ RollNo:r, Name:sts[r].Name, Descriptor:Array.from(det.descriptor) }).then(() => alert("Saved!"));
 }
 
-function genID(r) {
+function genI(r) {
     const s = sts[r]; const { jsPDF } = window.jspdf; const doc = new jsPDF();
-    doc.text(`SKY CLASSES\nID CARD\nName: ${s.Name}\nRoll: ${s.RollNo}`, 50, 50);
+    doc.text(`SKY ID CARD\nName: ${s.Name}\nRoll: ${s.RollNo}\nDirector: Sandesh Sir`, 50, 50);
     doc.save(`ID_${s.Name}.pdf`);
-}
-function downloadReport() {
-    const { jsPDF } = window.jspdf; const doc = new jsPDF();
-    doc.autoTable({ html: '#logTable' });
-    doc.save("Report.pdf");
 }
 </script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
