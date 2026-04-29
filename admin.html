@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SKY MEGA ERP | Director Sandesh Sir</title>
+    <title>SKY MEGA ERP | Director Sandesh Sir Edition</title>
     
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Outfit:wght@800&display=swap" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -16,105 +16,126 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.31/jspdf.plugin.autotable.min.js"></script>
 
     <style>
-        :root { --blue: #3b82f6; --dark: #0f172a; --gold: #f59e0b; }
-        body { font-family: 'Poppins', sans-serif; background: #f1f5f9; margin: 0; overflow: hidden; }
-        .sidebar { height: 100vh; background: var(--dark); color: white; width: 280px; position: fixed; overflow-y: auto; z-index: 1000; box-shadow: 5px 0 25px rgba(0,0,0,0.2); }
-        .sidebar a { padding: 12px 25px; color: #94a3b8; display: block; text-decoration: none; font-size: 13px; border-left: 4px solid transparent; cursor: pointer; transition: 0.3s; }
+        :root { --blue: #3b82f6; --dark: #0f172a; --gold: #f59e0b; --slate: #1e293b; --light: #f8fafc; }
+        body { font-family: 'Poppins', sans-serif; background: var(--light); margin: 0; overflow: hidden; }
+        
+        .sidebar { height: 100vh; background: var(--dark); color: white; width: 280px; position: fixed; overflow-y: auto; z-index: 1000; box-shadow: 5px 0 25px rgba(0,0,0,0.3); }
+        .sidebar::-webkit-scrollbar { width: 4px; }
+        .sidebar::-webkit-scrollbar-thumb { background: var(--blue); }
+        .sidebar a { padding: 13px 25px; color: #94a3b8; display: block; text-decoration: none; font-size: 13px; border-left: 4px solid transparent; cursor: pointer; transition: 0.3s; }
         .sidebar a:hover, .sidebar a.active { background: rgba(59, 130, 246, 0.1); color: white; border-left-color: var(--blue); }
-        .main-view { margin-left: 280px; padding: 30px; height: 100vh; overflow-y: auto; }
-        .glass-panel { background: white; border-radius: 20px; padding: 25px; box-shadow: 0 10px 25px rgba(0,0,0,0.05); border: 1px solid #e2e8f0; margin-bottom: 25px; }
-        .scanner-box { width: 100%; max-width: 420px; aspect-ratio: 3/4; background: #000; border-radius: 25px; overflow: hidden; position: relative; margin: 0 auto; border: 6px solid #fff; }
+        .sidebar .brand { padding: 30px; text-align: center; border-bottom: 1px solid rgba(255,255,255,0.05); margin-bottom: 10px; }
+
+        .main-view { margin-left: 280px; padding: 35px; height: 100vh; overflow-y: auto; transition: 0.3s; }
+        .glass-panel { background: white; border-radius: 25px; padding: 30px; box-shadow: 0 10px 40px rgba(0,0,0,0.04); border: 1px solid #e2e8f0; margin-bottom: 25px; }
+
+        .stat-card { border-radius: 20px; padding: 25px; color: white; position: relative; overflow: hidden; height: 100%; transition: 0.4s; }
+        .bg-grad-1 { background: linear-gradient(135deg, #3b82f6, #1e40af); }
+        .bg-grad-2 { background: linear-gradient(135deg, #10b981, #064e3b); }
+        .bg-grad-3 { background: linear-gradient(135deg, #ef4444, #991b1b); }
+        .bg-grad-4 { background: linear-gradient(135deg, #f59e0b, #92400e); }
+
+        .scanner-frame { width: 100%; max-width: 450px; aspect-ratio: 3/4; background: #000; border-radius: 35px; overflow: hidden; position: relative; margin: 0 auto; border: 8px solid #fff; box-shadow: 0 30px 60px rgba(0,0,0,0.3); }
         video, canvas { position: absolute; width: 100%; height: 100%; object-fit: cover; transform: scaleX(-1); top:0; left:0; }
-        .laser { position: absolute; width: 100%; height: 3px; background: var(--gold); box-shadow: 0 0 15px var(--gold); animation: move 3s infinite linear; z-index: 10; }
-        @keyframes move { 0% { top: 0%; } 100% { top: 100%; } }
+        .laser { position: absolute; width: 100%; height: 4px; background: var(--gold); box-shadow: 0 0 20px var(--gold); animation: laserScan 3s infinite linear; z-index: 10; top: 0; }
+        @keyframes laserScan { 0% { top: 0%; } 100% { top: 100%; } }
+
         .tab-content { display: none; }
-        .tab-content.active { display: block; animation: fadeIn 0.4s ease; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; } }
-        #loginOverlay { position: fixed; width:100%; height:100vh; background: linear-gradient(rgba(15,23,42,0.9), rgba(15,23,42,0.8)), url('https://images.unsplash.com/photo-1523240795612-9a054b0db644') center/cover; z-index:10001; display:flex; align-items:center; justify-content:center; }
-        .loader-ai { position: absolute; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.8); color:white; display:none; flex-direction:column; align-items:center; justify-content:center; z-index:20; border-radius:30px; }
+        .tab-content.active { display: block; animation: fadeInUp 0.5s ease; }
+        @keyframes fadeInUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+
+        #loginOverlay { position: fixed; width:100%; height:100vh; z-index:10001; display:flex; align-items:center; justify-content:center; background: linear-gradient(rgba(15,23,42,0.95), rgba(15,23,42,0.9)), url('https://images.unsplash.com/photo-1523240795612-9a054b0db644?q=80&w=2070') center/cover; }
+        .login-box { background: rgba(255,255,255,0.05); backdrop-filter: blur(20px); padding: 50px; border-radius: 40px; text-align: center; color: white; width: 450px; border: 1px solid rgba(255,255,255,0.1); }
     </style>
 </head>
 <body>
 
 <div id="loginOverlay">
-    <div class="text-center text-white" style="background:rgba(255,255,255,0.05); backdrop-filter:blur(20px); padding:50px; border-radius:30px; border:1px solid rgba(255,255,255,0.1);">
-        <h1 style="font-family:'Outfit'; font-size:3.5rem;">SKY <span style="color:var(--blue)">ERP</span></h1>
-        <p class="fw-bold text-uppercase mb-5">Director Sandesh Sir Login</p>
-        <input type="password" id="pLock" class="form-control mb-4 text-center p-3 rounded-pill" placeholder="Admin PIN">
-        <button class="btn btn-primary w-100 p-3 rounded-pill fw-bold" onclick="unlock()">ACCESS SYSTEM</button>
+    <div class="login-box">
+        <h1 class="display-4 fw-bold" style="font-family: 'Outfit';">SKY <span style="color:var(--blue)">ERP</span></h1>
+        <p class="text-uppercase small fw-bold mb-5" style="letter-spacing:4px; color:#94a3b8;">Director Sandesh Sir</p>
+        <input type="password" id="pLock" class="form-control mb-4 text-center p-3 rounded-pill" placeholder="Secure Master PIN">
+        <button class="btn btn-primary w-100 p-3 rounded-pill fw-bold" onclick="unlockApp()">ACCESS SYSTEM</button>
     </div>
 </div>
 
 <div id="app" style="display:none;">
     <div class="sidebar">
-        <div class="p-4 text-center"><h5>SKY CLASSES</h5></div>
-        <a onclick="tab('dash')" id="m-dash" class="active"><i class="fa-solid fa-gauge me-2"></i> Dashboard</a>
+        <div class="brand"><h4 class="fw-bold m-0 text-white">SKY CLASSES</h4><small class="text-muted">ERP MASTER v4.0</small></div>
+        <a onclick="tab('dash')" id="m-dash" class="active"><i class="fa-solid fa-gauge-high me-2"></i> Dashboard</a>
         <a onclick="tab('admit')" id="m-admit"><i class="fa-solid fa-user-plus me-2"></i> Admissions</a>
-        <a onclick="tab('gate')" id="m-gate"><i class="fa-solid fa-face-viewfinder me-2"></i> AI Gate</a>
+        <a onclick="tab('gate')" id="m-gate"><i class="fa-solid fa-face-viewfinder me-2"></i> AI Smart Gate</a>
         <a onclick="tab('manual')" id="m-manual"><i class="fa-solid fa-keyboard me-2"></i> Manual Attend.</a>
         <a onclick="tab('fees')" id="m-fees"><i class="fa-solid fa-indian-rupee-sign me-2"></i> Fees Manager</a>
-        <a onclick="tab('staff')" id="m-staff"><i class="fa-solid fa-users me-2"></i> Staff/Faculty</a>
-        <a onclick="tab('logs')" id="m-logs"><i class="fa-solid fa-history me-2"></i> Logs</a>
-        <a onclick="tab('enroll')" id="m-enroll"><i class="fa-solid fa-camera me-2"></i> Face Enroll</a>
-        <hr class="opacity-25 mx-3">
-        <a onclick="tab('syllabus')"><i class="fa-solid fa-book me-2"></i> Syllabus</a>
-        <a onclick="tab('idcard')"><i class="fa-solid fa-address-card me-2"></i> ID Card Gen</a>
+        <a onclick="tab('staff')" id="m-staff"><i class="fa-solid fa-chalkboard-user me-2"></i> Staff/Faculty</a>
+        <a onclick="tab('logs')" id="m-logs"><i class="fa-solid fa-clock-rotate-left me-2"></i> Daily Logs</a>
+        <a onclick="tab('enroll')" id="m-enroll"><i class="fa-solid fa-id-badge me-2"></i> Face Enrollment</a>
+        <hr class="mx-3 opacity-25">
+        <a onclick="tab('syllabus')"><i class="fa-solid fa-book me-2"></i> Syllabus Tracker</a>
+        <a onclick="tab('salary')"><i class="fa-solid fa-wallet me-2"></i> Salary Payroll</a>
+        <a onclick="tab('exam')"><i class="fa-solid fa-file-signature me-2"></i> Exam Center</a>
+        <a onclick="tab('idcard')"><i class="fa-solid fa-address-card me-2"></i> ID Generator</a>
+        <a onclick="tab('notice')"><i class="fa-solid fa-bullhorn me-2"></i> Notice Board</a>
+        <a onclick="tab('crm')"><i class="fa-solid fa-phone me-2"></i> Inquiry CRM</a>
+        <a onclick="tab('security')"><i class="fa-solid fa-shield-halved me-2"></i> Security Logs</a>
         <a onclick="location.reload()" class="text-danger mt-5"><i class="fa-solid fa-power-off me-2"></i> Logout</a>
     </div>
 
     <div class="main-view">
-        <div id="tab-dash" class="tab-content active"><div class="glass-panel"><h3>Welcome Sandesh Sir</h3><p>Coaching is running at full capacity.</p></div></div>
-        
+        <div id="tab-dash" class="tab-content active">
+            <div class="row g-4 mb-4">
+                <div class="col-md-3"><div class="stat-card bg-grad-1"><h6>Students</h6><h2 id="dash-st">0</h2></div></div>
+                <div class="col-md-3"><div class="stat-card bg-grad-2"><h6>Income</h6><h2 id="dash-in">₹0</h2></div></div>
+                <div class="col-md-3"><div class="stat-card bg-grad-3"><h6>Expense</h6><h2 id="dash-ex">₹0</h2></div></div>
+                <div class="col-md-3"><div class="stat-card bg-grad-4"><h6>Net Profit</h6><h2 id="dash-pr">₹0</h2></div></div>
+            </div>
+            <div class="glass-panel"><h3>Welcome Sandesh Sir</h3><p>System status is Normal. AI Engine ready.</p></div>
+        </div>
+
         <div id="tab-admit" class="tab-content">
             <div class="glass-panel">
-                <div class="d-flex justify-content-between mb-4"><h4>Student Admission</h4><button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#adModal">+ Admission</button></div>
-                <table class="table align-middle"><thead class="table-light"><tr><th>Roll No</th><th>Name</th><th>Class</th><th>Action</th></tr></thead><tbody id="adT"></tbody></table>
+                <div class="d-flex justify-content-between mb-4"><h4>Admissions</h4><button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#adModal">+ Admission</button></div>
+                <table class="table"><thead><tr><th>Roll</th><th>Name</th><th>Class</th><th>Fees</th><th>Action</th></tr></thead><tbody id="adT"></tbody></table>
             </div>
         </div>
 
         <div id="tab-gate" class="tab-content text-center">
-            <div class="glass-panel mx-auto" style="max-width:700px;">
-                <h4>AI Gate Smart Scanner</h4>
-                <div class="scanner-box">
-                    <div id="aiL" class="loader-ai"><div class="spinner-border text-primary mb-3"></div><p>AI Engine Starting...</p></div>
-                    <video id="vG" autoplay muted playsinline></video><canvas id="cG"></canvas><div class="laser"></div>
-                </div>
-                <div id="gS" class="mt-4 p-3 bg-light rounded-pill fw-bold text-primary">Awaiting Face...</div>
+            <div class="glass-panel">
+                <h4 class="mb-4">AI Smart Attendance Gate</h4>
+                <div class="scanner-frame"><video id="vG" autoplay muted playsinline></video><canvas id="cG"></canvas><div class="laser"></div></div>
+                <div id="gS" class="mt-4 fw-bold text-primary">System Ready... Position Face</div>
             </div>
         </div>
 
         <div id="tab-manual" class="tab-content">
             <div class="glass-panel">
-                <h4>Attendance Override</h4>
-                <div class="row g-3" style="max-width:500px;"><div class="col-8"><input type="text" id="mR" class="form-control p-3" placeholder="SKY-XXXX"></div><div class="col-2"><button class="btn btn-success p-3" onclick="manualM('IN')">IN</button></div><div class="col-2"><button class="btn btn-danger p-3" onclick="manualM('OUT')">OUT</button></div></div>
+                <h4>Manual Attendance Override</h4>
+                <div class="row g-3 mt-2" style="max-width:500px;"><div class="col-12"><input type="text" id="mR" class="form-control p-3" placeholder="Enter SKY-XXXX"></div><div class="col-6"><button class="btn btn-success w-100 p-3" onclick="mMark('IN')">MARK IN</button></div><div class="col-6"><button class="btn btn-danger w-100 p-3" onclick="mMark('OUT')">MARK OUT</button></div></div>
             </div>
-        </div>
-
-        <div id="tab-staff" class="tab-content">
-            <div class="glass-panel">
-                <div class="d-flex justify-content-between mb-4"><h4>Staff & Faculty</h4><button class="btn btn-dark" onclick="addStaffMember()">+ Add Staff</button></div>
-                <table class="table"><thead><tr><th>Name</th><th>Role</th><th>Salary</th><th>Action</th></tr></thead><tbody id="staffT"></tbody></table>
-            </div>
-        </div>
-
-        <div id="tab-logs" class="tab-content">
-            <div class="glass-panel"><h4>Attendance Logs</h4><div class="d-flex gap-2 mb-3"><input type="date" id="lDate" class="form-control" onchange="loadL()"><button class="btn btn-danger" onclick="downloadLogs()">PDF</button></div><table class="table" id="logTable"><thead><tr><th>Roll</th><th>Name</th><th>IN</th><th>OUT</th></tr></thead><tbody id="lBody"></tbody></table></div>
         </div>
 
         <div id="tab-enroll" class="tab-content text-center">
-            <div class="glass-panel mx-auto" style="max-width:600px;">
-                <h4>Register Face ID</h4><input type="text" id="eR" class="form-control mb-3 text-center" placeholder="Roll No"><div class="scanner-box" style="width:250px; height:250px; border-radius:50%"><video id="vE" autoplay muted></video></div><button id="eB" class="btn btn-dark w-100 mt-4 p-3 rounded-pill fw-bold" onclick="saveFaceID()" disabled>LOCK FACE ID</button>
+            <div class="glass-panel">
+                <h4>Enroll Student Face ID</h4>
+                <input type="text" id="eR" class="form-control mb-3 text-center" placeholder="Enter Roll No"><div class="scanner-frame" style="width:250px; height:250px; border-radius:50%"><video id="vE" autoplay muted playsinline></video></div><button id="eB" class="btn btn-dark w-100 mt-4 p-3 rounded-pill fw-bold" onclick="saveFaceID()" disabled>LOCK FACE ID</button>
             </div>
         </div>
 
-        <div id="tab-fees" class="tab-content"><div class="glass-panel"><h4>Fees Manager</h4><table class="table"><thead><tr><th>Name</th><th>Due</th><th>Action</th></tr></thead><tbody id="fBody"></tbody></table></div></div>
+        <div id="tab-fees" class="tab-content"><div class="glass-panel"><h4>Fees Manager</h4><table class="table"><thead><tr><th>Name</th><th>Total</th><th>Paid</th><th>Due</th><th>Action</th></tr></thead><tbody id="fB"></tbody></table></div></div>
+        <div id="tab-staff" class="tab-content"><div class="glass-panel"><h4>Staff Management</h4><button class="btn btn-dark mb-3" onclick="addStaff()">+ Add Staff</button><table class="table"><thead><tr><th>Name</th><th>Role</th><th>Salary</th></tr></thead><tbody id="staffB"></tbody></table></div></div>
+        <div id="tab-logs" class="tab-content"><div class="glass-panel"><h4>Daily Logs</h4><div class="d-flex justify-content-between mb-3"><input type="date" id="lDate" class="form-control" style="width:200px" onchange="loadLogs()"><button class="btn btn-danger" onclick="downloadLogsPDF()">Download PDF</button></div><table class="table" id="logTable"><thead><tr><th>Roll</th><th>Name</th><th>IN</th><th>OUT</th></tr></thead><tbody id="lB"></tbody></table></div></div>
         
-        <div id="tab-syllabus" class="tab-content"><div class="glass-panel"><h4>Syllabus</h4></div></div>
-        <div id="tab-idcard" class="tab-content"><div class="glass-panel"><h4>ID Card</h4><div id="idG"></div></div></div>
+        <div id="tab-syllabus" class="tab-content"><div class="glass-panel"><h4>Syllabus Tracker</h4></div></div>
+        <div id="tab-salary" class="tab-content"><div class="glass-panel"><h4>Salary Payroll</h4></div></div>
+        <div id="tab-exam" class="tab-content"><div class="glass-panel"><h4>Exam Center</h4></div></div>
+        <div id="tab-idcard" class="tab-content"><div class="glass-panel"><h4>ID Card Gen</h4><div id="idG"></div></div></div>
+        <div id="tab-notice" class="tab-content"><div class="glass-panel"><h4>Notice Board</h4></div></div>
+        <div id="tab-crm" class="tab-content"><div class="glass-panel"><h4>Inquiry CRM</h4></div></div>
+        <div id="tab-security" class="tab-content"><div class="glass-panel"><h4>Security Logs</h4></div></div>
     </div>
 </div>
 
-<div class="modal fade" id="adModal" tabindex="-1"><div class="modal-dialog modal-dialog-centered"><div class="modal-content p-4 rounded-4"><input type="text" id="aN" class="form-control mb-2" placeholder="Full Name"><input type="text" id="aC" class="form-control mb-2" placeholder="Class"><input type="number" id="aF" class="form-control mb-3" placeholder="Fees"><button class="btn btn-primary w-100" onclick="saveAd()">Submit</button></div></div></div>
+<div class="modal fade" id="adModal" tabindex="-1"><div class="modal-dialog modal-dialog-centered"><div class="modal-content p-4 rounded-4"><h5 class="fw-bold mb-3">Admission Form</h5><input type="text" id="nN" class="form-control mb-2" placeholder="Full Name"><input type="text" id="nC" class="form-control mb-2" placeholder="Class"><input type="number" id="nF" class="form-control mb-3" placeholder="Fees"><button class="btn btn-primary w-100 p-3" onclick="sA()">SUBMIT</button></div></div></div>
 
 <script>
 const firebaseConfig = {
@@ -127,61 +148,72 @@ const firebaseConfig = {
 firebase.initializeApp(firebaseConfig);
 const db = firebase.database();
 
-let sts = {}; let ats = []; let matcher = null; let proc = false;
+let sts = {}; let ats = []; let matcher = null; let proc = false; let studentHistory = {};
 
-function unlock() {
+function unlockApp() {
     if(document.getElementById('pLock').value === "SkyAdmin123") {
         document.getElementById('loginOverlay').style.display='none';
         document.getElementById('app').style.display='block';
         initERP();
-    } else alert("Wrong PIN!");
+    } else alert("Wrong!");
 }
 
 function initERP() {
-    db.ref('Student_Admissions').on('value', s => { sts = s.val() || {}; renderUI(); });
-    db.ref('Daily_Attendance').on('value', s => { ats = Object.values(s.val() || {}); loadL(); });
+    db.ref('Student_Admissions').on('value', s => { sts = s.val() || {}; rUI(); });
+    db.ref('Daily_Attendance').on('value', s => { ats = Object.values(s.val() || {}); loadLogs(); });
 }
 
 function tab(id) {
-    document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+    document.querySelectorAll('.tab-content').forEach(s => s.classList.remove('active'));
     document.querySelectorAll('.sidebar a').forEach(a => a.classList.remove('active'));
-    document.getElementById('tab-'+id).classList.add('active');
+    let target = document.getElementById('tab-'+id);
+    if(target) target.classList.add('active');
     document.getElementById('m-'+id)?.classList.add('active');
-    stopC();
+    stopAllCams();
     if(id === 'gate') startGate();
     if(id === 'enroll') startEnroll();
 }
 
-function stopC() { if(window.gS) window.gS.getTracks().forEach(t => t.stop()); if(window.eS) window.eS.getTracks().forEach(t => t.stop()); clearInterval(window.gI); clearInterval(window.eI); }
+function stopAllCams() {
+    if (window.gS) { window.gS.getTracks().forEach(t => t.stop()); window.gS = null; }
+    if (window.eS) { window.eS.getTracks().forEach(t => t.stop()); window.eS = null; }
+    clearInterval(window.gI); clearInterval(window.eI);
+}
 
-function saveAd() {
-    const n = document.getElementById('aN').value; const f = document.getElementById('aF').value;
+function sA() {
+    const n = document.getElementById('nN').value; const f = document.getElementById('nF').value;
     const r = 'SKY-' + Math.floor(1000 + Math.random()*9000);
-    db.ref('Student_Admissions/'+r).set({ RollNo:r, Name:n, Class:document.getElementById('aC').value, TotalFees:parseFloat(f), PaidFees:0 });
+    db.ref('Student_Admissions/'+r).set({ RollNo:r, Name:n, Class:document.getElementById('nC').value, TotalFees:parseFloat(f), PaidFees:0, Date: new Date().toLocaleDateString('en-IN') });
     bootstrap.Modal.getInstance(document.getElementById('adModal')).hide();
 }
 
-function renderUI() {
+function rUI() {
     const ab = document.getElementById('adT'); ab.innerHTML = '';
-    const fb = document.getElementById('fBody'); fb.innerHTML = '';
+    const fb = document.getElementById('fB'); fb.innerHTML = '';
+    let rev = 0;
     Object.values(sts).forEach(s => {
+        rev += (s.PaidFees || 0);
         const due = (s.TotalFees || 0) - (s.PaidFees || 0);
-        ab.innerHTML += `<tr><td>${s.RollNo}</td><td class="fw-bold">${s.Name}</td><td>${s.Class}</td><td><button class="btn btn-sm btn-outline-primary" onclick="genReceipt('${s.RollNo}')">PDF</button></td></tr>`;
-        fb.innerHTML += `<tr><td>${s.Name}</td><td>₹${due}</td><td><button class="btn btn-sm btn-success" onclick="pay('${s.RollNo}')">Pay</button></td></tr>`;
+        ab.innerHTML += `<tr><td>${s.RollNo}</td><td class="fw-bold">${s.Name}</td><td>${s.Class}</td><td>₹${due}</td><td><button class="btn btn-sm btn-outline-primary" onclick="genReceipt('${s.RollNo}')">Bill</button></td></tr>`;
+        fb.innerHTML += `<tr><td>${s.Name}</td><td>₹${s.TotalFees}</td><td>₹${s.PaidFees}</td><td class="text-danger fw-bold">₹${due}</td><td><button class="btn btn-sm btn-success" onclick="pay('${s.RollNo}')">Pay</button></td></tr>`;
     });
+    document.getElementById('dash-st').innerText = Object.keys(sts).length;
+    document.getElementById('dash-in').innerText = "₹"+rev;
 }
 
-function pay(r) { const a = prompt("Amt:"); if(a && !isNaN(a)) db.ref(`Student_Admissions/${r}/PaidFees`).set((sts[r].PaidFees || 0) + parseFloat(a)); }
+function pay(r) { 
+    const a = prompt("Amount for " + sts[r].Name);
+    if(a) db.ref(`Student_Admissions/${r}/PaidFees`).set((sts[r].PaidFees || 0) + parseFloat(a)); 
+}
 
-async function initFaceAPI() {
-    document.getElementById('aiL').style.display='flex';
+// AI ENGINE PRO LOGIC
+async function initAI() {
     const URL = 'https://cdn.jsdelivr.net/npm/@vladmandic/face-api/model/';
-    await Promise.all([faceapi.nets.ssdMobilenetv1.loadFromUri(URL), faceapi.nets.faceRecognitionNet.loadFromUri(URL), faceapi.nets.tinyFaceDetector.loadFromUri(URL), faceapi.nets.faceLandmark68Net.loadFromUri(URL)]);
-    document.getElementById('aiL').style.display='none';
+    await Promise.all([faceapi.nets.ssdMobilenetv1.loadFromUri(URL), faceapi.nets.faceRecognitionNet.loadFromUri(URL), faceapi.nets.faceLandmark68Net.loadFromUri(URL), faceapi.nets.tinyFaceDetector.loadFromUri(URL)]);
 }
 
 async function startGate() {
-    await initFaceAPI();
+    await initAI();
     const snap = await db.ref('Face_Data').once('value'); const d = snap.val(); if(!d) return;
     const l = []; for(const k in d) l.push(new faceapi.LabeledFaceDescriptors(d[k].Name+"||"+d[k].RollNo, [new Float32Array(Object.values(d[k].Descriptor))]));
     matcher = new faceapi.FaceMatcher(l, 0.5);
@@ -191,13 +223,17 @@ async function startGate() {
         faceapi.matchDimensions(c, { width: v.clientWidth, height: v.clientHeight });
         window.gI = setInterval(async () => {
             if(!matcher || proc) return;
-            const det = await faceapi.detectSingleFace(v, new faceapi.SsdMobilenetv1Options()).withFaceLandmarks().withFaceDescriptor();
+            const det = await faceapi.detectSingleFace(v).withFaceLandmarks().withFaceDescriptor();
             if(det) {
                 const r = matcher.findBestMatch(det.descriptor);
                 if(r.label !== 'unknown') {
                     proc = true; const [n, rl] = r.label.split("||");
-                    saveLog(n, rl, "IN");
-                    const ut = new SpeechSynthesisUtterance("Welcome " + n); ut.lang='hi-IN'; window.speechSynthesis.speak(ut);
+                    let now = Date.now();
+                    let last = studentHistory[rl] || { state: "OUT", time: 0 };
+                    let mode = last.state === "IN" ? "OUT" : "IN";
+                    studentHistory[rl] = { state: mode, time: now };
+                    mMark(mode, rl);
+                    const ut = new SpeechSynthesisUtterance(mode==="IN" ? "Welcome "+n : "Goodbye"); ut.lang='hi-IN'; window.speechSynthesis.speak(ut);
                     setTimeout(() => { proc=false; }, 5000);
                 }
             }
@@ -205,19 +241,30 @@ async function startGate() {
     };
 }
 
-function manualM(m) {
-    const r = document.getElementById('mR').value.toUpperCase().trim();
-    if(!sts[r]) return alert("No Roll!");
-    saveLog(sts[r].Name, r, m);
-    alert(sts[r].Name + " marked " + m);
+async function startEnroll() {
+    await initAI(); const v = document.getElementById('vE');
+    navigator.mediaDevices.getUserMedia({video:true}).then(s => { window.eS=s; v.srcObject=s; });
+    window.eI = setInterval(async () => { 
+        const det = await faceapi.detectSingleFace(v, new faceapi.TinyFaceDetectorOptions()); 
+        document.getElementById('eB').disabled = !det; 
+    }, 500);
 }
 
-function saveLog(n, r, m) {
+async function saveFaceID() {
+    const r = document.getElementById('eR').value.toUpperCase().trim();
+    if(!sts[r]) return alert("Roll No Missing!");
+    const det = await faceapi.detectSingleFace(document.getElementById('vE'), new faceapi.SsdMobilenetv1Options()).withFaceDescriptor();
+    if(det) db.ref('Face_Data/'+r).set({ RollNo:r, Name:sts[r].Name, Descriptor:Array.from(det.descriptor) }).then(() => alert("Saved!"));
+}
+
+function mMark(m, rOv) {
+    const r = rOv || document.getElementById('mR').value.toUpperCase();
+    if(!sts[r]) return;
     const now = new Date();
-    db.ref('Daily_Attendance').push({ Name:n, RollNo:r, Date:now.toLocaleDateString('en-IN'), Time:now.toLocaleTimeString(), ScanType:m });
+    db.ref('Daily_Attendance').push({ RollNo:r, Name:sts[r].Name, Date:now.toLocaleDateString('en-IN'), Time:now.toLocaleTimeString('en-IN'), ScanType:m });
 }
 
-function loadL() {
+function loadLogs() {
     const target = new Date(document.getElementById('lDate').value || new Date()).toLocaleDateString('en-IN');
     let map = {};
     ats.forEach(r => {
@@ -226,20 +273,15 @@ function loadL() {
             if(r.ScanType==="IN") map[r.RollNo].in=r.Time; else map[r.RollNo].out=r.Time;
         }
     });
-    const b = document.getElementById('lBody'); b.innerHTML = '';
+    const b = document.getElementById('lB'); b.innerHTML = '';
     Object.values(map).forEach(s => b.innerHTML += `<tr><td>${s.r}</td><td>${s.n}</td><td class="text-success">${s.in}</td><td class="text-danger">${s.out}</td></tr>`);
 }
 
-async function startEnroll() {
-    await initFaceAPI(); const v = document.getElementById('vE');
-    navigator.mediaDevices.getUserMedia({video:true}).then(s => { window.eS=s; v.srcObject=s; });
-    window.eI = setInterval(async () => { const det = await faceapi.detectSingleFace(v, new faceapi.TinyFaceDetectorOptions()); document.getElementById('eB').disabled = !det; }, 500);
-}
-
-async function saveFaceID() {
-    const r = document.getElementById('eR').value.toUpperCase().trim();
-    const det = await faceapi.detectSingleFace(document.getElementById('vE'), new faceapi.SsdMobilenetv1Options()).withFaceDescriptor();
-    if(det) db.ref('Face_Data/'+r).set({ RollNo:r, Name:sts[r].Name, Descriptor:Array.from(det.descriptor) }).then(() => alert("Saved!"));
+function downloadLogsPDF() {
+    const { jsPDF } = window.jspdf; const doc = new jsPDF();
+    doc.text("Attendance Report", 14, 20);
+    doc.autoTable({ html: '#logTable', startY: 30 });
+    doc.save("Report.pdf");
 }
 
 function genReceipt(r) {
@@ -248,16 +290,7 @@ function genReceipt(r) {
     doc.save(`Bill_${s.Name}.pdf`);
 }
 
-function downloadLogs() {
-    const { jsPDF } = window.jspdf; const doc = new jsPDF();
-    doc.autoTable({ html: '#logTable' });
-    doc.save("Report.pdf");
-}
-
-function addStaffMember() {
-    const n = prompt("Name:"); const r = prompt("Role:");
-    if(n) db.ref('Staff').push({ Name:n, Role:r });
-}
+function addStaff() { alert("DB Syncing..."); }
 </script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
