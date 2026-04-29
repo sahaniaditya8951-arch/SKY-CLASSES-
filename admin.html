@@ -3,188 +3,87 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sky Classes | Master Admin Dashboard</title>
+    <title>Sky Classes | Ultimate Admin AI Dashboard</title>
     
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Outfit:wght@300;400;600;700;800&display=swap" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <script src="https://www.gstatic.com/firebasejs/10.11.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.11.0/firebase-database-compat.js"></script>
     
+    <script src="https://cdn.jsdelivr.net/npm/@vladmandic/face-api/dist/face-api.js"></script>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.31/jspdf.plugin.autotable.min.js"></script>
+
     <style>
         :root { 
-            --primary-dark: #0f172a; 
-            --primary-blue: #1e293b; 
-            --accent-gold: #f59e0b; 
-            --accent-blue: #3b82f6;
-            --bg-color: #f8fafc;
-            --text-main: #334155;
+            --primary-dark: #0f172a; --primary-blue: #1e293b; 
+            --accent-gold: #f59e0b; --accent-blue: #3b82f6;
+            --bg-color: #f8fafc; --text-main: #334155;
         }
-        body { 
-            font-family: 'Poppins', sans-serif; 
-            background-color: var(--bg-color); 
-            margin: 0; 
-            overflow-x: hidden; 
-            color: var(--text-main);
-        }
+        body { font-family: 'Poppins', sans-serif; background-color: var(--bg-color); margin: 0; overflow-x: hidden; color: var(--text-main); }
         
-        /* --- Premium Login Screen --- */
-        #loginScreen { 
-            position: fixed; top: 0; left: 0; width: 100%; height: 100vh; 
-            display: flex; z-index: 9999; background: white;
-        }
-        /* Left side Banner */
-        .login-banner {
-            flex: 1.2;
-            background: url('https://images.unsplash.com/photo-1523240795612-9a054b0db644?q=80&w=2070&auto=format&fit=crop') center/cover no-repeat;
-            position: relative;
-            display: flex;
-            align-items: flex-end;
-            padding: 40px;
-        }
-        .login-banner::before {
-            content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-            background: linear-gradient(to top, rgba(15, 23, 42, 0.9), rgba(15, 23, 42, 0.2));
-        }
-        .banner-text {
-            position: relative; z-index: 1; color: white;
-        }
-        .banner-text h1 { font-weight: 700; font-size: 2.5rem; margin-bottom: 10px; }
-        .banner-text p { font-weight: 300; font-size: 1.1rem; opacity: 0.9; }
-
-        /* Right side Form */
-        .login-form-container {
-            flex: 0.8;
-            display: flex; justify-content: center; align-items: center;
-            background: white; padding: 40px;
-        }
-        .login-box { 
-            width: 100%; max-width: 400px; text-align: center; 
-        }
-        .login-logo {
-            width: 120px; height: auto; margin-bottom: 20px;
-            /* Agar logo image nahi hai toh is line ko hata dena */
-        }
+        /* Login Screen */
+        #loginScreen { position: fixed; top: 0; left: 0; width: 100%; height: 100vh; display: flex; z-index: 9999; background: white; }
+        .login-banner { flex: 1.2; background: url('https://images.unsplash.com/photo-1523240795612-9a054b0db644?q=80&w=2070&auto=format&fit=crop') center/cover; position: relative; display: flex; align-items: flex-end; padding: 40px; }
+        .login-banner::before { content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(to top, rgba(15, 23, 42, 0.9), rgba(15, 23, 42, 0.2)); }
+        .banner-text { position: relative; z-index: 1; color: white; }
+        .banner-text h1 { font-weight: 700; font-size: 2.5rem; }
+        .login-form-container { flex: 0.8; display: flex; justify-content: center; align-items: center; background: white; padding: 40px; }
+        .login-box { width: 100%; max-width: 400px; text-align: center; }
         .login-box h3 { font-weight: 800; color: var(--primary-dark); margin-bottom: 30px; font-size: 1.8rem; }
         .login-box h3 span { color: var(--accent-blue); }
-        .custom-input {
-            background: #f1f5f9; border: 1px solid #e2e8f0; padding: 15px;
-            border-radius: 10px; font-size: 1rem; color: var(--primary-dark);
-            box-shadow: inset 0 2px 4px rgba(0,0,0,0.02);
-            transition: all 0.3s;
-        }
-        .custom-input:focus {
-            background: white; border-color: var(--accent-blue);
-            box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1); outline: none;
-        }
-        .btn-login { 
-            background: var(--accent-blue); color: white; width: 100%; padding: 14px; 
-            border: none; border-radius: 10px; font-weight: 600; font-size: 1.1rem;
-            letter-spacing: 0.5px; transition: 0.3s; box-shadow: 0 10px 20px rgba(59, 130, 246, 0.3);
-        }
-        .btn-login:hover { background: #2563eb; transform: translateY(-2px); }
+        .custom-input { background: #f1f5f9; border: 1px solid #e2e8f0; padding: 15px; border-radius: 10px; transition: 0.3s; }
+        .btn-login { background: var(--accent-blue); color: white; width: 100%; padding: 14px; border: none; border-radius: 10px; font-weight: 600; transition: 0.3s; }
         
-        /* Mobile adjustment for login */
-        @media (max-width: 768px) {
-            #loginScreen { flex-direction: column; }
-            .login-banner { display: none; }
-            .login-form-container { flex: 1; }
-        }
-
-        /* --- Premium Dashboard --- */
+        /* Dashboard Sidebar */
         #dashboardScreen { display: none; }
-        
-        .sidebar { 
-            height: 100vh; background-color: var(--primary-dark); color: white; 
-            padding-top: 30px; position: fixed; width: 280px; z-index: 100;
-            box-shadow: 4px 0 20px rgba(0,0,0,0.05);
-        }
-        .sidebar-brand {
-            text-align: center; margin-bottom: 40px; padding: 0 20px;
-        }
-        .sidebar-brand img { width: 80px; margin-bottom: 10px; }
-        .sidebar-brand h4 { font-weight: 800; color: white; letter-spacing: 1px; margin: 0; }
+        .sidebar { height: 100vh; background-color: var(--primary-dark); color: white; padding-top: 30px; position: fixed; width: 280px; z-index: 100; overflow-y: auto; }
+        .sidebar-brand { text-align: center; margin-bottom: 30px; }
+        .sidebar-brand h4 { font-weight: 800; color: white; letter-spacing: 1px; }
         .sidebar-brand span { color: var(--accent-blue); }
-        
-        .sidebar a { 
-            padding: 16px 30px; text-decoration: none; color: #94a3b8; 
-            display: block; border-left: 4px solid transparent; cursor: pointer; 
-            transition: 0.3s; font-weight: 500; font-size: 1.05rem;
-        }
+        .sidebar a { padding: 16px 30px; text-decoration: none; color: #94a3b8; display: block; border-left: 4px solid transparent; cursor: pointer; transition: 0.3s; font-weight: 500; }
         .sidebar a i { width: 25px; text-align: center; }
-        .sidebar a:hover, .sidebar a.active { 
-            background: linear-gradient(90deg, rgba(59, 130, 246, 0.1) 0%, transparent 100%); 
-            color: white; border-left-color: var(--accent-blue); 
-        }
+        .sidebar a:hover, .sidebar a.active { background: rgba(59, 130, 246, 0.1); color: white; border-left-color: var(--accent-blue); }
         
-        .main-content { margin-left: 280px; padding: 40px; }
+        .main-content { margin-left: 280px; padding: 30px; }
         
-        /* Stat Cards */
-        .stat-card { 
-            background: white; padding: 30px; border-radius: 20px; 
-            box-shadow: 0 10px 30px rgba(0,0,0,0.03); display: flex; 
-            align-items: center; gap: 20px; border: 1px solid #e2e8f0;
-            transition: transform 0.3s ease;
-        }
-        .stat-card:hover { transform: translateY(-5px); }
-        .stat-icon {
-            width: 70px; height: 70px; border-radius: 18px; 
-            display: flex; justify-content: center; align-items: center; font-size: 2rem;
-        }
-        .icon-blue { background: #eff6ff; color: var(--accent-blue); }
-        .icon-green { background: #f0fdf4; color: #10b981; }
+        .stat-card { background: white; padding: 25px; border-radius: 15px; display: flex; align-items: center; gap: 20px; border: 1px solid #e2e8f0; box-shadow: 0 4px 15px rgba(0,0,0,0.03); }
+        .stat-card h2 { font-weight: 800; color: var(--primary-dark); margin: 0; font-size: 2rem; }
+        .stat-icon { width: 60px; height: 60px; border-radius: 15px; display: flex; justify-content: center; align-items: center; font-size: 1.8rem; }
+        .icon-blue { background: #eff6ff; color: var(--accent-blue); } .icon-green { background: #f0fdf4; color: #10b981; }
         
-        .stat-card h2 { font-weight: 800; color: var(--primary-dark); margin: 0; font-size: 2.5rem; }
-        .stat-card p { font-weight: 500; font-size: 0.95rem; margin: 0; }
-
-        /* Tables */
-        .table-container { 
-            background: white; padding: 30px; border-radius: 20px; margin-top: 30px; 
-            box-shadow: 0 10px 30px rgba(0,0,0,0.03); display: none; 
-            border: 1px solid #e2e8f0;
-        }
-        .active-section { display: block; animation: fadeIn 0.4s ease-in-out; }
+        .table-container { background: white; padding: 25px; border-radius: 15px; margin-top: 20px; display: none; border: 1px solid #e2e8f0; box-shadow: 0 4px 15px rgba(0,0,0,0.03); }
+        .active-section { display: block; animation: fadeIn 0.4s; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
         
-        .table { margin-bottom: 0; }
-        .table th { border-bottom-width: 2px; font-weight: 600; color: #64748b; padding: 15px; background: #f8fafc; text-transform: uppercase; font-size: 0.85rem; letter-spacing: 0.5px;}
-        .table td { padding: 15px; vertical-align: middle; color: #475569; border-bottom: 1px solid #f1f5f9; }
-        .table tbody tr:hover { background-color: #f8fafc; }
+        .btn-pdf { background: #ef4444; color: white; border: none; padding: 8px 16px; border-radius: 8px; font-weight: 600; display: flex; align-items: center; gap: 8px; }
+        .btn-add { background: var(--accent-blue); color: white; border: none; padding: 8px 16px; border-radius: 8px; font-weight: 600; }
         
-        .btn-excel { 
-            background: #10b981; color: white; border: none; padding: 10px 20px; 
-            border-radius: 10px; font-weight: 600; font-size: 0.95rem;
-            display: flex; align-items: center; gap: 8px; box-shadow: 0 4px 10px rgba(16, 185, 129, 0.2); transition: 0.3s;
-        }
-        .btn-excel:hover { background: #059669; transform: translateY(-2px); }
-        
-        .date-picker { 
-            border: 1px solid #cbd5e1; border-radius: 10px; padding: 10px 15px; 
-            outline: none; font-weight: 500; color: var(--primary-dark); background: #f8fafc;
-            transition: 0.3s;
-        }
-        .date-picker:focus { border-color: var(--accent-blue); box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1); background: white;}
-        
-        .badge { padding: 6px 12px; font-weight: 500; border-radius: 6px; letter-spacing: 0.3px; }
-        .bg-success { background-color: #10b981 !important; }
-        .text-success { color: #10b981 !important; }
-        .bg-warning { background-color: #f59e0b !important; color: white !important; }
-        .text-danger { color: #ef4444 !important; }
+        /* FACE REGISTER CSS (From User) */
+        .register-wrapper { background: linear-gradient(135deg, #07192F, #0A2540); padding: 40px 20px; border-radius: 20px; display: flex; justify-content: center; align-items: center; }
+        .scanner-box { background: white; padding: 30px; border-radius: 20px; width: 100%; max-width: 500px; text-align: center; }
+        .reg-camera-container { position: relative; width: 100%; max-width: 320px; height: 320px; margin: 0 auto 20px; border-radius: 15px; overflow: hidden; border: 4px solid #E6B31E; background: #000; }
+        #regVideo, #regCanvas { position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; transform: scaleX(-1); }
+
+        /* FACE SCANNER CSS (From User) */
+        .live-wrapper { font-family: 'Outfit', sans-serif; background: radial-gradient(circle at 50% 0%, #1e293b, #020617 80%, #000); padding: 40px 20px; border-radius: 20px; min-height: 70vh; display: flex; flex-direction: column; align-items: center; justify-content: center; position: relative; overflow: hidden; }
+        .live-badge { background: rgba(217, 4, 41, 0.15); color: #ff3366; padding: 6px 18px; border-radius: 50px; border: 1px solid rgba(255, 51, 102, 0.3); font-size: 12px; font-weight: 700; margin-bottom: 20px;}
+        .scan-container { position: relative; width: 85vw; max-width: 400px; aspect-ratio: 3/4; border-radius: 24px; overflow: hidden; background: #000; box-shadow: 0 20px 50px rgba(0,0,0,0.5), 0 0 0 2px rgba(251, 191, 36, 0.2); }
+        #liveVideo, #liveCanvas { position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: contain; border-radius: 24px; }
+        .scan-line { position: absolute; top: 0; left: 0; width: 100%; height: 2px; background: linear-gradient(to right, transparent, #fbbf24, transparent); box-shadow: 0 0 20px 2px #fbbf24; z-index: 5; animation: scan 2.5s ease-in-out infinite; }
+        @keyframes scan { 0% { top: 5%; opacity: 0; } 10% { opacity: 1; } 90% { opacity: 1; } 100% { top: 95%; opacity: 0; } }
+        .status-box { background: rgba(15, 23, 42, 0.6); backdrop-filter: blur(16px); padding: 20px; border-radius: 20px; text-align: center; border: 1px solid rgba(255, 255, 255, 0.08); margin-top: 20px; width: 100%; max-width: 400px; color: white;}
     </style>
 </head>
 <body>
 
     <div id="loginScreen">
-        <div class="login-banner">
-            <div class="banner-text">
-                <h1>Welcome to Sky Classes</h1>
-                <p>Master Admin Dashboard • Smart Attendance & Admissions</p>
-            </div>
-        </div>
+        <div class="login-banner"><div class="banner-text"><h1>Welcome to Sky Classes</h1><p>Ultimate AI Admin Dashboard</p></div></div>
         <div class="login-form-container">
             <div class="login-box">
-                <img src="https://cdn-icons-png.flaticon.com/512/3308/3308395.png" alt="Sky Classes Logo" class="login-logo">
                 <h3><span>SKY</span> ADMIN</h3>
                 <input type="password" id="adminPassword" class="form-control mb-4 text-center custom-input" placeholder="Enter Master Password">
                 <button class="btn-login" onclick="checkPassword()">SECURE LOGIN <i class="fa-solid fa-arrow-right ms-2"></i></button>
@@ -195,271 +94,470 @@
     <div id="dashboardScreen">
         
         <div class="sidebar">
-            <div class="sidebar-brand">
-                <h4><span>SKY</span> CLASSES</h4>
-            </div>
-            <a onclick="showSection('admissions')" id="link-admissions" class="active"><i class="fa-solid fa-user-plus me-3"></i> Admissions</a>
-            <a onclick="showSection('attendance')" id="link-attendance"><i class="fa-solid fa-calendar-check me-3"></i> Smart Attendance</a>
-            <a onclick="logout()" style="color: #ef4444; margin-top: 50px;"><i class="fa-solid fa-lock me-3"></i> Lock Dashboard</a>
+            <div class="sidebar-brand"><h4><span>SKY</span> CLASSES</h4></div>
+            <a onclick="showSection('admissions')" id="link-admissions" class="active"><i class="fa-solid fa-users"></i> Admissions (Roll No)</a>
+            <a onclick="showSection('face-register')" id="link-face-register"><i class="fa-solid fa-face-viewfinder"></i> Register AI Face</a>
+            <a onclick="showSection('face-scanner')" id="link-face-scanner"><i class="fa-solid fa-expand"></i> Live Auto Gate</a>
+            <a onclick="showSection('manual-entry')" id="link-manual-entry"><i class="fa-solid fa-pen-to-square"></i> Manual Auth</a>
+            <a onclick="showSection('attendance')" id="link-attendance"><i class="fa-solid fa-file-pdf"></i> Attendance Logs</a>
+            <a onclick="location.reload()" style="color: #ef4444; margin-top: 30px;"><i class="fa-solid fa-lock"></i> Lock App</a>
         </div>
 
         <div class="main-content">
             
-            <div class="row g-4 mb-4">
-                <div class="col-md-6">
-                    <div class="stat-card">
-                        <div class="stat-icon icon-blue"><i class="fa-solid fa-users"></i></div>
-                        <div>
-                            <p class="text-muted">Total Admissions</p>
-                            <h2 id="countAdmissions">0</h2>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-6">
-                    <div class="stat-card">
-                        <div class="stat-icon icon-green"><i class="fa-solid fa-user-check"></i></div>
-                        <div>
-                            <p class="text-muted" id="attendanceCardLabel">Students Present (Selected Date)</p>
-                            <h2 id="countAttendance">0</h2>
-                        </div>
-                    </div>
-                </div>
+            <div class="row g-4 mb-4" id="statsRow">
+                <div class="col-md-6"><div class="stat-card"><div class="stat-icon icon-blue"><i class="fa-solid fa-graduation-cap"></i></div><div><p class="text-muted m-0">Total Students</p><h2 id="countAdmissions">0</h2></div></div></div>
+                <div class="col-md-6"><div class="stat-card"><div class="stat-icon icon-green"><i class="fa-solid fa-user-check"></i></div><div><p class="text-muted m-0" id="attendanceCardLabel">Present Today</p><h2 id="countAttendance">0</h2></div></div></div>
             </div>
 
             <div id="section-admissions" class="table-container active-section">
                 <div class="d-flex justify-content-between align-items-center mb-4">
-                    <h5 class="fw-bold m-0" style="color: var(--primary-dark); font-size: 1.3rem;">Admission Data</h5>
-                    <button class="btn-excel" onclick="downloadCSV('admissions')"><i class="fa-solid fa-file-export"></i> Export CSV</button>
+                    <h5 class="fw-bold m-0 text-dark">Admissions & Roll Numbers</h5>
+                    <button class="btn-add" data-bs-toggle="modal" data-bs-target="#addStudentModal"><i class="fa-solid fa-plus"></i> Add New Student</button>
                 </div>
-                <div class="table-responsive">
-                    <table class="table align-middle">
-                        <thead>
-                            <tr><th>Date</th><th>Student Name</th><th>Phone Number</th><th>Course Enrolled</th></tr>
-                        </thead>
-                        <tbody id="admissionsBody"></tbody>
-                    </table>
+                <table class="table align-middle" id="admissionsTable">
+                    <thead class="table-light"><tr><th>Roll No</th><th>Student Name</th><th>Phone</th><th>Course</th><th>Action</th></tr></thead>
+                    <tbody id="admissionsBody"></tbody>
+                </table>
+            </div>
+
+            <div id="section-manual-entry" class="table-container">
+                <h5 class="fw-bold mb-4 text-dark"><i class="fa-solid fa-keyboard me-2"></i> Manual Attendance Override</h5>
+                <div class="row g-3 max-w-500">
+                    <div class="col-md-6">
+                        <input type="text" id="manualRollNo" class="form-control" placeholder="Enter Roll Number (e.g. SKY-1234)">
+                    </div>
+                    <div class="col-md-3">
+                        <button class="btn btn-success w-100 fw-bold" onclick="markManual('IN')">MARK IN</button>
+                    </div>
+                    <div class="col-md-3">
+                        <button class="btn btn-danger w-100 fw-bold" onclick="markManual('OUT')">MARK OUT</button>
+                    </div>
                 </div>
             </div>
 
             <div id="section-attendance" class="table-container">
                 <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-3">
-                    <h5 class="fw-bold m-0" style="color: var(--primary-dark); font-size: 1.3rem;">Daily Entry/Exit Log</h5>
+                    <h5 class="fw-bold m-0 text-dark">Smart Attendance Report</h5>
                     <div class="d-flex gap-3 align-items-center">
-                        <div class="d-flex align-items-center gap-2">
-                            <span class="text-muted fw-bold small">Filter Date:</span>
-                            <input type="date" id="dateFilter" class="date-picker" onchange="filterAttendanceData()">
+                        <input type="date" id="dateFilter" class="form-control" onchange="filterAttendanceData()">
+                        <button class="btn-pdf" onclick="downloadPDF()"><i class="fa-solid fa-file-pdf"></i> Download PDF</button>
+                    </div>
+                </div>
+                <table class="table text-center align-middle" id="attendanceTable">
+                    <thead class="table-dark"><tr><th>Roll No</th><th class="text-start">Name</th><th>ENTRY (IN)</th><th>EXIT (OUT)</th><th>Status</th></tr></thead>
+                    <tbody id="attendanceBody"></tbody>
+                </table>
+            </div>
+
+            <div id="section-face-register" class="table-container p-0 border-0">
+                <div class="register-wrapper">
+                    <div class="scanner-box">
+                        <h4 class="fw-bold mb-4" style="color: #0A2540;">Face Lock Registration</h4>
+                        
+                        <div class="input-group mb-3">
+                            <input type="text" id="searchRollReg" class="form-control fw-bold" placeholder="Enter Roll No (SKY-XXXX)">
+                            <button class="btn btn-primary fw-bold" onclick="fetchStudentForReg()">Search</button>
                         </div>
-                        <button class="btn-excel" style="background: var(--accent-blue);" onclick="downloadCSV('attendance')">
-                            <i class="fa-solid fa-file-csv"></i> Download CSV
+                        
+                        <p id="regStudentDetails" class="text-success fw-bold"></p>
+
+                        <div class="reg-camera-container">
+                            <video id="regVideo" autoplay muted playsinline></video>
+                            <canvas id="regCanvas"></canvas>
+                        </div>
+                        <p id="regStatusText" class="fw-bold text-danger"><i class="fa-solid fa-camera"></i> Searching for Face...</p>
+                        
+                        <input type="hidden" id="regHiddenRoll">
+                        <input type="hidden" id="regHiddenName">
+                        <input type="hidden" id="regHiddenPhone">
+
+                        <button class="btn btn-dark w-100 p-3 fw-bold" id="registerBtn" onclick="registerFace()" disabled>
+                            <i class="fa-solid fa-lock"></i> Lock Face & Save
                         </button>
                     </div>
                 </div>
-                <div class="table-responsive">
-                    <table class="table text-center align-middle">
-                        <thead>
-                            <tr>
-                                <th>S.No</th>
-                                <th class="text-start">Student Name</th>
-                                <th>Phone Number</th>
-                                <th>ENTRY (IN)</th>
-                                <th>EXIT (OUT)</th>
-                                <th>Current Status</th>
-                            </tr>
-                        </thead>
-                        <tbody id="attendanceBody"></tbody>
-                    </table>
+            </div>
+
+            <div id="section-face-scanner" class="table-container p-0 border-0">
+                <div class="live-wrapper">
+                    <div class="live-badge"><div class="live-dot" style="width:8px; height:8px; background:#ff3366; border-radius:50%; display:inline-block; margin-right:5px; animation: pulse 1.5s infinite;"></div> AUTO SMART GATE</div>
+                    
+                    <button class="btn btn-outline-light mb-3 rounded-pill px-4" onclick="toggleScannerCamera()"><i class="fa-solid fa-camera-rotate"></i> Flip Camera</button>
+
+                    <div class="scan-container">
+                        <video id="liveVideo" autoplay muted playsinline></video>
+                        <canvas id="liveCanvas"></canvas>
+                        <div class="scan-line"></div>
+                    </div>
+
+                    <div class="status-box">
+                        <p id="liveStatusText" style="font-size: 18px; font-weight: 700; color: #fbbf24; margin: 0;"><i class="fa-solid fa-crosshairs fa-spin"></i> Initializing System...</p>
+                        <p style="font-size: 13px; color: #94a3b8; margin-top: 8px;">Blink to mark attendance</p>
+                    </div>
                 </div>
             </div>
 
         </div>
     </div>
 
+    <div class="modal fade" id="addStudentModal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header bg-dark text-white">
+                    <h5 class="modal-title fw-bold">Register New Student</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body p-4">
+                    <input type="text" id="newStudentName" class="form-control mb-3" placeholder="Full Name" required>
+                    <input type="tel" id="newStudentPhone" class="form-control mb-3" placeholder="Phone Number" required>
+                    <input type="text" id="newStudentCourse" class="form-control mb-3" placeholder="Course / Class" required>
+                    <button class="btn btn-primary w-100 fw-bold" onclick="addStudent()">Generate Roll No & Add</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
     <script>
-        // --- UI Logic ---
+        // --- FIREBASE SETUP ---
+        const firebaseConfig = {
+          apiKey: "AIzaSyC6bcqETEnTjLEQnISXjnWR2brPrVOAm-Y",
+          authDomain: "sky-classes-db-d6140.firebaseapp.com",
+          databaseURL: "https://sky-classes-db-d6140-default-rtdb.firebaseio.com",
+          projectId: "sky-classes-db-d6140",
+          storageBucket: "sky-classes-db-d6140.firebasestorage.app"
+        };
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.database();
+
+        // --- GLOBAL VARIABLES ---
+        let allStudents = {}; 
+        let allAttendanceList = []; 
+        let currentSmartAttendanceList = []; 
+        let faceModelsLoaded = false;
+        
+        // --- LOGIN & NAVIGATION ---
         function checkPassword() {
             if(document.getElementById('adminPassword').value === "SkyAdmin123") {
                 document.getElementById('loginScreen').style.display = 'none';
                 document.getElementById('dashboardScreen').style.display = 'block';
-                setDefaultDate();
-                startRealtimeData();
+                document.getElementById('dateFilter').valueAsDate = new Date();
+                startDatabaseListeners();
             } else { alert("Wrong Password!"); }
         }
-
-        function logout() { location.reload(); }
 
         function showSection(id) {
             document.querySelectorAll('.table-container').forEach(el => el.classList.remove('active-section'));
             document.querySelectorAll('.sidebar a').forEach(el => el.classList.remove('active'));
             document.getElementById('section-' + id).classList.add('active-section');
             document.getElementById('link-' + id).classList.add('active');
+
+            // CAMERA MANAGEMENT (Stop cameras when tab changes)
+            stopAllCameras();
+
+            if(id === 'face-register') { startRegisterMode(); }
+            else if(id === 'face-scanner') { startLiveScannerMode(); }
         }
 
-        function setDefaultDate() {
-            const today = new Date();
-            const yyyy = today.getFullYear();
-            const mm = String(today.getMonth() + 1).padStart(2, '0');
-            const dd = String(today.getDate()).padStart(2, '0');
-            document.getElementById('dateFilter').value = `${yyyy}-${mm}-${dd}`;
+        function stopAllCameras() {
+            if(window.regStream) window.regStream.getTracks().forEach(t => t.stop());
+            if(window.liveStream) window.liveStream.getTracks().forEach(t => t.stop());
+            clearInterval(window.regInterval);
+            clearInterval(window.liveInterval);
         }
 
-        function formatInputDate(dateStr) {
-            if(!dateStr) return "";
-            const parts = dateStr.split('-');
-            return `${parts[2]}/${parts[1]}/${parts[0]}`; 
-        }
-
-        // --- Firebase Config ---
-        const firebaseConfig = {
-          apiKey: "AIzaSyC6bcqETEnTjLEQnISXjnWR2brPrVOAm-Y",
-          authDomain: "sky-classes-db-d6140.firebaseapp.com",
-          databaseURL: "https://sky-classes-db-d6140-default-rtdb.firebaseio.com",
-          projectId: "sky-classes-db-d6140",
-          storageBucket: "sky-classes-db-d6140.firebasestorage.app",
-          messagingSenderId: "915411828634",
-          appId: "1:915411828634:web:44aadc81aa911cdebcc423"
-        };
-        firebase.initializeApp(firebaseConfig);
-        const db = firebase.database();
-
-        // --- Data Variables ---
-        let admissionsList = [];
-        let allAttendanceList = []; 
-        let currentSmartAttendanceList = []; // For CSV Download
-
-        function startRealtimeData() {
-            // Admissions Fetch
+        // --- CORE DATABASE LOGIC ---
+        function startDatabaseListeners() {
             db.ref('Student_Admissions').on('value', snap => {
-                const data = snap.val();
-                const body = document.getElementById('admissionsBody');
-                body.innerHTML = ''; admissionsList = [];
-                if(data) {
-                    Object.values(data).reverse().forEach(st => {
-                        admissionsList.push(st);
-                        body.innerHTML += `<tr><td>${st.Date}</td><td class="fw-bold" style="color: var(--primary-dark);">${st.Name}</td><td>${st.Phone}</td><td><span class="badge bg-light text-dark border">${st.Course}</span></td></tr>`;
-                    });
-                }
-                document.getElementById('countAdmissions').innerText = admissionsList.length;
+                allStudents = snap.val() || {};
+                renderAdmissions();
             });
 
-            // Attendance Fetch
             db.ref('Daily_Attendance').on('value', snap => {
-                const data = snap.val();
-                allAttendanceList = [];
-                if(data) {
-                    Object.values(data).forEach(at => {
-                        allAttendanceList.push(at);
-                    });
-                }
-                filterAttendanceData(); 
+                allAttendanceList = Object.values(snap.val() || {});
+                filterAttendanceData();
             });
         }
 
-        // --- MERGED SMART FILTER LOGIC ---
+        // --- FEATURE 1: ADD / REMOVE STUDENT & AUTO ROLL NO ---
+        function addStudent() {
+            const name = document.getElementById('newStudentName').value;
+            const phone = document.getElementById('newStudentPhone').value;
+            const course = document.getElementById('newStudentCourse').value;
+
+            if(!name || !phone) return alert("Fill required fields!");
+
+            const rollNo = 'SKY-' + Math.floor(1000 + Math.random() * 9000);
+            
+            db.ref('Student_Admissions/' + rollNo).set({
+                RollNo: rollNo, Name: name, Phone: phone, Course: course, Date: new Date().toLocaleDateString('en-IN')
+            }).then(() => {
+                alert(`Student Added! Roll No: ${rollNo}`);
+                bootstrap.Modal.getInstance(document.getElementById('addStudentModal')).hide();
+                document.getElementById('newStudentName').value = ''; document.getElementById('newStudentPhone').value = '';
+            });
+        }
+
+        function deleteStudent(rollNo) {
+            if(confirm(`Remove ${rollNo} permanently? This will delete their Face ID too.`)) {
+                db.ref('Student_Admissions/' + rollNo).remove();
+                db.ref('Face_Data/' + rollNo).remove();
+            }
+        }
+
+        function renderAdmissions() {
+            const body = document.getElementById('admissionsBody'); body.innerHTML = '';
+            let count = 0;
+            Object.values(allStudents).reverse().forEach(st => {
+                count++;
+                body.innerHTML += `<tr>
+                    <td class="fw-bold text-primary">${st.RollNo}</td>
+                    <td class="fw-bold">${st.Name}</td>
+                    <td>${st.Phone}</td>
+                    <td><span class="badge bg-secondary">${st.Course}</span></td>
+                    <td><button class="btn btn-sm btn-danger" onclick="deleteStudent('${st.RollNo}')"><i class="fa-solid fa-trash"></i></button></td>
+                </tr>`;
+            });
+            document.getElementById('countAdmissions').innerText = count;
+        }
+
+        // --- FEATURE 4: MANUAL ATTENDANCE ---
+        function markManual(mode) {
+            const rollNo = document.getElementById('manualRollNo').value.trim().toUpperCase();
+            if(!rollNo || !allStudents[rollNo]) return alert("Invalid Roll Number! Ensure format is SKY-XXXX");
+
+            const student = allStudents[rollNo];
+            pushAttendanceToDB(student.Name, rollNo, student.Phone, mode);
+            alert(`${student.Name} marked ${mode} manually!`);
+            document.getElementById('manualRollNo').value = '';
+        }
+
+        function pushAttendanceToDB(name, rollNo, phone, mode) {
+            const now = new Date();
+            db.ref('Daily_Attendance').push({
+                RollNo: rollNo, Name: name, Phone: phone, 
+                Date: now.toLocaleDateString('en-IN'),
+                Time: now.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' }),
+                Timestamp: Date.now(), ScanType: mode
+            });
+        }
+
+        // --- ATTENDANCE FILTER LOGIC ---
         function filterAttendanceData() {
-            const selectedDateVal = document.getElementById('dateFilter').value;
-            const targetFormat1 = formatInputDate(selectedDateVal); // "DD/MM/YYYY"
-            
-            const parts = selectedDateVal.split('-');
-            const targetFormat2 = `${parseInt(parts[2])}/${parseInt(parts[1])}/${parts[0]}`; 
+            const targetDateStr = new Date(document.getElementById('dateFilter').value).toLocaleDateString('en-IN');
+            let grouped = {};
 
-            let studentRecords = {};
-
-            // Group data by student for the selected date
             allAttendanceList.forEach(record => {
-                if(record.Date === targetFormat1 || record.Date === targetFormat2) {
-                    let phone = record.Phone;
-                    
-                    if (!studentRecords[phone]) {
-                        studentRecords[phone] = {
-                            date: record.Date, name: record.Name, phone: phone, entryTime: "--", exitTime: "--"
-                        };
-                    }
-
-                    // Assign Entry/Exit based on ScanType
-                    if (record.ScanType === "IN" || !record.ScanType) {
-                        // Keep the first entry time
-                        if(studentRecords[phone].entryTime === "--") {
-                            studentRecords[phone].entryTime = record.Time;
-                        }
-                    } else if (record.ScanType === "OUT") {
-                        // Update to latest exit time
-                        studentRecords[phone].exitTime = record.Time;
-                    }
+                if(record.Date === targetDateStr) {
+                    let rNo = record.RollNo || record.Phone; // Fallback for old data
+                    if (!grouped[rNo]) grouped[rNo] = { name: record.Name, roll: rNo, inTime: "--", outTime: "--" };
+                    if (record.ScanType === "IN") { if(grouped[rNo].inTime === "--") grouped[rNo].inTime = record.Time; }
+                    else if (record.ScanType === "OUT") { grouped[rNo].outTime = record.Time; }
                 }
             });
 
-            // Generate HTML
-            const body = document.getElementById('attendanceBody');
-            body.innerHTML = '';
-            currentSmartAttendanceList = []; 
-            let count = 1;
-
-            for (let phone in studentRecords) {
-                let student = studentRecords[phone];
-                currentSmartAttendanceList.push(student); // Save for Excel
-
-                let statusBadge = student.exitTime !== "--" 
-                    ? '<span class="badge bg-success">Left Class</span>' 
-                    : '<span class="badge bg-warning">Inside Class</span>';
-
-                body.innerHTML += `
-                    <tr>
-                        <td class="text-muted fw-bold">${count++}</td>
-                        <td class="text-start fw-bold" style="color: var(--primary-dark);">${student.name}</td>
-                        <td>${student.phone}</td>
-                        <td class="text-success fw-bold">${student.entryTime}</td>
-                        <td class="text-danger fw-bold">${student.exitTime}</td>
-                        <td>${statusBadge}</td>
-                    </tr>
-                `;
-            }
-
-            // Update Counts and Labels
-            document.getElementById('countAttendance').innerText = currentSmartAttendanceList.length;
+            const body = document.getElementById('attendanceBody'); body.innerHTML = '';
+            currentSmartAttendanceList = Object.values(grouped);
             
-            const todayStr = formatInputDate(document.getElementById('dateFilter').defaultValue);
-            if(targetFormat1 === todayStr) {
-                document.getElementById('attendanceCardLabel').innerText = "Students Present Today";
-            } else {
-                document.getElementById('attendanceCardLabel').innerText = `Present on ${targetFormat1}`;
-            }
-
-            if(currentSmartAttendanceList.length === 0) {
-                body.innerHTML = `<tr><td colspan="6" class="text-center text-danger fw-bold py-5">No attendance records found for this date.</td></tr>`;
-            }
+            currentSmartAttendanceList.forEach(st => {
+                let status = st.outTime !== "--" ? '<span class="badge bg-success">Left Class</span>' : '<span class="badge bg-warning text-dark">Inside Class</span>';
+                body.innerHTML += `<tr><td class="fw-bold">${st.roll}</td><td class="text-start fw-bold">${st.name}</td><td class="text-success fw-bold">${st.inTime}</td><td class="text-danger fw-bold">${st.outTime}</td><td>${status}</td></tr>`;
+            });
+            document.getElementById('countAttendance').innerText = currentSmartAttendanceList.length;
         }
 
-        // --- EXCEL DOWNLOAD LOGIC ---
-        function downloadCSV(type) {
-            let csv = "";
-            let dataLength = 0;
+        // --- FEATURE 3: DOWNLOAD PDF (Replaced CSV) ---
+        function downloadPDF() {
+            if(currentSmartAttendanceList.length === 0) return alert("No data for selected date!");
+            const { jsPDF } = window.jspdf; const doc = new jsPDF();
+            
+            doc.setFontSize(18); doc.text("Sky Classes - Daily Attendance Report", 14, 20);
+            doc.setFontSize(11); doc.text(`Date: ${document.getElementById('dateFilter').value}`, 14, 30);
+            
+            const tableData = currentSmartAttendanceList.map((st, index) => [
+                index + 1, st.roll, st.name, st.inTime, st.outTime, st.outTime !== "--" ? "Left Class" : "Inside Class"
+            ]);
 
-            if(type === 'admissions') {
-                if(admissionsList.length === 0) { alert("No data!"); return; }
-                csv = "Date,Name,Phone,Course\n";
-                admissionsList.forEach(r => csv += `"${r.Date}","${r.Name}","${r.Phone}","${r.Course}"\n`);
-                dataLength = admissionsList.length;
-            } 
-            else if (type === 'attendance') {
-                if(currentSmartAttendanceList.length === 0) { alert("No data for selected date!"); return; }
-                // Smart Excel Format
-                csv = "Date,Student Name,Phone Number,Entry Time (IN),Exit Time (OUT),Status\n";
-                currentSmartAttendanceList.forEach(r => {
-                    let statusText = r.exitTime !== "--" ? "Left Class" : "Inside Class";
-                    csv += `"${r.date}","${r.name}","${r.phone}","${r.entryTime}","${r.exitTime}","${statusText}"\n`;
-                });
-                dataLength = currentSmartAttendanceList.length;
-            }
+            doc.autoTable({
+                startY: 35, head: [['S.No', 'Roll No', 'Student Name', 'Entry (IN)', 'Exit (OUT)', 'Status']],
+                body: tableData, theme: 'grid', headStyles: { fillColor: [15, 23, 42] }
+            });
+            doc.save(`Sky_Attendance_${document.getElementById('dateFilter').value}.pdf`);
+        }
 
-            if(dataLength > 0) {
-                const blob = new Blob([csv], { type: 'text/csv' });
-                const link = document.createElement("a");
-                link.href = URL.createObjectURL(blob);
-                
-                const dateSuf = type === 'attendance' ? document.getElementById('dateFilter').value : new Date().toLocaleDateString().replace(/\//g,'-');
-                link.download = `Sky_${type}_${dateSuf}.csv`;
-                link.click();
+        // =======================================================
+        // --- AI FACE REGISTER (User Code 1 Integrated) ---
+        // =======================================================
+        async function loadFaceModels() {
+            if(faceModelsLoaded) return;
+            const MODEL_URL = 'https://cdn.jsdelivr.net/npm/@vladmandic/face-api/model/';
+            await Promise.all([
+                faceapi.nets.tinyFaceDetector.loadFromUri(MODEL_URL),
+                faceapi.nets.ssdMobilenetv1.loadFromUri(MODEL_URL),
+                faceapi.nets.faceLandmark68Net.loadFromUri(MODEL_URL),
+                faceapi.nets.faceRecognitionNet.loadFromUri(MODEL_URL)
+            ]);
+            faceModelsLoaded = true;
+        }
+
+        function fetchStudentForReg() {
+            const roll = document.getElementById('searchRollReg').value.trim().toUpperCase();
+            if(allStudents[roll]) {
+                document.getElementById('regStudentDetails').innerText = `Linked: ${allStudents[roll].Name} | ${allStudents[roll].Phone}`;
+                document.getElementById('regHiddenRoll').value = roll;
+                document.getElementById('regHiddenName').value = allStudents[roll].Name;
+                document.getElementById('regHiddenPhone').value = allStudents[roll].Phone;
+            } else { alert("Roll Number not found in Admissions!"); }
+        }
+
+        async function startRegisterMode() {
+            await loadFaceModels();
+            const video = document.getElementById('regVideo');
+            const canvas = document.getElementById('regCanvas');
+            const status = document.getElementById('regStatusText');
+            const btn = document.getElementById('registerBtn');
+
+            navigator.mediaDevices.getUserMedia({ video: { facingMode: "user" } }).then(stream => {
+                window.regStream = stream; video.srcObject = stream;
+            });
+
+            video.onplay = () => {
+                faceapi.matchDimensions(canvas, { width: video.clientWidth, height: video.clientHeight });
+                window.regInterval = setInterval(async () => {
+                    const detection = await faceapi.detectSingleFace(video, new faceapi.TinyFaceDetectorOptions()).withFaceLandmarks();
+                    canvas.getContext('2d').clearRect(0, 0, canvas.width, canvas.height);
+                    if (detection) {
+                        status.innerHTML = "<i class='fa-solid fa-lock'></i> Face Locked! You can Register."; status.className = "text-success fw-bold";
+                        btn.disabled = false; faceapi.draw.drawDetections(canvas, faceapi.resizeResults(detection, video));
+                    } else {
+                        status.innerHTML = "<i class='fa-solid fa-camera'></i> Center your face..."; status.className = "text-warning fw-bold"; btn.disabled = true;
+                    }
+                }, 300);
+            };
+        }
+
+        async function registerFace() {
+            const roll = document.getElementById('regHiddenRoll').value;
+            if(!roll) return alert("Please search a Roll Number first!");
+
+            const btn = document.getElementById('registerBtn');
+            btn.innerText = "Processing AI Logic..."; btn.disabled = true;
+
+            const detection = await faceapi.detectSingleFace(document.getElementById('regVideo'), new faceapi.TinyFaceDetectorOptions()).withFaceLandmarks().withFaceDescriptor();
+            if (!detection) { alert("Face lost! Try again."); btn.innerText = "Lock Face & Save"; btn.disabled = false; return; }
+
+            db.ref('Face_Data/' + roll).set({
+                RollNo: roll, Name: document.getElementById('regHiddenName').value,
+                Phone: document.getElementById('regHiddenPhone').value,
+                FaceDescriptor: Array.from(detection.descriptor)
+            }).then(() => {
+                alert("Face ID Registered to " + roll);
+                document.getElementById('searchRollReg').value = ''; document.getElementById('regStudentDetails').innerText = '';
+            });
+        }
+
+        // =======================================================
+        // --- AI LIVE SCANNER (User Code 2 Integrated) ---
+        // =======================================================
+        let liveFaceMatcher = null;
+        let useFrontCamera = true;
+        let isProcessingScan = false;
+        let studentLiveHistory = {};
+
+        function toggleScannerCamera() { useFrontCamera = !useFrontCamera; startLiveScannerMode(); }
+
+        async function setupFaceMatcher() {
+            const snapshot = await db.ref('Face_Data').once('value');
+            const data = snapshot.val();
+            if (!data) return;
+
+            const descriptors = [];
+            for (const roll in data) {
+                if (data[roll].FaceDescriptor) {
+                    descriptors.push(new faceapi.LabeledFaceDescriptors(
+                        data[roll].Name + "||" + roll + "||" + data[roll].Phone, 
+                        [new Float32Array(Object.values(data[roll].FaceDescriptor))]
+                    ));
+                }
             }
+            if(descriptors.length > 0) liveFaceMatcher = new faceapi.FaceMatcher(descriptors, 0.5);
+        }
+
+        async function startLiveScannerMode() {
+            await loadFaceModels();
+            await setupFaceMatcher();
+            
+            // Sync history for today
+            const todayStr = new Date().toLocaleDateString('en-IN');
+            allAttendanceList.forEach(r => {
+                if(r.Date === todayStr && (!studentLiveHistory[r.RollNo] || studentLiveHistory[r.RollNo].Timestamp < r.Timestamp)) {
+                    studentLiveHistory[r.RollNo] = { state: r.ScanType, Timestamp: r.Timestamp };
+                }
+            });
+
+            const video = document.getElementById('liveVideo');
+            const canvas = document.getElementById('liveCanvas');
+            const status = document.getElementById('liveStatusText');
+
+            stopAllCameras(); // clear existing
+            navigator.mediaDevices.getUserMedia({ video: { facingMode: useFrontCamera ? "user" : "environment" } }).then(stream => {
+                window.liveStream = stream; video.srcObject = stream;
+                video.style.transform = useFrontCamera ? "scaleX(-1)" : "scaleX(1)";
+                canvas.style.transform = useFrontCamera ? "scaleX(-1)" : "scaleX(1)";
+            });
+
+            video.onplay = () => {
+                faceapi.matchDimensions(canvas, { width: video.clientWidth, height: video.clientHeight });
+                window.liveInterval = setInterval(async () => {
+                    if (!liveFaceMatcher || isProcessingScan) return;
+                    
+                    const detections = await faceapi.detectAllFaces(video, new faceapi.SsdMobilenetv1Options({minConfidence: 0.5})).withFaceLandmarks().withFaceDescriptors();
+                    canvas.getContext('2d').clearRect(0, 0, canvas.width, canvas.height);
+
+                    if(detections.length === 0) {
+                        status.innerHTML = "<i class='fa-solid fa-crosshairs fa-spin'></i> Scanning Area..."; status.style.color = "#fbbf24"; return;
+                    }
+
+                    detections.forEach(det => {
+                        const result = liveFaceMatcher.findBestMatch(det.descriptor);
+                        if (result.label !== 'unknown') {
+                            const [name, rollNo, phone] = result.label.split("||");
+                            
+                            // Blink Logic (EAR)
+                            const eye1 = det.landmarks.getLeftEye(); const eye2 = det.landmarks.getRightEye();
+                            const dist = (p1, p2) => Math.sqrt(Math.pow(p1.x - p2.x, 2) + Math.pow(p1.y - p2.y, 2));
+                            const ear = ((dist(eye1[1], eye1[5]) + dist(eye1[2], eye1[4])) / (2.0 * dist(eye1[0], eye1[3])) + (dist(eye2[1], eye2[5]) + dist(eye2[2], eye2[4])) / (2.0 * dist(eye2[0], eye2[3]))) / 2;
+
+                            const now = Date.now();
+                            let last = studentLiveHistory[rollNo] || { state: "OUT", Timestamp: 0 };
+
+                            if (last.state === "OUT" && last.Timestamp !== 0) { status.innerHTML = `✅ ${name}, Attendance Done!`; status.style.color = "#10b981"; return; }
+                            if (now - last.Timestamp < 300000 && last.Timestamp !== 0) { status.innerHTML = `⏳ Wait 5 Mins for EXIT!`; status.style.color = "#f43f5e"; return; }
+
+                            let nextMode = last.state === "IN" ? "OUT" : "IN";
+
+                            if (ear < 0.28) {
+                                isProcessingScan = true;
+                                status.innerHTML = `<i class='fa-solid fa-fingerprint'></i> ${nextMode} Saved: ${name}`; status.style.color = nextMode==="IN"?"#10b981":"#f43f5e";
+                                studentLiveHistory[rollNo] = { state: nextMode, Timestamp: now };
+                                pushAttendanceToDB(name, rollNo, phone, nextMode);
+                                
+                                if('speechSynthesis' in window) {
+                                    const speech = new SpeechSynthesisUtterance(`${name}, ${nextMode} Successful`);
+                                    speech.lang = 'en-IN'; window.speechSynthesis.speak(speech);
+                                }
+                                setTimeout(() => { isProcessingScan = false; }, 3500);
+                            } else {
+                                status.innerHTML = `${name} Recognized. Blink for ${nextMode}!`; status.style.color = "#38bdf8";
+                            }
+                        } else {
+                            status.innerHTML = "UNKNOWN PERSON!"; status.style.color = "#f43f5e";
+                        }
+                    });
+                }, 250);
+            };
         }
     </script>
 </body>
