@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sky Classes | Premium AI ERP System</title>
+    <title>Sky Classes | Premium ERP System</title>
     
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -11,281 +11,505 @@
     
     <script src="https://www.gstatic.com/firebasejs/10.11.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.11.0/firebase-database-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.11.0/firebase-storage-compat.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.25/jspdf.plugin.autotable.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@vladmandic/face-api/dist/face-api.js"></script>
     
     <style>
-        :root { --primary-dark: #0f172a; --primary-blue: #1e3a8a; --accent-gold: #E6B31E; --accent-red: #D90429; --cbse-teal: #0d9488; }
-        body { font-family: 'Poppins', sans-serif; background-color: #f8fafc; margin: 0; overflow-x: hidden; }
+        :root { --primary-dark: #07192F; --primary-blue: #0A2540; --accent-gold: #E6B31E; --accent-red: #D90429; }
+        body { font-family: 'Poppins', sans-serif; background-color: #f4f7f6; margin: 0; overflow-x: hidden; }
         
-        /* PREMIUM LOGIN UI */
-        #loginScreen { position: fixed; top: 0; left: 0; width: 100%; height: 100vh; background: linear-gradient(135deg, #0f172a, #1e3a8a); display: flex; justify-content: center; align-items: center; z-index: 9999; }
-        .login-portal { display: flex; background: white; border-radius: 24px; overflow: hidden; width: 90%; max-width: 900px; height: 550px; box-shadow: 0 25px 50px rgba(0,0,0,0.5); }
-        .login-brand-side { flex: 1.2; background: linear-gradient(180deg, rgba(15,23,42,0.85), rgba(30,58,138,0.95)), url('https://images.unsplash.com/photo-1523050854058-8df90110c9f1?q=80&w=1000') no-repeat center; background-size: cover; color: white; padding: 50px; display: flex; flex-direction: column; justify-content: center; text-align: center; border-right: 4px solid var(--accent-gold); }
-        .login-brand-side h1 { font-weight: 800; font-size: 45px; margin-bottom: 10px; }
-        .login-brand-side h1 span { color: var(--accent-red); }
-        .login-form-side { flex: 1; padding: 50px; display: flex; flex-direction: column; justify-content: center; background: #ffffff;}
-        .btn-login { background: var(--accent-red); color: white; width: 100%; padding: 14px; border: none; border-radius: 10px; font-weight: 700; margin-top: 15px; }
-
-        /* DASHBOARD UI */
+        #loginScreen { position: fixed; top: 0; left: 0; width: 100%; height: 100vh; background: linear-gradient(135deg, var(--primary-dark), var(--primary-blue)); display: flex; justify-content: center; align-items: center; z-index: 9999; }
+        .login-box { background: white; padding: 40px; border-radius: 15px; text-align: center; width: 100%; max-width: 400px; box-shadow: 0 20px 50px rgba(0,0,0,0.5); }
+        .btn-login { background: var(--accent-red); color: white; width: 100%; padding: 12px; border: none; border-radius: 8px; font-weight: bold; margin-top: 10px;}
+        
         #dashboardScreen { display: none; }
-        .sidebar { height: 100vh; background-color: var(--primary-dark); color: #e2e8f0; padding-top: 20px; position: fixed; width: 260px; z-index: 100; border-right: 3px solid var(--accent-gold);}
-        .sidebar a { padding: 12px 25px; text-decoration: none; color: #cbd5e1; display: block; cursor: pointer; transition: 0.3s; font-size: 13px; font-weight: 500;}
-        .sidebar a:hover, .sidebar a.active { background: rgba(255,255,255,0.05); color: white; border-left: 4px solid var(--cbse-teal); }
+        .sidebar { height: 100vh; background-color: var(--primary-dark); color: white; padding-top: 20px; position: fixed; width: 260px; z-index: 100; overflow-y: auto;}
+        .sidebar h4 { text-align: center; font-weight: 800; color: var(--accent-gold); margin-bottom: 25px; }
+        .sidebar a { padding: 12px 25px; text-decoration: none; color: #a0aec0; display: block; border-left: 4px solid transparent; cursor: pointer; transition: 0.3s; font-size: 15px;}
+        .sidebar a:hover, .sidebar a.active { background: rgba(255,255,255,0.05); color: white; border-left-color: var(--accent-gold); }
+        
         .main-content { margin-left: 260px; padding: 30px; }
-        .cbse-header { background: white; padding: 15px 25px; border-radius: 12px; margin-bottom: 25px; display: flex; justify-content: space-between; align-items: center; border-left: 5px solid var(--primary-blue); box-shadow: 0 4px 6px rgba(0,0,0,0.04);}
-        .table-container { background: white; padding: 25px; border-radius: 12px; margin-top: 20px; display: none; box-shadow: 0 4px 15px rgba(0,0,0,0.04); }
+        .stat-card { background: white; padding: 20px; border-radius: 15px; text-align: center; border-bottom: 5px solid var(--primary-blue); box-shadow: 0 4px 15px rgba(0,0,0,0.04); }
+        .table-container { background: white; padding: 25px; border-radius: 15px; margin-top: 20px; display: none; box-shadow: 0 4px 15px rgba(0,0,0,0.04); }
         .active-section { display: block; }
         
-        /* CAMERA UI */
-        .camera-wrapper { position: relative; width: 100%; max-width: 400px; margin: 0 auto; border-radius: 15px; overflow: hidden; border: 4px solid var(--primary-blue); }
-        #video, #videoReg { width: 100%; height: auto; transform: scaleX(-1); }
-        #canvas, #canvasReg { position: absolute; top: 0; left: 0; width: 100%; height: 100%; transform: scaleX(-1); }
+        .tool-card { max-width: 800px; margin: auto; border: 1px solid #eee; padding: 30px; border-radius: 15px; background: #fff;}
+        .tool-header { text-align: center; border-bottom: 2px solid #eee; padding-bottom: 15px; margin-bottom: 25px; }
+        .btn-print { background: #0A2540; color: white; padding: 12px; border-radius: 8px; width: 100%; font-weight: 700; border: none; transition: 0.3s; margin-top: 15px;}
+        .btn-print:hover { background: #D90429; color: white; }
     </style>
 </head>
 <body>
 
     <div id="loginScreen">
-        <div class="login-portal">
-            <div class="login-brand-side">
-                <h1 class="fw-bold">SKY <span>CLASSES</span></h1>
-                <p>Advanced AI ERP Management Suite</p>
-                <div class="mt-auto"><small>Academic Session 2026-27</small></div>
-            </div>
-            <div class="login-form-side">
-                <h4 class="fw-bold text-center mb-4">Admin Login</h4>
-                <input type="password" id="adminPassword" class="form-control text-center mb-3" placeholder="Master Password">
-                <button class="btn-login" onclick="checkPassword()">LOGIN</button>
-            </div>
+        <div class="login-box">
+            <h3 class="fw-bold"><span style="color: var(--accent-red);">SKY</span> ERP</h3>
+            <p class="text-muted small">Secure Admin Login</p>
+            <input type="password" id="adminPassword" class="form-control text-center" placeholder="Enter Master Password">
+            <button class="btn-login" onclick="checkPassword()">LOGIN</button>
         </div>
     </div>
 
     <div id="dashboardScreen">
         <div class="sidebar">
-            <h4 class="text-center fw-bold mb-4">SKY PORTAL</h4>
+            <h4>SKY CLASSES</h4>
             <a onclick="showSection('crm')" id="link-crm" class="active"><i class="fa-solid fa-users me-2"></i> Students Directory</a>
-            <a onclick="showSection('scan')" id="link-scan" style="color: var(--accent-gold);"><i class="fa-solid fa-face-viewfinder me-2"></i> AI Attendance</a>
-            <a onclick="showSection('register-face')" id="link-register"><i class="fa-solid fa-camera me-2"></i> Register Face</a>
             <a onclick="showSection('attendance')" id="link-attendance"><i class="fa-solid fa-calendar-check me-2"></i> Attendance Log</a>
             <a onclick="showSection('finance')" id="link-finance"><i class="fa-solid fa-wallet me-2"></i> Daily Finance</a>
             <hr style="border-color: #334155;">
             <a onclick="showSection('fee')" id="link-fee"><i class="fa-solid fa-file-invoice-dollar me-2"></i> Fee Receipt</a>
-            <a onclick="showSection('idcard')" id="link-idcard"><i class="fa-solid fa-id-card me-2"></i> ID Card</a>
-            <a onclick="showSection('result')" id="link-result"><i class="fa-solid fa-graduation-cap me-2"></i> Marksheet</a>
+            <a onclick="showSection('idcard')" id="link-idcard"><i class="fa-solid fa-id-card me-2"></i> Premium ID Card</a>
+            <a onclick="showSection('result')" id="link-result"><i class="fa-solid fa-graduation-cap me-2"></i> Premium Marksheet</a>
             <a onclick="showSection('paper')" id="link-paper"><i class="fa-solid fa-file-pen me-2"></i> Paper Generator</a>
+            <a onclick="logout()" style="color: #ff4d4d; margin-top: 40px;"><i class="fa-solid fa-power-off me-2"></i> Lock System</a>
         </div>
 
         <div class="main-content">
-            <div class="cbse-header">
-                <h4 class="fw-bold m-0">Sky Classes | ERP Portal</h4>
-                <span class="badge bg-primary">Session 2026-27</span>
-            </div>
-
-            <div id="section-scan" class="table-container text-center">
-                <h5 class="fw-bold mb-3">AI Face Scanner</h5>
-                <div class="camera-wrapper">
-                    <video id="video" autoplay muted playsinline></video>
-                    <canvas id="canvas"></canvas>
-                </div>
-                <div id="scanStatus" class="mt-3 fw-bold text-success">Starting AI...</div>
-            </div>
-
-            <div id="section-register-face" class="table-container text-center">
-                <h5 class="fw-bold mb-3">Register New Face Descriptor</h5>
-                <div class="camera-wrapper">
-                    <video id="videoReg" autoplay muted playsinline></video>
-                    <canvas id="canvasReg"></canvas>
-                </div>
-                <div class="mt-3 row g-2">
-                    <div class="col-md-6"><input type="text" id="regName" class="form-control" placeholder="Name"></div>
-                    <div class="col-md-6"><input type="tel" id="regPhone" class="form-control" placeholder="Phone"></div>
-                    <button class="btn btn-primary mt-2" id="btnCapture" onclick="registerFace()" disabled>Capture Face</button>
-                </div>
+            <div class="row g-4 mb-4">
+                <div class="col-md-4"><div class="stat-card" style="border-color: #0d6efd;"><h2 id="countTotalStudents">0</h2><p class="text-muted fw-bold mb-0">Total Students</p></div></div>
+                <div class="col-md-4"><div class="stat-card" style="border-color: #28a745;"><h2 id="countAttendance">0</h2><p class="text-muted fw-bold mb-0">Present Today</p></div></div>
+                <div class="col-md-4"><div class="stat-card" style="border-color: #E6B31E;"><h2 id="countRevenue">₹0</h2><p class="text-muted fw-bold mb-0">Total Fee Revenue</p></div></div>
             </div>
 
             <div id="section-crm" class="table-container active-section">
-                <h5 class="fw-bold mb-4">Students Directory</h5>
-                <div class="table-responsive"><table class="table table-hover text-center"><thead class="table-dark"><tr><th>Roll No</th><th>Name</th><th>Phone</th><th>Action</th></tr></thead><tbody id="crmBody"></tbody></table></div>
+                <h5 class="fw-bold mb-4 text-primary"><i class="fa-solid fa-address-book me-2"></i> Registered Students</h5>
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle text-center">
+                        <thead class="table-dark"><tr><th>Roll No</th><th>Student Name</th><th>Phone Number</th><th>Action</th></tr></thead>
+                        <tbody id="crmBody"></tbody>
+                    </table>
+                </div>
             </div>
 
             <div id="section-attendance" class="table-container">
-                <div class="d-flex justify-content-between mb-4"><h5>Attendance Log</h5><input type="date" id="dateFilter" class="form-control w-25" onchange="filterAttendanceData()"></div>
-                <div class="table-responsive"><table class="table table-hover text-center" id="attendanceTable"><thead class="table-light"><tr><th>Roll No</th><th>Name</th><th>IN</th><th>OUT</th><th>Status</th></tr></thead><tbody id="attendanceBody"></tbody></table></div>
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <h5 class="fw-bold m-0 text-success"><i class="fa-solid fa-clock-rotate-left me-2"></i> Entry/Exit Log</h5>
+                    <div class="d-flex gap-2">
+                        <input type="date" id="dateFilter" class="form-control" onchange="filterAttendanceData()">
+                        <button class="btn btn-success" onclick="downloadAttendancePDF()"><i class="fa-solid fa-file-pdf"></i> PDF</button>
+                    </div>
+                </div>
+                <div class="table-responsive">
+                    <table class="table table-hover text-center align-middle" id="attendanceTable">
+                        <thead class="table-light"><tr><th>Roll No</th><th>Name</th><th class="text-success">ENTRY (IN)</th><th class="text-danger">EXIT (OUT)</th><th>Status</th></tr></thead>
+                        <tbody id="attendanceBody"></tbody>
+                    </table>
+                </div>
             </div>
 
             <div id="section-finance" class="table-container">
-                <h5>Daily Finance</h5>
-                <div class="row g-2 mb-4 p-3 bg-light rounded"><div class="col-md-4"><input type="text" id="finTitle" class="form-control" placeholder="Detail"></div><div class="col-md-4"><input type="number" id="finAmt" class="form-control" placeholder="Amount"></div><div class="col-md-2"><select id="finType" class="form-select"><option value="Income">Income</option><option value="Expense">Expense</option></select></div><div class="col-md-2"><button class="btn btn-primary w-100" onclick="addManualFinance()">Add</button></div></div>
-                <table class="table text-center"><thead class="table-dark"><tr><th>Date</th><th>Detail</th><th>Income</th><th>Expense</th></tr></thead><tbody id="financeBody"></tbody></table>
+                <h5 class="fw-bold mb-4 text-primary"><i class="fa-solid fa-chart-pie me-2"></i> Income & Expenses</h5>
+                <div class="row g-3 mb-4 p-3" style="background:#f8fafc; border-radius:10px; border:1px solid #e2e8f0;">
+                    <div class="col-md-4"><input type="text" id="finTitle" class="form-control" placeholder="Detail (e.g. Electricity, Rent)"></div>
+                    <div class="col-md-3"><input type="number" id="finAmount" class="form-control" placeholder="Amount (₹)"></div>
+                    <div class="col-md-3"><select id="finType" class="form-select"><option value="Expense">Expense</option><option value="Income">Income</option></select></div>
+                    <div class="col-md-2"><button class="btn btn-primary w-100" onclick="addManualFinance()">Add</button></div>
+                </div>
+                <table class="table table-hover text-center"><thead class="table-dark"><tr><th>Date</th><th>Description</th><th class="text-success">Income</th><th class="text-danger">Expense</th></tr></thead><tbody id="financeBody"></tbody></table>
             </div>
 
-            <div id="section-fee" class="table-container"><div class="tool-card text-center"><h5>Fee Receipt</h5><input type="text" id="feeSearch" class="form-control mb-2" list="studentDatalist" placeholder="Select Student"><input type="number" id="feeAmount" class="form-control mb-3" placeholder="Amount"><button class="btn btn-primary w-100" onclick="generateReceipt()">Print & Save</button></div></div>
-            
-            <div id="section-idcard" class="table-container"><div class="tool-card text-center"><h5>ID Card Maker</h5><input type="text" id="idSearch" class="form-control mb-2" list="studentDatalist"><input type="text" id="idCourse" class="form-control mb-3" placeholder="Course"><button class="btn btn-primary w-100" onclick="generatePremiumIDCard()">Download PDF</button></div></div>
+            <div id="section-fee" class="table-container">
+                <div class="tool-card">
+                    <div class="tool-header"><h4 class="fw-bold" style="color: var(--primary-blue);">Generate Fee Receipt</h4></div>
+                    <div class="mb-3"><label class="fw-bold small">Student Name / Roll No</label><input type="text" id="feeSearch" class="form-control" list="studentDatalist" placeholder="Search student..."></div>
+                    <div class="row mb-3">
+                        <div class="col-md-6"><label class="fw-bold small">Course</label><input type="text" id="feeCourse" class="form-control" placeholder="Course Name"></div>
+                        <div class="col-md-6"><label class="fw-bold small">Amount Paid (₹)</label><input type="number" id="feeAmount" class="form-control" placeholder="Amount Paid"></div>
+                    </div>
+                    <div class="alert alert-success py-2 mt-3" style="font-size: 13px;"><i class="fa-solid fa-circle-info me-1"></i> Generating receipt will automatically add this amount to <b>Finance (Income)</b>.</div>
+                    <button class="btn-print" onclick="generateReceipt()"><i class="fa-solid fa-file-invoice me-2"></i> Print Receipt & Add to Finance</button>
+                </div>
+            </div>
 
-            <div id="section-result" class="table-container"><div class="tool-card text-center"><h5>Marksheet Maker</h5><input type="text" id="resSearch" class="form-control mb-2" list="studentDatalist"><div id="subjectsContainer"></div><button class="btn btn-success w-100 mt-3" onclick="generatePremiumResult()">Print Marksheet</button></div></div>
+            <div id="section-idcard" class="table-container">
+                <div class="tool-card">
+                    <div class="tool-header"><h4 class="fw-bold" style="color: var(--primary-blue);">Premium ID Card Maker</h4></div>
+                    <div class="mb-3"><label class="fw-bold small">Select Student</label><input type="text" id="idSearch" class="form-control" list="studentDatalist"></div>
+                    <div class="row mb-3">
+                        <div class="col-md-6"><label class="fw-bold small">Course/Class</label><input type="text" id="idCourse" class="form-control"></div>
+                        <div class="col-md-6"><label class="fw-bold small">Valid Till</label><input type="text" id="idValid" class="form-control" value="March 2027"></div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="fw-bold small text-primary">Upload Student Photo</label>
+                        <input type="file" id="idPhotoUpload" class="form-control" accept="image/*">
+                    </div>
+                    <button class="btn-print" onclick="generatePremiumIDCard()"><i class="fa-solid fa-id-badge me-2"></i> Download Premium ID Card</button>
+                </div>
+            </div>
+
+            <div id="section-result" class="table-container">
+                <div class="tool-card" style="max-width: 900px;">
+                    <div class="tool-header"><h4 class="fw-bold" style="color: var(--primary-blue);">Premium Marksheet Generator</h4></div>
+                    <div class="row mb-3">
+                        <div class="col-md-6"><label class="fw-bold small">Student</label><input type="text" id="resSearch" class="form-control" list="studentDatalist"></div>
+                        <div class="col-md-6"><label class="fw-bold small">Exam Name</label><input type="text" id="resExam" class="form-control" placeholder="e.g. Annual Exam"></div>
+                    </div>
+                    
+                    <div class="row fw-bold text-center mb-2"><div class="col-6">Subject</div><div class="col-3">Obtained</div><div class="col-3">Max Marks</div></div>
+                    <div id="subjectsContainer"></div>
+
+                    <div class="alert alert-warning mt-3">
+                        <strong>Auto Calculation:</strong> Total: <span id="autoTotalObt">0</span> / <span id="autoTotalMax">0</span> &nbsp;&nbsp; | &nbsp;&nbsp; Percentage: <span id="autoPerc">0.00</span>%
+                    </div>
+
+                    <button class="btn-print" style="background:#28a745;" onclick="generatePremiumResult()"><i class="fa-solid fa-trophy me-2"></i> Save to Portal & Print Result</button>
+                </div>
+            </div>
+
+            <div id="section-paper" class="table-container">
+                <div class="tool-card">
+                    <div class="tool-header"><h4 class="fw-bold" style="color: var(--primary-blue);">Question Paper Maker</h4></div>
+                    <div class="row mb-3">
+                        <div class="col-md-6"><label class="fw-bold small">Exam Name</label><input type="text" id="pExam" class="form-control mb-2" placeholder="e.g. Half Yearly"></div>
+                        <div class="col-md-6"><label class="fw-bold small">Subject</label><input type="text" id="pSub" class="form-control mb-2" placeholder="e.g. Physics"></div>
+                    </div>
+                    <label class="fw-bold small">Questions List</label>
+                    <textarea id="pQuestions" class="form-control mb-3" rows="8" placeholder="1. What is gravity?&#10;2. Define motion."></textarea>
+                    <button class="btn-print" style="background:var(--accent-red);" onclick="generatePaper()"><i class="fa-solid fa-print me-2"></i> Generate Paper PDF</button>
+                </div>
+            </div>
 
             <datalist id="studentDatalist"></datalist>
         </div>
     </div>
 
     <script>
-        const firebaseConfig = { apiKey: "AIzaSyC6bcqETEnTjLEQnISXjnWR2brPrVOAm-Y", authDomain: "sky-classes-db-d6140.firebaseapp.com", databaseURL: "https://sky-classes-db-d6140-default-rtdb.firebaseio.com", projectId: "sky-classes-db-d6140", storageBucket: "sky-classes-db-d6140.firebasestorage.app" };
+        const firebaseConfig = {
+          apiKey: "AIzaSyC6bcqETEnTjLEQnISXjnWR2brPrVOAm-Y",
+          authDomain: "sky-classes-db-d6140.firebaseapp.com",
+          databaseURL: "https://sky-classes-db-d6140-default-rtdb.firebaseio.com",
+          projectId: "sky-classes-db-d6140",
+          storageBucket: "sky-classes-db-d6140.firebasestorage.app"
+        };
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
-        const storage = firebase.storage();
-
-        let allStudents = {}; let faceMatcher = null; let stream = null;
 
         function checkPassword() {
             if(document.getElementById('adminPassword').value === "SkyAdmin123") {
                 document.getElementById('loginScreen').style.display = 'none';
                 document.getElementById('dashboardScreen').style.display = 'block';
-                initAI(); loadDatabase(); createSubjectRows();
-            } else { alert("Wrong Password!"); }
+                const td = new Date();
+                document.getElementById('dateFilter').value = `${td.getFullYear()}-${String(td.getMonth()+1).padStart(2,'0')}-${String(td.getDate()).padStart(2,'0')}`;
+                loadDatabase();
+                createSubjectRows(); 
+            } else { alert("Wrong Password! Use 'SkyAdmin123'"); }
         }
+
+        document.addEventListener("DOMContentLoaded", function() {
+            document.getElementById("adminPassword").addEventListener("keypress", function(e) {
+                if (e.key === "Enter") { e.preventDefault(); checkPassword(); }
+            });
+        });
+
+        function logout() { location.reload(); }
 
         function showSection(id) {
             document.querySelectorAll('.table-container').forEach(el => el.classList.remove('active-section'));
             document.querySelectorAll('.sidebar a').forEach(el => el.classList.remove('active'));
             document.getElementById('section-' + id).classList.add('active-section');
             document.getElementById('link-' + id).classList.add('active');
-            stopCamera();
-            if(id === 'scan' || id === 'register-face') startCamera(id === 'scan' ? 'video' : 'videoReg');
         }
 
-        // --- AI LOGIC ---
-        async function initAI() {
-            const URL = 'https://cdn.jsdelivr.net/npm/@vladmandic/face-api/model/';
-            await Promise.all([faceapi.nets.tinyFaceDetector.loadFromUri(URL), faceapi.nets.faceLandmark68Net.loadFromUri(URL), faceapi.nets.faceRecognitionNet.loadFromUri(URL), faceapi.nets.ssdMobilenetv1.loadFromUri(URL)]);
-            loadFaceMatcher();
-        }
+        let allStudents = {}; let allAttendance = [];
 
-        async function loadFaceMatcher() {
-            db.ref('Face_Data').once('value', snap => {
-                const data = snap.val(); if(!data) return;
-                const descriptors = [];
-                for(let p in data) { if(data[p].FaceDescriptor) { descriptors.push(new faceapi.LabeledFaceDescriptors(data[p].Name + "||" + p, [new Float32Array(Object.values(data[p].FaceDescriptor))])); } }
-                if(descriptors.length) faceMatcher = new faceapi.FaceMatcher(descriptors, 0.6);
-            });
-        }
-
-        async function startCamera(vidId) {
-            const vid = document.getElementById(vidId);
-            stream = await navigator.mediaDevices.getUserMedia({ video: {} });
-            vid.srcObject = stream;
-            if(vidId === 'video') runAttendanceAI(); else runRegistrationAI();
-        }
-
-        function stopCamera() { if(stream) stream.getTracks().forEach(t => t.stop()); }
-
-        async function runAttendanceAI() {
-            const vid = document.getElementById('video'); const canvas = document.getElementById('canvas');
-            const displaySize = { width: vid.clientWidth, height: vid.clientHeight };
-            faceapi.matchDimensions(canvas, displaySize);
-            setInterval(async () => {
-                if(!stream) return;
-                const detections = await faceapi.detectAllFaces(vid, new faceapi.TinyFaceDetectorOptions()).withFaceLandmarks().withFaceDescriptors();
-                const resized = faceapi.resizeResults(detections, displaySize);
-                canvas.getContext('2d').clearRect(0,0,canvas.width,canvas.height);
-                if(resized.length && faceMatcher) {
-                    const result = faceMatcher.findBestMatch(resized[0].descriptor);
-                    if(result.label !== 'unknown') markAttendance(result.label.split("||")[0], result.label.split("||")[1]);
-                    faceapi.draw.drawDetections(canvas, resized);
-                }
-            }, 1000);
-        }
-
-        async function markAttendance(name, phone) {
-            const now = new Date(); const d = now.toLocaleDateString('en-IN'); const t = now.toLocaleTimeString('en-IN');
-            db.ref('Daily_Attendance').push({ Name: name, Phone: phone, Date: d, Time: t, ScanType: "IN" });
-            document.getElementById('scanStatus').innerText = "Marked: " + name;
-        }
-
-        async function runRegistrationAI() {
-            const vid = document.getElementById('videoReg'); const btn = document.getElementById('btnCapture');
-            setInterval(async () => {
-                if(!stream) return;
-                const det = await faceapi.detectSingleFace(vid, new faceapi.TinyFaceDetectorOptions());
-                btn.disabled = !det;
-            }, 1000);
-        }
-
-        async function registerFace() {
-            const n = document.getElementById('regName').value; const p = document.getElementById('regPhone').value;
-            const det = await faceapi.detectSingleFace(document.getElementById('videoReg'), new faceapi.SSDMobilenetv1Options()).withFaceDescriptor();
-            if(det && n && p) {
-                await db.ref('Face_Data/' + p).set({ Name: n, Phone: p, FaceDescriptor: Array.from(det.descriptor), RollNo: "SKY"+Math.floor(10000+Math.random()*90000) });
-                alert("Registered!"); location.reload();
-            }
-        }
-
-        // --- DATABASE & PDF LOGIC (RESTORED) ---
         function loadDatabase() {
             db.ref('Face_Data').on('value', snap => {
-                const cBody = document.getElementById('crmBody'); const dList = document.getElementById('studentDatalist');
-                cBody.innerHTML = ''; dList.innerHTML = ''; allStudents = snap.val() || {};
-                for(let p in allStudents) {
-                    let s = allStudents[p];
-                    cBody.innerHTML += `<tr><td class="text-primary fw-bold">${s.RollNo}</td><td>${s.Name}</td><td>${p}</td><td><button class="btn btn-sm btn-danger" onclick="delStu('${p}')"><i class="fa-solid fa-trash"></i></button></td></tr>`;
-                    let opt = document.createElement('option'); opt.value = s.Name + " | " + s.RollNo + " | " + p; dList.appendChild(opt);
+                const data = snap.val();
+                const crmBody = document.getElementById('crmBody');
+                const datalist = document.getElementById('studentDatalist');
+                crmBody.innerHTML = ''; datalist.innerHTML = '';
+                let count = 0; allStudents = {};
+                
+                if(data) {
+                    for(let phone in data) {
+                        let st = data[phone]; count++;
+                        let rollNo = st.RollNo;
+                        if(!rollNo) {
+                            rollNo = "SKY" + Math.floor(10000 + Math.random() * 90000); 
+                            db.ref('Face_Data/' + phone).update({ RollNo: rollNo }); 
+                        }
+
+                        allStudents[phone] = { name: st.Name, roll: rollNo };
+                        let opt = document.createElement('option');
+                        opt.value = `${st.Name} | ${rollNo} | ${phone}`;
+                        datalist.appendChild(opt);
+
+                        crmBody.innerHTML += `<tr><td class="fw-bold text-primary">${rollNo}</td><td class="fw-bold">${st.Name}</td><td>${phone}</td>
+                        <td><button onclick="deleteStudent('${phone}')" class="btn btn-sm btn-danger"><i class="fa-solid fa-trash"></i></button></td></tr>`;
+                    }
                 }
-                document.getElementById('financeBody').innerHTML = '';
+                document.getElementById('countTotalStudents').innerText = count;
+                loadAttendance(); 
             });
+
             db.ref('Finance_Data').on('value', snap => {
-                const fBody = document.getElementById('financeBody'); fBody.innerHTML = '';
-                if(snap.val()) Object.values(snap.val()).reverse().forEach(f => {
-                    fBody.innerHTML += `<tr><td>${f.Date}</td><td>${f.Title}</td><td class="text-success">${f.Type=='Income'?'₹'+f.Amount:'-'}</td><td class="text-danger">${f.Type=='Expense'?'₹'+f.Amount:'-'}</td></tr>`;
-                });
+                const data = snap.val();
+                const fBody = document.getElementById('financeBody');
+                fBody.innerHTML = ''; let totalIncome = 0;
+                if(data) {
+                    Object.values(data).reverse().forEach(f => {
+                        let inc = f.Type === "Income" ? `+ ₹${f.Amount}` : "-";
+                        let exp = f.Type === "Expense" ? `- ₹${f.Amount}` : "-";
+                        if(f.Type === "Income") totalIncome += Number(f.Amount);
+                        fBody.innerHTML += `<tr><td>${f.Date}</td><td class="fw-bold">${f.Title}</td><td class="text-success fw-bold">${inc}</td><td class="text-danger fw-bold">${exp}</td></tr>`;
+                    });
+                }
+                document.getElementById('countRevenue').innerText = `₹${totalIncome}`;
             });
         }
 
-        function extract(raw) { if(!raw) return {n:"-", r:"-", p:"-"}; const pts = raw.split(" | "); return {n:pts[0], r:pts[1], p:pts[2]}; }
+        function loadAttendance() {
+            db.ref('Daily_Attendance').on('value', snap => {
+                allAttendance = [];
+                if(snap.val()) Object.values(snap.val()).forEach(at => allAttendance.push(at));
+                filterAttendanceData(); 
+            });
+        }
 
+        function filterAttendanceData() {
+            let selectedDate = document.getElementById('dateFilter').value;
+            if(!selectedDate) return;
+            let parts = selectedDate.split('-');
+            let f1 = `${parts[2]}/${parts[1]}/${parts[0]}`; 
+            let f2 = `${parseInt(parts[2])}/${parseInt(parts[1])}/${parts[0]}`;
+            
+            let records = {};
+            allAttendance.forEach(r => {
+                if(r.Date === f1 || r.Date === f2) {
+                    let p = r.Phone;
+                    let roll = allStudents[p] ? allStudents[p].roll : "UNKNOWN";
+                    if(!records[p]) records[p] = {name: r.Name, phone: p, roll: roll, in: "--", out: "--"};
+                    if(r.ScanType === "IN" || !r.ScanType) records[p].in = r.Time;
+                    else if (r.ScanType === "OUT") records[p].out = r.Time;
+                }
+            });
+
+            let body = document.getElementById('attendanceBody'); body.innerHTML = ''; let count = 0;
+            for(let p in records) {
+                let st = records[p]; count++;
+                let stat = st.out !== "--" ? '<span class="badge bg-success">Left</span>' : '<span class="badge bg-warning text-dark">Inside Class</span>';
+                body.innerHTML += `<tr><td class="fw-bold text-primary">${st.roll}</td><td class="fw-bold">${st.name}</td><td class="text-success fw-bold">${st.in}</td><td class="text-danger fw-bold">${st.out}</td><td>${stat}</td></tr>`;
+            }
+            document.getElementById('countAttendance').innerText = count;
+        }
+
+        function downloadAttendancePDF() {
+            const { jsPDF } = window.jspdf; const doc = new jsPDF();
+            doc.setFontSize(18); doc.text("SKY CLASSES - Daily Attendance", 14, 15);
+            doc.setFontSize(11); doc.text(`Date: ${document.getElementById('dateFilter').value}`, 14, 22);
+            doc.autoTable({ html: '#attendanceTable', startY: 25, theme: 'grid', headStyles: { fillColor: [10, 37, 64] }});
+            doc.save(`Attendance_${document.getElementById('dateFilter').value}.pdf`);
+        }
+
+        function deleteStudent(phone) {
+            if(confirm("Permanently delete this student's face data and record?")) db.ref('Face_Data/' + phone).remove();
+        }
+
+        function addManualFinance() {
+            let title = document.getElementById('finTitle').value; let amt = document.getElementById('finAmount').value; let type = document.getElementById('finType').value;
+            if(!title || !amt) return alert("Fill Expense details and Amount!");
+            db.ref('Finance_Data').push({ Date: new Date().toLocaleDateString('en-IN'), Title: title, Amount: amt, Type: type });
+            document.getElementById('finTitle').value = ''; document.getElementById('finAmount').value = '';
+        }
+
+        function extractData(rawString) {
+            if(!rawString) return {name: "Student", roll: "N/A", phone: "N/A"};
+            let parts = rawString.split(" | ");
+            return { name: parts[0], roll: parts[1] || "N/A", phone: parts[2] || "N/A" };
+        }
+
+        // FULLY FUNCTIONAL PDF GENERATORS BELOW
+
+        // 1. FEE RECEIPT
         function generateReceipt() {
             const { jsPDF } = window.jspdf; const doc = new jsPDF();
-            const data = extract(document.getElementById('feeSearch').value); const amt = document.getElementById('feeAmount').value;
-            doc.text("SKY CLASSES - RECEIPT", 105, 20, null, null, "center");
-            doc.text(`Student: ${data.n} (${data.r})`, 20, 40); doc.text(`Amount: Rs. ${amt}`, 20, 50);
-            doc.save(`Fee_${data.n}.pdf`);
-            db.ref('Finance_Data').push({ Date: new Date().toLocaleDateString(), Title: "Fee: "+data.n, Amount: amt, Type: "Income" });
+            let stData = extractData(document.getElementById('feeSearch').value);
+            let amt = document.getElementById('feeAmount').value; 
+            let crs = document.getElementById('feeCourse').value || 'General Course';
+            
+            if(stData.name === "Student" || !amt) return alert("Select student and enter Fee Amount!");
+
+            doc.setFillColor(10, 37, 64); doc.rect(0, 0, 210, 40, 'F');
+            doc.setTextColor(255); doc.setFontSize(26); doc.setFont("helvetica", "bold"); 
+            doc.text("SKY CLASSES", 105, 20, null, null, "center");
+            doc.setFontSize(12); doc.setFont("helvetica", "normal"); doc.text("Gorakhpur's Premium Educational Institute", 105, 30, null, null, "center");
+            
+            doc.setTextColor(217, 4, 41); doc.setFontSize(18); doc.setFont("helvetica", "bold");
+            doc.text("FEE RECEIPT", 105, 60, null, null, "center");
+            
+            doc.setDrawColor(200, 200, 200); doc.setLineWidth(0.5); doc.rect(20, 70, 170, 75);
+            doc.setTextColor(0); doc.setFontSize(12);
+            doc.text(`Receipt Date: ${new Date().toLocaleDateString('en-IN')}`, 130, 85);
+            doc.text(`Roll Number: ${stData.roll}`, 30, 85);
+            
+            doc.text(`Received From :  ${stData.name.toUpperCase()}`, 30, 105);
+            doc.text(`Course Name   :  ${crs}`, 30, 115);
+            
+            doc.setFillColor(245, 245, 245); doc.rect(120, 110, 60, 15, 'F');
+            doc.setTextColor(10, 37, 64); doc.setFont("helvetica", "bold");
+            doc.text(`Amount Paid: Rs. ${amt} /-`, 125, 120);
+            
+            doc.setTextColor(0); doc.setFontSize(10); doc.setFont("helvetica", "normal");
+            doc.text("-----------------------------------", 155, 185, null, null, "center");
+            doc.text("Authorized Signatory", 155, 190, null, null, "center");
+
+            doc.save(`Receipt_${stData.name}.pdf`);
+
+            // AUTO SAVE TO FINANCE
+            db.ref('Finance_Data').push({
+                Date: new Date().toLocaleDateString('en-IN'),
+                Title: `Fee Received: ${stData.name}`, Amount: amt, Type: "Income"
+            });
+            
+            alert("Receipt Generated and Amount Added to Finance (Income) Successfully!");
+            document.getElementById('feeSearch').value = ''; document.getElementById('feeAmount').value = ''; document.getElementById('feeCourse').value = '';
         }
+
+        // 2. ID CARD
+        let uploadedPhotoBase64 = null;
+        document.getElementById('idPhotoUpload').addEventListener('change', function(e) {
+            const file = e.target.files[0]; const reader = new FileReader();
+            reader.onload = function(event) { uploadedPhotoBase64 = event.target.result; };
+            reader.readAsDataURL(file);
+        });
 
         function generatePremiumIDCard() {
-            const { jsPDF } = window.jspdf; const doc = new jsPDF({unit: "mm", format: [54, 86]});
-            const data = extract(document.getElementById('idSearch').value);
-            doc.setFillColor(15, 23, 42); doc.rect(0, 0, 54, 15, 'F');
-            doc.setTextColor(255); doc.text("SKY CLASSES", 27, 10, null, null, "center");
-            doc.setTextColor(0); doc.text(data.n, 27, 40, null, null, "center");
-            doc.save(`ID_${data.n}.pdf`);
+            const { jsPDF } = window.jspdf; 
+            const doc = new jsPDF({orientation: "portrait", unit: "mm", format: [54, 86]});
+            
+            let stData = extractData(document.getElementById('idSearch').value);
+            let course = document.getElementById('idCourse').value || "Student";
+            let valid = document.getElementById('idValid').value;
+            
+            if(stData.name === "Student") return alert("Please select a student!");
+
+            doc.setFillColor(10, 37, 64); doc.rect(0, 0, 54, 16, 'F');
+            doc.setTextColor(255); doc.setFontSize(13); doc.setFont("helvetica", "bold"); doc.text("SKY CLASSES", 27, 10, null, null, "center");
+            doc.setDrawColor(230, 179, 30); doc.setLineWidth(1); doc.rect(2, 2, 50, 82); 
+            
+            if(uploadedPhotoBase64) {
+                doc.addImage(uploadedPhotoBase64, 'JPEG', 14, 20, 26, 32);
+                doc.setDrawColor(10,37,64); doc.rect(14,20,26,32); 
+            } else {
+                doc.setFillColor(230); doc.rect(14, 20, 26, 32, 'F'); 
+                doc.setTextColor(150); doc.setFontSize(8); doc.text("NO PHOTO", 27, 36, null, null, "center");
+            }
+            
+            doc.setTextColor(0); doc.setFontSize(12); doc.setFont("helvetica", "bold"); doc.text(stData.name.toUpperCase(), 27, 58, null, null, "center");
+            doc.setFontSize(9); doc.setFont("helvetica", "normal"); doc.text(`Roll: ${stData.roll}`, 27, 63, null, null, "center");
+            doc.setTextColor(217, 4, 41); doc.setFont("helvetica", "bold"); doc.text(course, 27, 68, null, null, "center");
+            
+            doc.setFillColor(10, 37, 64); doc.rect(0, 75, 54, 11, 'F');
+            doc.setTextColor(255); doc.setFontSize(7); doc.setFont("helvetica", "normal"); doc.text(`Valid Till: ${valid}`, 27, 82, null, null, "center");
+            
+            doc.save(`Premium_ID_${stData.name}.pdf`);
         }
 
+        // 3. MARKSHEET
         function createSubjectRows() {
-            const cont = document.getElementById('subjectsContainer'); cont.innerHTML = '';
-            for(let i=1; i<=5; i++) cont.innerHTML += `<div class="row g-2 mt-1"><div class="col-6"><input type="text" id="sub${i}" class="form-control" placeholder="Sub"></div><div class="col-6"><input type="number" id="obt${i}" class="form-control" placeholder="Marks"></div></div>`;
+            let container = document.getElementById('subjectsContainer');
+            container.innerHTML = '';
+            for(let i=1; i<=8; i++) {
+                container.innerHTML += `
+                <div class="row mb-2">
+                    <div class="col-6"><input type="text" id="sub${i}" class="form-control" placeholder="Subject ${i}"></div>
+                    <div class="col-3"><input type="number" id="obt${i}" class="form-control obt-val" oninput="calcMarks()"></div>
+                    <div class="col-3"><input type="number" id="max${i}" class="form-control max-val" value="100" oninput="calcMarks()"></div>
+                </div>`;
+            }
+      }  
+
+        function calcMarks() {
+            let totObt = 0, totMax = 0;
+            for(let i=1; i<=8; i++) {
+                let o = parseFloat(document.getElementById(`obt${i}`).value) || 0;
+                let m = parseFloat(document.getElementById(`max${i}`).value) || 0;
+                if(document.getElementById(`obt${i}`).value !== "") { totObt += o; totMax += m; }
+            }
+            document.getElementById('autoTotalObt').innerText = totObt;
+            document.getElementById('autoTotalMax').innerText = totMax;
+            let perc = totMax > 0 ? ((totObt/totMax)*100).toFixed(2) : 0;
+            document.getElementById('autoPerc').innerText = perc;
         }
 
         function generatePremiumResult() {
             const { jsPDF } = window.jspdf; const doc = new jsPDF();
-            const data = extract(document.getElementById('resSearch').value);
-            doc.text("SKY CLASSES - MARKSHEET", 105, 20, null, null, "center");
-            doc.text(`Student: ${data.n}`, 20, 40); doc.save(`Result_${data.n}.pdf`);
+            let stData = extractData(document.getElementById('resSearch').value); 
+            let exam = document.getElementById('resExam').value || "Final Examination";
+            
+            if(!stData.roll || stData.roll === "N/A") return alert("Please select student from the dropdown!");
+
+            let tableData = []; let totObt = 0, totMax = 0;
+            for(let i=1; i<=8; i++) {
+                let sub = document.getElementById(`sub${i}`).value;
+                let obt = document.getElementById(`obt${i}`).value;
+                let max = document.getElementById(`max${i}`).value;
+                if(sub && obt) {
+                    tableData.push([sub, obt, max]);
+                    totObt += parseFloat(obt); totMax += parseFloat(max);
+                }
+            }
+            if(tableData.length === 0) return alert("Please enter at least 1 subject and marks!");
+
+            let perc = totMax > 0 ? ((totObt/totMax)*100).toFixed(2) : 0;
+
+            doc.setFillColor(10, 37, 64); doc.rect(0, 0, 210, 35, 'F');
+            doc.setTextColor(255); doc.setFontSize(28); doc.setFont("helvetica", "bold"); doc.text("SKY CLASSES", 105, 18, null, null, "center");
+            doc.setFontSize(12); doc.setFont("helvetica", "normal"); doc.text("Gorakhpur's Premium Educational Institute", 105, 26, null, null, "center");
+            
+            doc.setTextColor(217, 4, 41); doc.setFontSize(20); doc.setFont("helvetica", "bold"); doc.text("STATEMENT OF MARKS", 105, 48, null, null, "center");
+            
+            doc.setDrawColor(200); doc.rect(14, 55, 182, 25);
+            doc.setTextColor(0); doc.setFontSize(11);
+            doc.text(`Student Name : ${stData.name.toUpperCase()}`, 20, 63);
+            doc.text(`Roll Number   : ${stData.roll}`, 20, 73);
+            doc.text(`Examination   : ${exam}`, 120, 63);
+            
+            doc.autoTable({
+                startY: 85, head: [['Subject Name', 'Marks Obtained', 'Maximum Marks']], body: tableData,
+                theme: 'grid', styles: { fontSize: 11, halign: 'center' }, headStyles: { fillColor: [10, 37, 64] }
+            });
+
+            let finalY = doc.lastAutoTable.finalY;
+            doc.setFillColor(240); doc.rect(14, finalY + 10, 182, 20, 'F');
+            doc.setFontSize(13); doc.setFont("helvetica", "bold"); doc.text(`Total Marks: ${totObt} / ${totMax}`, 20, finalY + 22);
+            doc.setTextColor(217, 4, 41); doc.text(`Percentage: ${perc} %`, 140, finalY + 22);
+
+            doc.setTextColor(0); doc.setFont("helvetica", "italic"); doc.setFontSize(14); doc.text("SkyClassesAuth", 150, finalY + 55, null, null, "center"); 
+            doc.setFont("helvetica", "normal"); doc.setFontSize(10); doc.text("-----------------------------------", 150, finalY + 58, null, null, "center"); doc.text("Director / Authorized Signatory", 150, finalY + 63, null, null, "center");
+
+            doc.save(`Result_${stData.name}.pdf`);
+
+            db.ref('Student_Results/' + stData.roll).set({
+                Name: stData.name, Exam: exam, Total: totObt, Max: totMax, Percentage: perc, Subjects: tableData
+            });
+            alert("Result PDF Downloaded & Saved to Student Portal!");
+            
+            // Clear inputs
+            for(let i=1; i<=8; i++) { document.getElementById(`sub${i}`).value=''; document.getElementById(`obt${i}`).value=''; }
+            document.getElementById('resSearch').value='';
         }
 
-        function filterAttendanceData() {
-            const d = document.getElementById('dateFilter').value;
-            db.ref('Daily_Attendance').once('value', snap => {
-                const body = document.getElementById('attendanceBody'); body.innerHTML = '';
-                if(snap.val()) Object.values(snap.val()).forEach(at => {
-                    if(at.Date.includes(d.split("-")[2])) body.innerHTML += `<tr><td>-</td><td>${at.Name}</td><td>${at.Time}</td><td>-</td><td>IN</td></tr>`;
-                });
-            });
+        // 4. QUESTION PAPER
+        function generatePaper() {
+            const { jsPDF } = window.jspdf; const doc = new jsPDF();
+            let examName = document.getElementById('pExam').value || "Mock Test";
+            let subject = document.getElementById('pSub').value || "General Subject";
+            let qText = document.getElementById('pQuestions').value;
+            
+            if(!qText) return alert("Please type some questions!");
+
+            doc.setFontSize(24); doc.setFont("helvetica", "bold"); doc.text("SKY CLASSES", 105, 20, null, null, "center");
+            doc.setFontSize(12); doc.setFont("helvetica", "normal"); doc.text("Gorakhpur's Premium Educational Institute", 105, 28, null, null, "center");
+            doc.setLineWidth(0.5); doc.line(15, 32, 195, 32);
+
+            doc.setFont("helvetica", "bold"); doc.setFontSize(14); doc.text(examName.toUpperCase(), 105, 42, null, null, "center");
+            doc.setFontSize(11); doc.setFont("helvetica", "normal"); doc.text(`Subject: ${subject}`, 15, 52); doc.line(15, 57, 195, 57);
+
+            let lines = doc.splitTextToSize(qText, 170);
+            doc.text(lines, 20, 65); 
+            doc.save(`Paper_${subject}.pdf`);
         }
-        
-        function delStu(p) { if(confirm("Delete?")) db.ref('Face_Data/'+p).remove(); }
-        function logout() { location.reload(); }
     </script>
 </body>
 </html>
