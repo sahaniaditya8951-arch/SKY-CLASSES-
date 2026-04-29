@@ -17,31 +17,27 @@
 
     <style>
         :root { --dark: #0b1120; --blue: #3b82f6; --gold: #f59e0b; --slate: #0f172a; }
-        body { font-family: 'Poppins', sans-serif; background: #f1f5f9; margin: 0; }
+        body { font-family: 'Poppins', sans-serif; background: #f1f5f9; margin: 0; overflow-x: hidden; }
         
-        /* Premium Login */
-        #loginScreen { position: fixed; width:100%; height:100vh; background: linear-gradient(rgba(11,17,32,0.9), rgba(11,17,32,0.8)), url('https://images.unsplash.com/photo-1522202176988-66273c2fd55f?q=80&w=2071&auto=format&fit=crop') center/cover; z-index:9999; display:flex; align-items:center; justify-content:center; }
-        .login-card { background: rgba(255,255,255,0.05); backdrop-filter: blur(20px); border: 1px solid rgba(255,255,255,0.1); padding: 50px; border-radius: 30px; text-align: center; color: white; width: 450px; }
-        .login-card h1 { font-family: 'Outfit', sans-serif; font-size: 3rem; font-weight: 800; letter-spacing: -1px; }
+        #loginScreen { position: fixed; width:100%; height:100vh; background: linear-gradient(rgba(11,17,32,0.95), rgba(11,17,32,0.85)), url('https://images.unsplash.com/photo-1523240795612-9a054b0db644?q=80&w=2070&auto=format&fit=crop') center/cover; z-index:9999; display:flex; align-items:center; justify-content:center; }
+        .login-card { background: rgba(255,255,255,0.05); backdrop-filter: blur(20px); padding: 50px; border-radius: 30px; text-align: center; color: white; width: 450px; border: 1px solid rgba(255,255,255,0.1); }
+        .login-card h1 { font-family: 'Outfit', sans-serif; font-size: 3.2rem; font-weight: 800; }
 
-        /* Sidebar */
-        .sidebar { height: 100vh; background: var(--slate); color: white; width: 280px; position: fixed; box-shadow: 10px 0 30px rgba(0,0,0,0.1); }
+        .sidebar { height: 100vh; background: var(--slate); color: white; width: 280px; position: fixed; box-shadow: 10px 0 30px rgba(0,0,0,0.1); z-index: 100; }
         .sidebar a { padding: 18px 30px; color: #94a3b8; display: block; text-decoration: none; font-weight: 500; border-left: 4px solid transparent; transition: 0.3s; cursor: pointer; }
         .sidebar a:hover, .sidebar a.active { background: rgba(59,130,246,0.1); color: white; border-left-color: var(--blue); }
         
         .main-content { margin-left: 280px; padding: 40px; }
         .glass-card { background: white; border-radius: 20px; padding: 30px; box-shadow: 0 10px 25px rgba(0,0,0,0.05); margin-bottom: 30px; border: 1px solid #e2e8f0; }
 
-        /* Stats */
-        .stat-box { border-radius: 20px; padding: 25px; color: white; position: relative; overflow: hidden; }
+        .stat-box { border-radius: 20px; padding: 25px; color: white; position: relative; overflow: hidden; height: 100%; }
         .bg-sky { background: linear-gradient(135deg, #3b82f6, #1d4ed8); }
         .bg-earn { background: linear-gradient(135deg, #10b981, #047857); }
         .bg-loss { background: linear-gradient(135deg, #ef4444, #b91c1c); }
         .bg-net { background: linear-gradient(135deg, #f59e0b, #b45309); }
 
-        /* Scanner */
-        .scanner-frame { width: 100%; max-width: 400px; aspect-ratio: 3/4; background: #000; border-radius: 30px; overflow: hidden; position: relative; margin: 0 auto; border: 6px solid #fff; box-shadow: 0 20px 40px rgba(0,0,0,0.2); }
-        video, canvas { position: absolute; width: 100%; height: 100%; object-fit: cover; }
+        .scanner-frame { width: 100%; max-width: 400px; aspect-ratio: 3/4; background: #000; border-radius: 30px; overflow: hidden; position: relative; margin: 0 auto; border: 6px solid #fff; }
+        video, canvas { position: absolute; width: 100%; height: 100%; object-fit: cover; top: 0; left: 0; }
         .laser { position: absolute; width: 100%; height: 3px; background: var(--gold); box-shadow: 0 0 15px var(--gold); animation: move 3s infinite linear; z-index: 10; }
         @keyframes move { 0% { top: 0%; } 100% { top: 100%; } }
 
@@ -56,8 +52,8 @@
     <div class="login-card">
         <h1>SKY <span style="color:var(--blue)">CLASSES</span></h1>
         <p class="text-uppercase fw-bold mb-5" style="letter-spacing:2px; color:#94a3b8;">Director Login Portal</p>
-        <input type="password" id="adminPass" class="form-control mb-4 text-center p-3 rounded-pill" style="background:rgba(255,255,255,0.1); color:white; border:1px solid rgba(255,255,255,0.2);" placeholder="Master Password">
-        <button class="btn btn-primary w-100 p-3 rounded-pill fw-bold" onclick="doLogin()">SECURE ACCESS <i class="fa-solid fa-shield-halved ms-2"></i></button>
+        <input type="password" id="adminPass" class="form-control mb-4 text-center p-3 rounded-pill" style="background:rgba(255,255,255,0.1); color:white; border:1px solid rgba(255,255,255,0.2);" placeholder="Enter Master Password">
+        <button class="btn btn-primary w-100 p-3 rounded-pill fw-bold" onclick="doLogin()">SECURE LOGIN <i class="fa-solid fa-shield-halved ms-2"></i></button>
     </div>
 </div>
 
@@ -87,10 +83,12 @@
                     <h4 class="fw-bold">Student Directory</h4>
                     <button class="btn btn-primary rounded-pill px-4" data-bs-toggle="modal" data-bs-target="#admitModal">+ New Admission</button>
                 </div>
-                <table class="table align-middle">
-                    <thead><tr><th>Roll No</th><th>Name</th><th>Class</th><th>Contact</th><th>Status</th><th>Actions</th></tr></thead>
-                    <tbody id="admitBody"></tbody>
-                </table>
+                <div class="table-responsive">
+                    <table class="table align-middle">
+                        <thead><tr><th>Roll No</th><th>Name</th><th>Class</th><th>Contact</th><th>Status</th><th>Actions</th></tr></thead>
+                        <tbody id="admitBody"></tbody>
+                    </table>
+                </div>
             </div>
         </div>
 
@@ -98,9 +96,9 @@
             <div class="glass-card">
                 <h4 class="fw-bold mb-4">Manual Attendance Entry</h4>
                 <div class="row g-3" style="max-width: 600px;">
-                    <div class="col-md-6"><input type="text" id="mRoll" class="form-control p-3" placeholder="SKY-XXXX"></div>
-                    <div class="col-md-3"><button class="btn btn-success w-100 p-3 fw-bold" onclick="manualMark('IN')">IN</button></div>
-                    <div class="col-md-3"><button class="btn btn-danger w-100 p-3 fw-bold" onclick="manualMark('OUT')">OUT</button></div>
+                    <div class="col-md-6"><input type="text" id="mRoll" class="form-control p-3" placeholder="Enter SKY-XXXX"></div>
+                    <div class="col-md-3"><button class="btn btn-success w-100 p-3 fw-bold" onclick="manualMark('IN')">MARK IN</button></div>
+                    <div class="col-md-3"><button class="btn btn-danger w-100 p-3 fw-bold" onclick="manualMark('OUT')">MARK OUT</button></div>
                 </div>
             </div>
         </div>
@@ -143,7 +141,7 @@
         <div id="sec-enroll" class="hidden-section text-center">
             <div class="glass-card mx-auto" style="max-width:500px;">
                 <h4 class="fw-bold mb-4">Register Face ID</h4>
-                <input type="text" id="regRoll" class="form-control mb-3 text-center" placeholder="Enter Roll No (SKY-XXXX)">
+                <input type="text" id="regRoll" class="form-control mb-3 text-center" placeholder="Enter SKY-XXXX">
                 <button class="btn btn-primary w-100 mb-4 rounded-pill" onclick="searchForReg()">Link Student</button>
                 <div class="scanner-frame mx-auto mb-4" style="width:250px; height:250px; border-radius:50%; border:5px solid var(--gold);">
                     <video id="vReg" autoplay muted playsinline></video>
@@ -156,7 +154,21 @@
     </div>
 </div>
 
-<div class="modal fade" id="admitModal" tabindex="-1"><div class="modal-dialog modal-dialog-centered"><div class="modal-content rounded-4 border-0"><div class="modal-header bg-primary text-white"><h5 class="modal-title fw-bold">New Student Enrollment</h5><button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button></div><div class="modal-body p-4"><input type="text" id="nName" class="form-control mb-3" placeholder="Full Name"><input type="text" id="nClass" class="form-control mb-3" placeholder="Class/Course"><input type="text" id="nAddr" class="form-control mb-3" placeholder="Address"><div class="row g-3 mb-3"><div class="col-6"><input type="tel" id="nSPh" class="form-control" placeholder="Student Phone"></div><div class="col-6"><input type="tel" id="nPPh" class="form-control" placeholder="Parent Phone"></div></div><input type="number" id="nFees" class="form-control mb-4" placeholder="Total Fees (₹)"><button class="btn btn-primary w-100 p-3 fw-bold rounded-pill" onclick="submitAdmit()">CONFIRM ADMISSION</button></div></div></div></div>
+<div class="modal fade" id="admitModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content rounded-4 border-0">
+            <div class="modal-header bg-primary text-white"><h5 class="modal-title fw-bold">New Student Enrollment</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
+            <div class="modal-body p-4">
+                <input type="text" id="nName" class="form-control mb-3" placeholder="Full Name">
+                <input type="text" id="nClass" class="form-control mb-3" placeholder="Class/Course">
+                <input type="text" id="nAddr" class="form-control mb-3" placeholder="Address">
+                <div class="row g-3 mb-3"><div class="col-6"><input type="tel" id="nSPh" class="form-control" placeholder="Student Phone"></div><div class="col-6"><input type="tel" id="nPPh" class="form-control" placeholder="Parent Phone"></div></div>
+                <input type="number" id="nFees" class="form-control mb-4" placeholder="Total Fees (₹)">
+                <button class="btn btn-primary w-100 p-3 fw-bold rounded-pill" onclick="submitAdmit()">CONFIRM ADMISSION</button>
+            </div>
+        </div>
+    </div>
+</div>
 
 <script>
 const firebaseConfig = {
@@ -198,17 +210,16 @@ function openSec(id) {
 }
 
 function stopCam() {
-    if(window.rS) window.rS.getTracks().forEach(t => t.stop());
     if(window.gS) window.gS.getTracks().forEach(t => t.stop());
-    clearInterval(window.rI); clearInterval(window.gI);
+    if(window.rS) window.rS.getTracks().forEach(t => t.stop());
+    clearInterval(window.gI); clearInterval(window.rI);
 }
 
-// ADMISSIONS FIX
 function submitAdmit() {
     const n = document.getElementById('nName').value;
     const c = document.getElementById('nClass').value;
     const f = document.getElementById('nFees').value;
-    if(!n || !f) return alert("Details bharo bhai!");
+    if(!n || !f) return alert("Details bharo!");
     const roll = 'SKY-' + Math.floor(1000 + Math.random()*9000);
     db.ref('Student_Admissions/'+roll).set({
         RollNo: roll, Name: n, Class: c, Address: document.getElementById('nAddr').value,
@@ -216,7 +227,7 @@ function submitAdmit() {
         TotalFees: parseFloat(f), PaidFees: 0, Date: new Date().toLocaleDateString('en-IN')
     }).then(() => {
         bootstrap.Modal.getInstance(document.getElementById('admitModal')).hide();
-        alert("Admission Success: "+roll);
+        alert("Success: " + roll);
     });
 }
 
@@ -225,16 +236,16 @@ function renderAll() {
     const fb = document.getElementById('fTableBody'); fb.innerHTML = '';
     Object.values(students).reverse().forEach(s => {
         const due = s.TotalFees - s.PaidFees;
-        b.innerHTML += `<tr><td>${s.RollNo}</td><td class="fw-bold">${s.Name}</td><td>${s.Class || "N/A"}</td><td>${s.ParentPhone || s.Phone}</td><td>${due==0?'<span class="badge bg-success">PAID</span>':'<span class="badge bg-danger">DUE</span>'}</td><td><button class="btn btn-sm btn-outline-primary me-2" onclick="genBill('${s.RollNo}')">PDF</button><button class="btn btn-sm btn-danger" onclick="delSt('${s.RollNo}')"><i class="fa-solid fa-trash"></i></button></td></tr>`;
-        fb.innerHTML += `<tr><td class="fw-bold">${s.Name}</td><td>Fees: ₹${s.TotalFees}</td><td class="text-success">Paid: ₹${s.PaidFees}</td><td class="text-danger">Due: ₹${due}</td><td><button class="btn btn-sm btn-success" onclick="pay('${s.RollNo}')">Collect</button></td></tr>`;
+        b.innerHTML += `<tr><td>${s.RollNo}</td><td class="fw-bold">${s.Name}</td><td>${s.Class}</td><td>${s.ParentPhone || s.Phone}</td><td>${due==0?'<span class="badge bg-success">PAID</span>':'<span class="badge bg-danger">DUE</span>'}</td><td><button class="btn btn-sm btn-outline-primary me-2" onclick="genBill('${s.RollNo}')">PDF</button><button class="btn btn-sm btn-danger" onclick="delSt('${s.RollNo}')">X</button></td></tr>`;
+        fb.innerHTML += `<tr><td class="fw-bold">${s.Name}</td><td>₹${s.TotalFees}</td><td class="text-success">₹${s.PaidFees}</td><td class="text-danger">₹${due}</td><td><button class="btn btn-sm btn-success" onclick="pay('${s.RollNo}')">Pay</button></td></tr>`;
     });
     document.getElementById('sCount').innerText = Object.keys(students).length;
     updateFin();
 }
 
-function delSt(r) { if(confirm("Humesha ke liye delete?")) { db.ref('Student_Admissions/'+r).remove(); db.ref('Face_Data/'+r).remove(); } }
+function delSt(r) { if(confirm("Delete?")) db.ref('Student_Admissions/'+r).remove(); }
 function pay(r) { const a = prompt("Amount:"); if(a && !isNaN(a)) db.ref(`Student_Admissions/${r}/PaidFees`).set(parseFloat(students[r].PaidFees) + parseFloat(a)); }
-function addEx() { const n = document.getElementById('exN').value; const a = document.getElementById('exA').value; if(n && a) { db.ref('Expenses').push({ Name: n, Amount: parseFloat(a), Date: new Date().toLocaleDateString() }); document.getElementById('exN').value=''; document.getElementById('exA').value=''; } }
+function addEx() { const n = document.getElementById('exN').value; const a = document.getElementById('exA').value; if(n && a) db.ref('Expenses').push({ Name: n, Amount: parseFloat(a), Date: new Date().toLocaleDateString() }); }
 
 function updateFin() {
     let col = 0; Object.values(students).forEach(s => col += (s.PaidFees || 0));
@@ -244,7 +255,6 @@ function updateFin() {
     document.getElementById('nProfit').innerText = "₹" + (col - ex);
 }
 
-// LOGS FIX
 function loadLogs() {
     const target = new Date(document.getElementById('logDate').value).toLocaleDateString('en-IN');
     let map = {};
@@ -256,32 +266,25 @@ function loadLogs() {
         }
     });
     const b = document.getElementById('logBody'); b.innerHTML = '';
-    Object.values(map).forEach(s => b.innerHTML += `<tr><td class="fw-bold">${s.roll}</td><td>${s.name}</td><td class="text-success">${s.in}</td><td class="text-danger">${s.out}</td><td><span class="badge ${s.out!=='--'?'bg-success':'bg-warning text-dark'}">${s.out!=='--'?'EXITED':'INSIDE'}</span></td></tr>`);
+    Object.values(map).forEach(s => b.innerHTML += `<tr><td>${s.roll}</td><td>${s.name}</td><td class="text-success">${s.in}</td><td class="text-danger">${s.out}</td><td>${s.out!=='--'?'LEFT':'INSIDE'}</td></tr>`);
 }
 
-// MANUAL ATTENDANCE FIX
 function manualMark(m) {
-    const r = document.getElementById('mRoll').value.toUpperCase().trim();
+    const r = document.getElementById('mRoll').value.toUpperCase();
     if(!students[r]) return alert("Galat Roll No!");
     markDB(students[r].Name, r, students[r].Phone, m);
-    alert(`${students[r].Name} ka ${m} lag gaya!`);
-    document.getElementById('mRoll').value = '';
+    alert("Saved: " + m);
 }
 
 function markDB(n, r, p, m) {
     const now = new Date(); const t = now.toLocaleTimeString('en-IN', { hour:'2-digit', minute:'2-digit' });
     db.ref('Daily_Attendance').push({ RollNo:r, Name:n, Phone:p, Date:now.toLocaleDateString('en-IN'), Time:t, Timestamp:Date.now(), ScanType:m });
     const pPh = students[r]?.ParentPhone || p;
-    sendSMS(pPh, n, t, m);
-}
-
-function sendSMS(ph, n, t, m) {
     const proxy = "https://corsproxy.io/?https://www.fast2sms.com/dev/bulkV2";
-    const msg = m === "IN" ? `Sky Classes: Aapka baccha ${n} coaching par ${t} baje pahunch gaya hai.` : `Sky Classes: Aapka baccha ${n} coaching se ${t} baje nikal gaya hai.`;
-    fetch(proxy, { method:"POST", headers:{"authorization":"5kO3otv1Ra9gTwlQDUze6IWVhBmKNnb80c2AJMP4CLXiFrpYdSrHbiDTSLOZM65YR4QeqBFKd3sN0gpv","Content-Type":"application/json"}, body:JSON.stringify({"route":"q","message":msg,"language":"english","flash":0,"numbers":ph}) });
+    const msg = m === "IN" ? `Sky Classes: ${n} coaching pahunch gaya hai.` : `Sky Classes: ${n} coaching se nikal gaya hai.`;
+    fetch(proxy, { method:"POST", headers:{"authorization":"5kO3otv1Ra9gTwlQDUze6IWVhBmKNnb80c2AJMP4CLXiFrpYdSrHbiDTSLOZM65YR4QeqBFKd3sN0gpv","Content-Type":"application/json"}, body:JSON.stringify({"route":"q","message":msg,"language":"english","flash":0,"numbers":pPh}) });
 }
 
-// AI STUFF
 async function loadAI() {
     const URL = 'https://cdn.jsdelivr.net/npm/@vladmandic/face-api/model/';
     await Promise.all([faceapi.nets.tinyFaceDetector.loadFromUri(URL), faceapi.nets.ssdMobilenetv1.loadFromUri(URL), faceapi.nets.faceLandmark68Net.loadFromUri(URL), faceapi.nets.faceRecognitionNet.loadFromUri(URL)]);
@@ -293,76 +296,49 @@ async function startGate() {
     const descs = [];
     for(const k in data) descs.push(new faceapi.LabeledFaceDescriptors(data[k].Name+"||"+data[k].RollNo+"||"+data[k].Phone, [new Float32Array(Object.values(data[k].Descriptor))]));
     matcher = new faceapi.FaceMatcher(descs, 0.5);
-
-    const v = document.getElementById('vGate'); const c = document.getElementById('cGate'); const s = document.getElementById('gateStatus');
-    navigator.mediaDevices.getUserMedia({ video: true }).then(stream => { window.gS = stream; v.srcObject = stream; });
+    const v = document.getElementById('vGate'); const c = document.getElementById('cGate');
+    navigator.mediaDevices.getUserMedia({ video: true }).then(s => { window.gS = s; v.srcObject = s; });
     v.onplay = () => {
-        faceapi.matchDimensions(c, { width: v.clientWidth, height: v.clientHeight });
+        faceapi.matchDimensions(c, v);
         window.gI = setInterval(async () => {
-            if(!matcher || processing) return;
-            const dets = await faceapi.detectAllFaces(v, new faceapi.SsdMobilenetv1Options()).withFaceLandmarks().withFaceDescriptors();
-            c.getContext('2d').clearRect(0,0,c.width,c.height);
-            if(dets.length === 0) { s.innerText = "Scanning Gate..."; return; }
-            dets.forEach(d => {
-                const res = matcher.findBestMatch(d.descriptor);
+            const dets = await faceapi.detectAllFaces(v, new faceapi.SsdMobilenetv1Options()).withFaceDescriptors();
+            if(dets.length > 0 && matcher && !processing) {
+                const res = matcher.findBestMatch(dets[0].descriptor);
                 if(res.label !== 'unknown') {
                     const [name, roll, phone] = res.label.split("||");
-                    const now = Date.now(); let last = history[roll] || { state:"OUT", Timestamp:0 };
-                    if(now - last.Timestamp < 300000 && last.Timestamp !== 0) return;
-                    
-                    const eye = d.landmarks.getLeftEye(); 
-                    const ear = (Math.sqrt(Math.pow(eye[1].x-eye[5].x,2)+Math.pow(eye[1].y-eye[5].y,2)) + Math.sqrt(Math.pow(eye[2].x-eye[4].x,2)+Math.pow(eye[2].y-eye[4].y,2))) / (2.0 * Math.sqrt(Math.pow(eye[0].x-eye[3].x,2)+Math.pow(eye[0].y-eye[3].y,2)));
-                    
-                    if(ear < 0.28) {
-                        processing = true; let mode = last.state === "IN" ? "OUT" : "IN";
-                        history[roll] = { state:mode, Timestamp:now };
-                        markDB(name, roll, phone, mode);
-                        const ut = new SpeechSynthesisUtterance(mode==="IN"?`Swagat hai ${name}`:`Milte hai kal ${name}`); ut.lang='hi-IN'; window.speechSynthesis.speak(ut);
-                        setTimeout(() => processing = false, 3500);
-                    }
+                    processing = true; 
+                    let last = history[roll] || { state:"OUT", Timestamp:0 };
+                    let mode = last.state === "IN" ? "OUT" : "IN";
+                    history[roll] = { state:mode, Timestamp:Date.now() };
+                    markDB(name, roll, phone, mode);
+                    const ut = new SpeechSynthesisUtterance(mode==="IN"?`Hello ${name}`:`Bye ${name}`); ut.lang='hi-IN'; window.speechSynthesis.speak(ut);
+                    setTimeout(() => processing = false, 5000);
                 }
-            });
-        }, 300);
+            }
+        }, 500);
     };
 }
 
 async function startReg() {
-    await loadAI(); const v = document.getElementById('vReg'); const c = document.getElementById('cReg');
-    navigator.mediaDevices.getUserMedia({ video: true }).then(stream => { window.rS = stream; v.srcObject = stream; });
-    v.onplay = () => {
-        faceapi.matchDimensions(c, { width: v.clientWidth, height: v.clientHeight });
-        window.rI = setInterval(async () => {
-            const det = await faceapi.detectSingleFace(v, new faceapi.TinyFaceDetectorOptions()).withFaceLandmarks();
-            c.getContext('2d').clearRect(0,0,c.width,c.height);
-            if(det) { document.getElementById('regBtn').disabled = false; faceapi.draw.drawDetections(c, faceapi.resizeResults(det, v)); }
-            else document.getElementById('regBtn').disabled = true;
-        }, 300);
-    };
+    await loadAI(); const v = document.getElementById('vReg');
+    navigator.mediaDevices.getUserMedia({ video: true }).then(s => { window.rS = s; v.srcObject = s; });
+    window.rI = setInterval(async () => {
+        const det = await faceapi.detectSingleFace(v, new faceapi.TinyFaceDetectorOptions());
+        document.getElementById('regBtn').disabled = !det;
+    }, 500);
 }
 
-function searchForReg() { const r = document.getElementById('regRoll').value.toUpperCase().trim(); if(students[r]) document.getElementById('regStatus').innerText = "Found: "+students[r].Name; else alert("Nahi mila!"); }
+function searchForReg() { const r = document.getElementById('regRoll').value.toUpperCase(); if(students[r]) document.getElementById('regStatus').innerText = "Found: "+students[r].Name; }
 async function saveFace() {
-    const r = document.getElementById('regRoll').value.toUpperCase().trim();
-    const det = await faceapi.detectSingleFace(document.getElementById('vReg'), new faceapi.TinyFaceDetectorOptions()).withFaceLandmarks().withFaceDescriptor();
-    if(det) db.ref('Face_Data/'+r).set({ RollNo:r, Name:students[r].Name, Descriptor:Array.from(det.descriptor) }).then(() => alert("Face Saved!"));
+    const r = document.getElementById('regRoll').value.toUpperCase();
+    const det = await faceapi.detectSingleFace(document.getElementById('vReg'), new faceapi.TinyFaceDetectorOptions()).withFaceDescriptor();
+    if(det) db.ref('Face_Data/'+r).set({ RollNo:r, Name:students[r].Name, Descriptor:Array.from(det.descriptor) }).then(() => alert("Saved!"));
 }
 
-// PDF EXPORTS
 function genBill(r) {
     const s = students[r]; const { jsPDF } = window.jspdf; const doc = new jsPDF();
-    doc.setFillColor(15,23,42); doc.rect(0,0,210,40,'F');
-    doc.setTextColor(255); doc.setFontSize(22); doc.text("SKY CLASSES", 105, 20, {align:'center'});
-    doc.setFontSize(10); doc.text("Official Fee Receipt", 105, 30, {align:'center'});
-    doc.setTextColor(0); doc.text(`Date: ${new Date().toLocaleDateString()}`, 155, 50);
-    doc.autoTable({ startY:60, head:[['Detail','Value']], body:[['Roll No', s.RollNo],['Name', s.Name],['Course', s.Class],['Paid', 'INR '+s.PaidFees],['Due', 'INR '+(s.TotalFees-s.PaidFees)]], theme:'striped' });
-    doc.text("Director Sig: Sandesh Sir", 15, 140); doc.save(`Bill_${s.Name}.pdf`);
-}
-
-function exportLogs() {
-    const { jsPDF } = window.jspdf; const doc = new jsPDF();
-    doc.text("Sky Attendance Report - " + document.getElementById('logDate').value, 14, 20);
-    doc.autoTable({ html: '#logTable', startY: 30 });
-    doc.save("Attendance_Report.pdf");
+    doc.text(`SKY CLASSES - Receipt\nName: ${s.Name}\nPaid: ${s.PaidFees}\nDue: ${s.TotalFees - s.PaidFees}\nDirector: Sandesh Sir`, 20, 20);
+    doc.save(`Bill_${s.Name}.pdf`);
 }
 </script>
 </body>
