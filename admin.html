@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sky Classes | Premium ERP System</title>
     
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;800&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
@@ -15,119 +15,260 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.25/jspdf.plugin.autotable.min.js"></script>
     
     <style>
-        :root { --primary-dark: #07192F; --primary-blue: #0A2540; --accent-gold: #E6B31E; --accent-red: #D90429; }
-        body { font-family: 'Poppins', sans-serif; background-color: #f4f7f6; margin: 0; overflow-x: hidden; }
+        :root { 
+            --primary-dark: #0F172A; /* Corporate Deep Indigo */
+            --primary-blue: #1E293B; /* Modern Slate */
+            --accent-gold: #E6B31E; 
+            --accent-red: #DC2626; /* Professional Crimson */
+            --bg-light: #F1F5F9;
+            --font-main: 'Montserrat', sans-serif;
+            --font-dash: 'Poppins', sans-serif;
+        }
+
+        body { font-family: var(--font-dash); background-color: #f4f7f6; margin: 0; overflow-x: hidden; }
         
-        /* UPDATED PREMIUM LOGIN SCREEN UI */
+        /* =========================================================================
+           NEW CORPORATE LOGIN SCREEN UI
+           ========================================================================= */
         #loginScreen { 
             position: fixed; top: 0; left: 0; width: 100%; height: 100vh; 
-            /* Added Background Image of students with a dark blue overlay for premium look */
-            background: linear-gradient(rgba(7, 25, 47, 0.8), rgba(10, 37, 64, 0.85)), 
-                        url('https://images.unsplash.com/photo-1523050854058-8df90110c9f1?q=80&w=2070&auto=format&fit=crop') no-repeat center center;
+            display: flex; 
+            z-index: 9999; 
+            background: #fff;
+            font-family: var(--font-main);
+        }
+
+        /* Left Side: Student Gallery with Overlay */
+        .login-gallery {
+            flex: 0 0 60%;
+            position: relative;
+            background: #000; /* Fallback */
+            /* Using a single background image representing the multi-photo grid look */
+            background-image: url('https://images.unsplash.com/photo-1571260899304-425eee4c7efc?q=80&w=2070&auto=format&fit=crop'); 
             background-size: cover;
-            display: flex; justify-content: center; align-items: center; z-index: 9999; 
+            background-position: center;
+        }
+
+        .login-gallery::after {
+            content: '';
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background: linear-gradient(135deg, rgba(15, 23, 42, 0.95), rgba(15, 23, 42, 0.8));
+        }
+
+        .gallery-content {
+            position: relative;
+            z-index: 2;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            padding: 10% 10% 10% 10%;
+            color: white;
+        }
+
+        .gallery-logo {
+            font-size: 4rem;
+            font-weight: 800;
+            letter-spacing: -2px;
+            margin-bottom: 10px;
+        }
+
+        .gallery-tagline {
+            font-size: 1.5rem;
+            font-weight: 400;
+            opacity: 0.8;
+            max-width: 500px;
+            line-height: 1.4;
+        }
+
+        /* Right Side: Login Panel */
+        .login-panel {
+            flex: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: var(--bg-light);
+            padding: 40px;
         }
         
         .login-box { 
-            /* Glassmorphism effect */
-            background: rgba(255, 255, 255, 0.95); 
-            padding: 40px 40px 50px 40px; 
-            border-radius: 20px; 
+            background: #fff; 
+            padding: 60px 50px; 
+            border-radius: 16px; 
             text-align: center; 
             width: 100%; 
-            max-width: 420px; 
-            box-shadow: 0 25px 50px rgba(0,0,0,0.5); 
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            animation: fadeIn 0.8s ease-out;
+            max-width: 480px; 
+            box-shadow: 0 10px 25px rgba(0,0,0,0.05); 
+            border: 1px solid rgba(0,0,0,0.05);
+            animation: fadeIn Corporate 0.6s ease-out;
         }
 
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(30px); }
-            to { opacity: 1; transform: translateY(0); }
+        @keyframes fadeInCorporate {
+            from { opacity: 0; transform: translateX(20px); }
+            to { opacity: 1; transform: translateX(0); }
         }
 
-        /* New Floating Icon for Login Box */
+        .authorized-access {
+            font-size: 14px;
+            text-transform: uppercase;
+            color: #94A3B8;
+            letter-spacing: 2px;
+            margin-bottom: 30px;
+            font-weight: 600;
+        }
+
+        /* Corporate Shield Icon */
         .login-icon-wrapper {
-            width: 90px;
-            height: 90px;
-            background: linear-gradient(135deg, var(--primary-blue), var(--primary-dark));
+            width: 80px;
+            height: 80px;
+            background: var(--primary-dark);
             border-radius: 50%;
             display: flex;
             justify-content: center;
             align-items: center;
-            margin: -85px auto 20px auto;
-            border: 5px solid white;
-            box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+            margin: 0 auto 30px auto;
+            box-shadow: 0 5px 15px rgba(15, 23, 42, 0.2);
         }
 
+        .login-icon-wrapper i {
+            font-size: 2.5rem;
+            color: #fff;
+        }
+
+        .login-box h3 {
+            font-weight: 800;
+            color: var(--primary-dark);
+            margin-bottom: 5px;
+            font-size: 2.2rem;
+            letter-spacing: -1px;
+        }
+
+        .login-box .secure-title {
+            color: #64748B;
+            font-size: 16px;
+            margin-bottom: 40px;
+        }
+
+        /* Modern Floating Label Input */
+        .form-floating {
+            text-align: left;
+            margin-bottom: 25px;
+        }
+
+        .form-floating > .form-control {
+            border: 1px solid #E2E8F0;
+            border-radius: 8px;
+            padding: 1.5rem 1rem 0.5rem 1rem;
+            height: 60px;
+            font-size: 16px;
+            color: var(--primary-dark);
+            box-shadow: none;
+            background-color: #fff;
+        }
+
+        .form-floating > .form-control:focus {
+            border-color: var(--primary-dark);
+            box-shadow: 0 0 0 3px rgba(15, 23, 42, 0.1);
+        }
+
+        .form-floating > label {
+            color: #94A3B8;
+            padding: 1rem;
+            font-size: 14px;
+        }
+
+        .form-floating > .form-control:focus ~ label,
+        .form-floating > .form-control:not(:placeholder-shown) ~ label {
+            color: var(--primary-dark);
+            opacity: 0.8;
+            transform: scale(0.85) translateY(-0.75rem) translateX(0.15rem);
+        }
+
+        .input-icon-lock {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #94A3B8;
+            z-index: 10;
+            font-size: 1.2rem;
+        }
+
+        /* Professional Login Button */
         .btn-login { 
-            background: linear-gradient(135deg, var(--accent-red), #ff4d4d); 
-            color: white; width: 100%; padding: 14px; border: none; 
-            border-radius: 10px; font-weight: bold; margin-top: 15px;
+            background: linear-gradient(135deg, var(--accent-red), #e53e3e); 
+            color: white; width: 100%; padding: 18px; border: none; 
+            border-radius: 8px; font-weight: 700; margin-top: 10px;
             font-size: 16px; letter-spacing: 1px;
             transition: all 0.3s ease;
+            text-transform: uppercase;
         }
         .btn-login:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 10px 20px rgba(217, 4, 41, 0.4);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(220, 38, 38, 0.3);
+            background: linear-gradient(135deg, #e53e3e, var(--accent-red));
         }
-        .login-input-group {
-            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
-            border-radius: 10px;
-            overflow: hidden;
+
+        .powered-by {
+            font-size: 12px;
+            color: #CBD5E1;
+            margin-top: 50px;
         }
-        .login-input-group .input-group-text {
-            background: white; border: none; padding-left: 20px;
-            color: var(--primary-blue);
-        }
-        .login-input-group .form-control {
-            border: none; padding: 15px; font-size: 15px;
-        }
-        .login-input-group .form-control:focus {
-            box-shadow: none;
-        }
-        /* END UPDATED LOGIN SCREEN UI */
+
+        /* END NEW CORPORATE LOGIN SCREEN UI */
 
         #dashboardScreen { display: none; }
         .sidebar { height: 100vh; background-color: var(--primary-dark); color: white; padding-top: 20px; position: fixed; width: 260px; z-index: 100; overflow-y: auto;}
-        .sidebar h4 { text-align: center; font-weight: 800; color: var(--accent-gold); margin-bottom: 25px; }
+        .sidebar h4 { text-align: center; font-weight: 800; color: var(--accent-gold); margin-bottom: 25px; font-family: var(--font-main); }
         .sidebar a { padding: 12px 25px; text-decoration: none; color: #a0aec0; display: block; border-left: 4px solid transparent; cursor: pointer; transition: 0.3s; font-size: 15px;}
         .sidebar a:hover, .sidebar a.active { background: rgba(255,255,255,0.05); color: white; border-left-color: var(--accent-gold); }
         
         .main-content { margin-left: 260px; padding: 30px; }
-        .stat-card { background: white; padding: 20px; border-radius: 15px; text-align: center; border-bottom: 5px solid var(--primary-blue); box-shadow: 0 4px 15px rgba(0,0,0,0.04); }
+        .stat-card { background: white; padding: 20px; border-radius: 15px; text-align: center; border-bottom: 5px solid #E2E8F0; box-shadow: 0 4px 15px rgba(0,0,0,0.04); transition: 0.3s;}
+        .stat-card:hover { border-color: var(--primary-dark); transform: translateY(-3px);}
+        
         .table-container { background: white; padding: 25px; border-radius: 15px; margin-top: 20px; display: none; box-shadow: 0 4px 15px rgba(0,0,0,0.04); }
         .active-section { display: block; }
         
         .tool-card { max-width: 800px; margin: auto; border: 1px solid #eee; padding: 30px; border-radius: 15px; background: #fff;}
-        .tool-header { text-align: center; border-bottom: 2px solid #eee; padding-bottom: 15px; margin-bottom: 25px; }
-        .btn-print { background: #0A2540; color: white; padding: 12px; border-radius: 8px; width: 100%; font-weight: 700; border: none; transition: 0.3s; margin-top: 15px;}
-        .btn-print:hover { background: #D90429; color: white; }
+        .tool-header { text-align: center; border-bottom: 2px solid #eee; padding-bottom: 15px; margin-bottom: 25px; font-family: var(--font-main);}
+        .btn-print { background: var(--primary-dark); color: white; padding: 12px; border-radius: 8px; width: 100%; font-weight: 700; border: none; transition: 0.3s; margin-top: 15px;}
+        .btn-print:hover { background: var(--accent-red); color: white; }
     </style>
 </head>
 <body>
 
     <div id="loginScreen">
-        <div class="login-box">
-            <!-- New Floating Icon -->
-            <div class="login-icon-wrapper">
-                <i class="fa-solid fa-user-shield fa-2x text-white"></i>
+        <div class="login-gallery">
+            <div class="gallery-content">
+                <div class="gallery-logo">SKY ERP</div>
+                <div class="gallery-tagline">A Premium ERP System for the Future of Education.</div>
             </div>
-            
-            <h3 class="fw-bold"><span style="color: var(--accent-red);">SKY</span> ERP</h3>
-            <p class="text-muted small mb-4">Secure Admin Login</p>
-            
-            <!-- Upgraded Input Field with Icon -->
-            <div class="input-group login-input-group mb-4">
-                <span class="input-group-text"><i class="fa-solid fa-lock"></i></span>
-                <input type="password" id="adminPassword" class="form-control" placeholder="Enter Master Password">
+        </div>
+
+        <div class="login-panel">
+            <div class="login-box">
+                <div class="authorized-access">Authorized Access</div>
+                
+                <div class="login-icon-wrapper">
+                    <i class="fa-solid fa-user-shield"></i>
+                </div>
+                
+                <h3>SKY ERP</h3>
+                <p class="secure-title">Secure Admin Login</p>
+                
+                <div class="form-floating position-relative">
+                    <i class="fa-solid fa-lock input-icon-lock"></i>
+                    <input type="password" id="adminPassword" class="form-control" placeholder="Master Password" style="padding-left: 45px;">
+                    <label for="adminPassword" style="padding-left: 45px;">Master Password</label>
+                </div>
+                
+                <button class="btn-login" onclick="checkPassword()">
+                    LOGIN <i class="fa-solid fa-arrow-right ms-2"></i>
+                </button>
+
+                <div class="powered-by">powered by SkyClasses</div>
             </div>
-            
-            <!-- Upgraded Button with Icon -->
-            <button class="btn-login" onclick="checkPassword()">
-                LOGIN <i class="fa-solid fa-arrow-right-to-bracket ms-2"></i>
-            </button>
         </div>
     </div>
 
@@ -137,7 +278,7 @@
             <a onclick="showSection('crm')" id="link-crm" class="active"><i class="fa-solid fa-users me-2"></i> Students Directory</a>
             <a onclick="showSection('attendance')" id="link-attendance"><i class="fa-solid fa-calendar-check me-2"></i> Attendance Log</a>
             <a onclick="showSection('finance')" id="link-finance"><i class="fa-solid fa-wallet me-2"></i> Daily Finance</a>
-            <hr style="border-color: #334155;">
+            <hr style="border-color: rgba(255,255,255,0.1);">
             <a onclick="showSection('fee')" id="link-fee"><i class="fa-solid fa-file-invoice-dollar me-2"></i> Fee Receipt</a>
             <a onclick="showSection('idcard')" id="link-idcard"><i class="fa-solid fa-id-card me-2"></i> Premium ID Card</a>
             <a onclick="showSection('result')" id="link-result"><i class="fa-solid fa-graduation-cap me-2"></i> Premium Marksheet</a>
@@ -147,9 +288,9 @@
 
         <div class="main-content">
             <div class="row g-4 mb-4">
-                <div class="col-md-4"><div class="stat-card" style="border-color: #0d6efd;"><h2 id="countTotalStudents">0</h2><p class="text-muted fw-bold mb-0">Total Students</p></div></div>
-                <div class="col-md-4"><div class="stat-card" style="border-color: #28a745;"><h2 id="countAttendance">0</h2><p class="text-muted fw-bold mb-0">Present Today</p></div></div>
-                <div class="col-md-4"><div class="stat-card" style="border-color: #E6B31E;"><h2 id="countRevenue">₹0</h2><p class="text-muted fw-bold mb-0">Total Fee Revenue</p></div></div>
+                <div class="col-md-4"><div class="stat-card" style="border-color: #0d6efd;"><h2 id="countTotalStudents" class="fw-bold">0</h2><p class="text-muted fw-bold mb-0">Total Students</p></div></div>
+                <div class="col-md-4"><div class="stat-card" style="border-color: #28a745;"><h2 id="countAttendance" class="fw-bold">0</h2><p class="text-muted fw-bold mb-0">Present Today</p></div></div>
+                <div class="col-md-4"><div class="stat-card" style="border-color: #E6B31E;"><h2 id="countRevenue" class="fw-bold">₹0</h2><p class="text-muted fw-bold mb-0">Total Fee Revenue</p></div></div>
             </div>
 
             <div id="section-crm" class="table-container active-section">
@@ -191,7 +332,7 @@
 
             <div id="section-fee" class="table-container">
                 <div class="tool-card">
-                    <div class="tool-header"><h4 class="fw-bold" style="color: var(--primary-blue);">Generate Fee Receipt</h4></div>
+                    <div class="tool-header"><h4 class="fw-bold" style="color: var(--primary-dark);">Generate Fee Receipt</h4></div>
                     <div class="mb-3"><label class="fw-bold small">Student Name / Roll No</label><input type="text" id="feeSearch" class="form-control" list="studentDatalist" placeholder="Search student..."></div>
                     <div class="row mb-3">
                         <div class="col-md-6"><label class="fw-bold small">Course</label><input type="text" id="feeCourse" class="form-control" placeholder="Course Name"></div>
@@ -204,7 +345,7 @@
 
             <div id="section-idcard" class="table-container">
                 <div class="tool-card">
-                    <div class="tool-header"><h4 class="fw-bold" style="color: var(--primary-blue);">Premium ID Card Maker</h4></div>
+                    <div class="tool-header"><h4 class="fw-bold" style="color: var(--primary-dark);">Premium ID Card Maker</h4></div>
                     <div class="mb-3"><label class="fw-bold small">Select Student</label><input type="text" id="idSearch" class="form-control" list="studentDatalist"></div>
                     <div class="row mb-3">
                         <div class="col-md-6"><label class="fw-bold small">Course/Class</label><input type="text" id="idCourse" class="form-control"></div>
@@ -220,7 +361,7 @@
 
             <div id="section-result" class="table-container">
                 <div class="tool-card" style="max-width: 900px;">
-                    <div class="tool-header"><h4 class="fw-bold" style="color: var(--primary-blue);">Premium Marksheet Generator</h4></div>
+                    <div class="tool-header"><h4 class="fw-bold" style="color: var(--primary-dark);">Premium Marksheet Generator</h4></div>
                     <div class="row mb-3">
                         <div class="col-md-6"><label class="fw-bold small">Student</label><input type="text" id="resSearch" class="form-control" list="studentDatalist"></div>
                         <div class="col-md-6"><label class="fw-bold small">Exam Name</label><input type="text" id="resExam" class="form-control" placeholder="e.g. Annual Exam"></div>
@@ -239,7 +380,7 @@
 
             <div id="section-paper" class="table-container">
                 <div class="tool-card">
-                    <div class="tool-header"><h4 class="fw-bold" style="color: var(--primary-blue);">Question Paper Maker</h4></div>
+                    <div class="tool-header"><h4 class="fw-bold" style="color: var(--primary-dark);">Question Paper Maker</h4></div>
                     <div class="row mb-3">
                         <div class="col-md-6"><label class="fw-bold small">Exam Name</label><input type="text" id="pExam" class="form-control mb-2" placeholder="e.g. Half Yearly"></div>
                         <div class="col-md-6"><label class="fw-bold small">Subject</label><input type="text" id="pSub" class="form-control mb-2" placeholder="e.g. Physics"></div>
@@ -378,7 +519,7 @@
             const { jsPDF } = window.jspdf; const doc = new jsPDF();
             doc.setFontSize(18); doc.text("SKY CLASSES - Daily Attendance", 14, 15);
             doc.setFontSize(11); doc.text(`Date: ${document.getElementById('dateFilter').value}`, 14, 22);
-            doc.autoTable({ html: '#attendanceTable', startY: 25, theme: 'grid', headStyles: { fillColor: [10, 37, 64] }});
+            doc.autoTable({ html: '#attendanceTable', startY: 25, theme: 'grid', headStyles: { fillColor: [15, 23, 42] }});
             doc.save(`Attendance_${document.getElementById('dateFilter').value}.pdf`);
         }
 
@@ -410,12 +551,12 @@
             
             if(stData.name === "Student" || !amt) return alert("Select student and enter Fee Amount!");
 
-            doc.setFillColor(10, 37, 64); doc.rect(0, 0, 210, 40, 'F');
+            doc.setFillColor(15, 23, 42); doc.rect(0, 0, 210, 40, 'F');
             doc.setTextColor(255); doc.setFontSize(26); doc.setFont("helvetica", "bold"); 
             doc.text("SKY CLASSES", 105, 20, null, null, "center");
             doc.setFontSize(12); doc.setFont("helvetica", "normal"); doc.text("Gorakhpur's Premium Educational Institute", 105, 30, null, null, "center");
             
-            doc.setTextColor(217, 4, 41); doc.setFontSize(18); doc.setFont("helvetica", "bold");
+            doc.setTextColor(220, 38, 38); doc.setFontSize(18); doc.setFont("helvetica", "bold");
             doc.text("FEE RECEIPT", 105, 60, null, null, "center");
             
             doc.setDrawColor(200, 200, 200); doc.setLineWidth(0.5); doc.rect(20, 70, 170, 75);
@@ -427,7 +568,7 @@
             doc.text(`Course Name   :  ${crs}`, 30, 115);
             
             doc.setFillColor(245, 245, 245); doc.rect(120, 110, 60, 15, 'F');
-            doc.setTextColor(10, 37, 64); doc.setFont("helvetica", "bold");
+            doc.setTextColor(15, 23, 42); doc.setFont("helvetica", "bold");
             doc.text(`Amount Paid: Rs. ${amt} /-`, 125, 120);
             
             doc.setTextColor(0); doc.setFontSize(10); doc.setFont("helvetica", "normal");
@@ -464,13 +605,13 @@
             
             if(stData.name === "Student") return alert("Please select a student!");
 
-            doc.setFillColor(10, 37, 64); doc.rect(0, 0, 54, 16, 'F');
+            doc.setFillColor(15, 23, 42); doc.rect(0, 0, 54, 16, 'F');
             doc.setTextColor(255); doc.setFontSize(13); doc.setFont("helvetica", "bold"); doc.text("SKY CLASSES", 27, 10, null, null, "center");
             doc.setDrawColor(230, 179, 30); doc.setLineWidth(1); doc.rect(2, 2, 50, 82); 
             
             if(uploadedPhotoBase64) {
                 doc.addImage(uploadedPhotoBase64, 'JPEG', 14, 20, 26, 32);
-                doc.setDrawColor(10,37,64); doc.rect(14,20,26,32); 
+                doc.setDrawColor(15, 23, 42); doc.rect(14,20,26,32); 
             } else {
                 doc.setFillColor(230); doc.rect(14, 20, 26, 32, 'F'); 
                 doc.setTextColor(150); doc.setFontSize(8); doc.text("NO PHOTO", 27, 36, null, null, "center");
@@ -478,9 +619,9 @@
             
             doc.setTextColor(0); doc.setFontSize(12); doc.setFont("helvetica", "bold"); doc.text(stData.name.toUpperCase(), 27, 58, null, null, "center");
             doc.setFontSize(9); doc.setFont("helvetica", "normal"); doc.text(`Roll: ${stData.roll}`, 27, 63, null, null, "center");
-            doc.setTextColor(217, 4, 41); doc.setFont("helvetica", "bold"); doc.text(course, 27, 68, null, null, "center");
+            doc.setTextColor(220, 38, 38); doc.setFont("helvetica", "bold"); doc.text(course, 27, 68, null, null, "center");
             
-            doc.setFillColor(10, 37, 64); doc.rect(0, 75, 54, 11, 'F');
+            doc.setFillColor(15, 23, 42); doc.rect(0, 75, 54, 11, 'F');
             doc.setTextColor(255); doc.setFontSize(7); doc.setFont("helvetica", "normal"); doc.text(`Valid Till: ${valid}`, 27, 82, null, null, "center");
             
             doc.save(`Premium_ID_${stData.name}.pdf`);
@@ -534,11 +675,11 @@
 
             let perc = totMax > 0 ? ((totObt/totMax)*100).toFixed(2) : 0;
 
-            doc.setFillColor(10, 37, 64); doc.rect(0, 0, 210, 35, 'F');
+            doc.setFillColor(15, 23, 42); doc.rect(0, 0, 210, 35, 'F');
             doc.setTextColor(255); doc.setFontSize(28); doc.setFont("helvetica", "bold"); doc.text("SKY CLASSES", 105, 18, null, null, "center");
             doc.setFontSize(12); doc.setFont("helvetica", "normal"); doc.text("Gorakhpur's Premium Educational Institute", 105, 26, null, null, "center");
             
-            doc.setTextColor(217, 4, 41); doc.setFontSize(20); doc.setFont("helvetica", "bold"); doc.text("STATEMENT OF MARKS", 105, 48, null, null, "center");
+            doc.setTextColor(220, 38, 38); doc.setFontSize(20); doc.setFont("helvetica", "bold"); doc.text("STATEMENT OF MARKS", 105, 48, null, null, "center");
             
             doc.setDrawColor(200); doc.rect(14, 55, 182, 25);
             doc.setTextColor(0); doc.setFontSize(11);
@@ -548,13 +689,13 @@
             
             doc.autoTable({
                 startY: 85, head: [['Subject Name', 'Marks Obtained', 'Maximum Marks']], body: tableData,
-                theme: 'grid', styles: { fontSize: 11, halign: 'center' }, headStyles: { fillColor: [10, 37, 64] }
+                theme: 'grid', styles: { fontSize: 11, halign: 'center' }, headStyles: { fillColor: [15, 23, 42] }
             });
 
             let finalY = doc.lastAutoTable.finalY;
             doc.setFillColor(240); doc.rect(14, finalY + 10, 182, 20, 'F');
             doc.setFontSize(13); doc.setFont("helvetica", "bold"); doc.text(`Total Marks: ${totObt} / ${totMax}`, 20, finalY + 22);
-            doc.setTextColor(217, 4, 41); doc.text(`Percentage: ${perc} %`, 140, finalY + 22);
+            doc.setTextColor(220, 38, 38); doc.text(`Percentage: ${perc} %`, 140, finalY + 22);
 
             doc.setTextColor(0); doc.setFont("helvetica", "italic"); doc.setFontSize(14); doc.text("SkyClassesAuth", 150, finalY + 55, null, null, "center"); 
             doc.setFont("helvetica", "normal"); doc.setFontSize(10); doc.text("-----------------------------------", 150, finalY + 58, null, null, "center"); doc.text("Director / Authorized Signatory", 150, finalY + 63, null, null, "center");
