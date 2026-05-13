@@ -265,7 +265,13 @@
                 
                 <button class="btn-login" onclick="checkPassword()">
                     LOGIN <i class="fa-solid fa-arrow-right ms-2"></i>
-                </button>
+                </button><div style="text-align: center; margin-top: 15px;">
+    <button type="button" onclick="captureFingerprint()" style="background-color: #f3f4f6; color: #333; border: 1px solid #ccc; padding: 10px 20px; border-radius: 5px; cursor: pointer; width: 100%; font-weight: bold;">
+        <span style="margin-right: 8px;">👆</span> Login with Fingerprint
+    </button>
+    <p id="biometricStatus" style="font-size: 13px; margin-top: 10px; font-weight: 500;"></p>
+</div>
+
 
                 <div class="powered-by">powered by SkyClasses</div>
             </div>
