@@ -739,5 +739,56 @@
             doc.save(`Paper_${subject}.pdf`);
         }
     </script>
+    <script>
+async function captureFingerprint() {
+    const statusText = document.getElementById('biometricStatus');
+    statusText.innerText = "Scanner start ho raha hai... Kripya apna finger rakhein.";
+    statusText.style.color = "blue";
+
+    const captureXml = `<?xml version="1.0"?>
+    <PidOptions ver="1.0">
+       <Opts fCount="1" fType="0" iCount="0" pCount="0" format="0" pidVer="2.0" timeout="10000" env="P" />
+    </PidOptions>`;
+
+    const rdServiceUrl = "http://127.0.0.1:11100/rd/capture"; 
+
+    try {
+        const response = await fetch(rdServiceUrl, {
+            method: 'CAPTURE', 
+            headers: { 'Content-Type': 'text/xml', 'Accept': 'text/xml' },
+            body: captureXml
+        });
+
+        if (response.ok) {
+            const xmlResponse = await response.text();
+            const parser = new DOMParser();
+            const xmlDoc = parser.parseFromString(xmlResponse, "text/xml");
+            const respNode = xmlDoc.getElementsByTagName("Resp")[0];
+            const errCode = respNode ? respNode.getAttribute("errCode") : "-1";
+
+            if (errCode === "0") {
+                statusText.innerText = "✅ Fingerprint capture ho gaya!";
+                statusText.style.color = "green";
+                
+                // Fingerprint data yahan aayega
+                const pidDataNode = xmlDoc.getElementsByTagName("Data")[0];
+                const fingerprintData = pidDataNode ? pidDataNode.textContent : "";
+                console.log("Fingerprint Data:", fingerprintData);
+
+            } else {
+                statusText.innerText = `❌ Capture Fail. Kripya dobara try karein.`;
+                statusText.style.color = "red";
+            }
+        } else {
+            statusText.innerText = "❌ Scanner se connect nahi hua.";
+            statusText.style.color = "red";
+        }
+    } catch (error) {
+        statusText.innerText = "❌ Mantra RD Service chalu nahi hai. Phele Mantra app start karein.";
+        statusText.style.color = "red";
+    }
+}
+</script>
+
 </body>
 </html>
